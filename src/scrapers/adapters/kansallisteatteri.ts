@@ -1,7 +1,7 @@
 import * as cheerio from "cheerio";
 import { politeFetch } from "../http";
 import { mapRoleText } from "../roles";
-import { cleanText, helsinkiToUtc } from "../text";
+import { cleanText, helsinkiToUtc, languageCodes } from "../text";
 import {
   rawProductionDetailSchema,
   rawProductionSchema,
@@ -62,7 +62,18 @@ function stageFromLocation(location: string): string | undefined {
   return parts.length > 1 ? parts.slice(1).join(", ") : parts[0];
 }
 
-function parsePerformances($: cheerio.CheerioAPI): RawPerformance[] {
+/**
+ * Subtitle languages from the production's info text: "Tekstitys saatavilla englanniksi
+ * ja suomeksi … valituissa näytännöissä" or "suomen- ja englanninkielinen tekstitys".
+ * Only the sentence about subtitles counts; empty when the text names no language.
+ */
+export function subtitleLanguages(info: string): string[] {
+  const sentence = info.split(/(?<=[.!?])\s+|\n/).find((part) => /tekstity/i.test(part)) ?? "";
+  return languageCodes(sentence.replace(/tekstity\w*/gi, ""));
+}
+
+/** Which performances have subtitles: each row carries its own indicator (often not all of them). */
+function parsePerformances($: cheerio.CheerioAPI, subtitleLangs: string[]): RawPerformance[] {
   const performances = new Map<number, RawPerformance>();
   $(".paragraph--type--performance").each((_, element) => {
     const row = $(element);
@@ -79,6 +90,7 @@ function parsePerformances($: cheerio.CheerioAPI): RawPerformance[] {
       startsAt,
       stage: location ? stageFromLocation(location) : undefined,
       ticketUrl: ticketHref && /^https?:\/\//.test(ticketHref) ? ticketHref : undefined,
+      subtitleLangs: row.find(".subtitle-indicator").length > 0 ? subtitleLangs : [],
     });
   });
   return [...performances.values()].sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime());
@@ -121,7 +133,10 @@ function parseReviews($: cheerio.CheerioAPI): RawCriticReview[] {
 export function parseDetail(html: string, ref: Pick<RawProduction, "externalId" | "url" | "isVisiting">): RawProductionDetail {
   const $ = cheerio.load(html);
   const title = cleanText($("h1 .field--name-title").first().text()) || cleanText($("h1").first().text());
-  const performances = parsePerformances($);
+  const info = $(".field--name-field-info").first().text();
+  const performances = parsePerformances($, subtitleLanguages(info));
+  // Production-wide only when every performance has them; otherwise per performance.
+  const everyPerformance = performances.length > 0 && performances.every((performance) => performance.subtitleLangs?.length);
   const durationText = cleanText($(".field--name-field-duration-info").first().text()) || undefined;
   const stageFromPerformances = performances.find((performance) => performance.stage)?.stage;
 
@@ -135,7 +150,7 @@ export function parseDetail(html: string, ref: Pick<RawProduction, "externalId" 
     runStart: performances[0]?.startsAt,
     runEnd: performances.at(-1)?.startsAt,
     languages: ["fi"],
-    subtitleLangs: [],
+    subtitleLangs: everyPerformance ? (performances[0].subtitleLangs ?? []) : [],
     credits: parseCredits($),
     performances,
     criticReviews: parseReviews($),

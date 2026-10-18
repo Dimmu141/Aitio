@@ -1,4 +1,13 @@
-/** Inline message for empty or unavailable data. */
-export function Notice({ children }: { children: React.ReactNode }) {
-  return <p className="rounded-md border border-rule bg-paper-raised p-4 text-ink-muted">{children}</p>;
+import type { ReactNode } from "react";
+
+/** A status line after an action ("Tallennettu"), or an error. Announced by screen readers. */
+export function Notice({ tone = "info", children }: { tone?: "info" | "error"; children: ReactNode }) {
+  return (
+    <p
+      role={tone === "error" ? "alert" : "status"}
+      className={`rounded-md border-l-4 px-4 py-3 ${tone === "error" ? "border-accent bg-paper-raised font-semibold" : "border-success bg-paper-raised"}`}
+    >
+      {children}
+    </p>
+  );
 }

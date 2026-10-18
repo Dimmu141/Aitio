@@ -1,6 +1,6 @@
-/** Absolute base URL for canonical links, the sitemap and JSON-LD. */
-export function siteUrl(): string {
-  const configured = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.VERCEL_PROJECT_PRODUCTION_URL;
-  if (!configured) return "http://localhost:3000";
-  return configured.startsWith("http") ? configured.replace(/\/$/, "") : `https://${configured}`;
+/** Public origin for canonical URLs, sitemap and OpenGraph. Set SITE_URL in production. */
+export const SITE_URL = new URL(process.env.SITE_URL ?? "http://localhost:3000");
+
+export function absoluteUrl(pathname: string): string {
+  return new URL(pathname, SITE_URL).toString();
 }

@@ -1,30 +1,27 @@
 import Link from "next/link";
-import { t } from "@/i18n/fi";
+import { Suspense } from "react";
+import type { Locale } from "@/i18n/config";
+import type { Dictionary } from "@/i18n/dictionaries/fi";
+import { alternates, href } from "@/i18n/paths";
+import { LocaleLinks } from "./LocaleLinks";
+import { LocaleSwitcher } from "./LocaleSwitcher";
+import { TabBar } from "./TabBar";
 
-export function SiteHeader() {
+/** Top bar: wordmark, the main navigation on wide screens (the tab bar on phones), languages. */
+export function SiteHeader({ locale, t }: { locale: Locale; t: Dictionary }) {
   return (
-    <header className="border-b border-rule">
-      <div className="mx-auto flex min-h-14 w-full max-w-measure items-center justify-between gap-4 px-4">
-        <Link href="/" className="font-serif text-[26px] leading-none font-semibold tracking-[-0.01em] text-ink no-underline">
+    <header className="ai-topbar">
+      <div className="mx-auto flex min-h-tap-primary max-w-measure items-center justify-between gap-x-4 px-4 md:max-w-wide md:gap-x-8">
+        <Link href={href(locale)} className="ai-wordmark">
           {t.site.name}
         </Link>
-        <nav aria-label="Päävalikko" className="flex gap-1">
-          <Link href="/" className="flex min-h-tap items-center px-2 font-bold text-ink no-underline hover:text-accent">
-            {t.site.nav.programme}
-          </Link>
-          <Link href="/teatterit" className="flex min-h-tap items-center px-2 font-bold text-ink no-underline hover:text-accent">
-            {t.site.nav.theatres}
-          </Link>
-        </nav>
+        <TabBar locale={locale} t={t} variant="top" />
+        {/* On prerendered pages the pathname only arrives with JavaScript; until then, and
+            without it, the links point to each language's front page. */}
+        <Suspense fallback={<LocaleLinks current={locale} label={t.site.language} hrefs={alternates()} />}>
+          <LocaleSwitcher current={locale} label={t.site.language} />
+        </Suspense>
       </div>
     </header>
-  );
-}
-
-export function SiteFooter() {
-  return (
-    <footer className="mt-12 border-t border-rule">
-      <p className="mx-auto w-full max-w-measure px-4 py-6 text-meta text-ink-muted">{t.site.footer}</p>
-    </footer>
   );
 }

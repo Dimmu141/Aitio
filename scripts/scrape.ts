@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { ADAPTERS, runSource } from "../src/scrapers/run";
+import { ADAPTERS, describeError, runSource } from "../src/scrapers/run";
 
 /**
  * Usage:
@@ -29,7 +29,7 @@ async function main(): Promise<void> {
       console.log(`${id}: ${result.saved}/${result.found} processed, ${result.failed.length} failed${dryRun ? " (dry run, nothing saved)" : ""}`);
     } catch (error) {
       exitCode = 1;
-      console.error(`${id}: run failed: ${error instanceof Error ? error.message : String(error)}`);
+      console.error(`${id}: run failed: ${describeError(error)}`);
     }
   }
   await db?.$disconnect();

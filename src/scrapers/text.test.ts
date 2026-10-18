@@ -1,5 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { cleanText, helsinkiToUtc, languageCodes, parseFinnishDate, slugify } from "./text";
+import {
+  cleanText,
+  helsinkiToUtc,
+  helsinkiWeekday,
+  languageCodes,
+  parseFinnishDate,
+  personName,
+  slugify,
+  stripGuestMarker,
+  weekdaysIn,
+  yearFromWeekday,
+} from "./text";
 
 describe("helsinkiToUtc", () => {
   it("uses UTC+3 in summer time", () => {
@@ -43,5 +54,63 @@ describe("languageCodes", () => {
   it("maps Swedish and Finnish language names", () => {
     expect(languageCodes("Finska, engelska, svenska. Textningskod NATT").sort()).toEqual(["en", "fi", "sv"]);
     expect(languageCodes("suomeksi ja ruotsiksi").sort()).toEqual(["fi", "sv"]);
+  });
+});
+
+describe("stripGuestMarker", () => {
+  it("removes guest markers", () => {
+    expect(stripGuestMarker("Mawlawi Rahem (vier.)")).toBe("Mawlawi Rahem");
+    expect(stripGuestMarker("Anna Gäst (gäst)")).toBe("Anna Gäst");
+    expect(stripGuestMarker("Pia Runnakko")).toBe("Pia Runnakko");
+  });
+});
+
+describe("weekdays", () => {
+  it("reads Finnish and Swedish weekday adverbs", () => {
+    expect(weekdaysIn("Tekstitys keskiviikkoisin ja perjantaisin.")).toEqual([3, 5]);
+    expect(weekdaysIn("textning på lördagar")).toEqual([6]);
+    expect(weekdaysIn("joka ilta")).toEqual([]);
+  });
+
+  it("uses the Helsinki weekday, not the UTC one", () => {
+    // 23:30 UTC on Tuesday is already Wednesday in Helsinki.
+    expect(helsinkiWeekday(new Date("2026-10-20T23:30:00Z"))).toBe(3);
+  });
+});
+
+describe("languageCodes, more languages", () => {
+  it("reads Espoo's language labels", () => {
+    expect(languageCodes("suomi, englanti ja latvia")).toEqual(["fi", "en", "lv"]);
+    expect(languageCodes("espanja")).toEqual(["es"]);
+    expect(languageCodes("arabia")).toEqual(["ar"]);
+    expect(languageCodes("sanaton")).toEqual(["zxx"]);
+  });
+});
+
+describe("yearFromWeekday", () => {
+  const near = new Date("2026-10-18T12:00:00Z");
+
+  it("finds the year whose date falls on that weekday", () => {
+    expect(yearFromWeekday(14, 11, "la", near)).toBe(2026); // Saturday 14.11.2026
+    expect(yearFromWeekday(12, 1, "ti", near)).toBe(2027); // Tuesday 12.1.2027
+  });
+
+  it("returns null when no nearby year fits", () => {
+    // 14.11. is a Friday in 2025, Saturday in 2026 and Sunday in 2027: never a Monday.
+    expect(yearFromWeekday(14, 11, "ma", near)).toBeNull();
+    expect(yearFromWeekday(14, 11, "xx", near)).toBeNull();
+  });
+});
+
+describe("personName", () => {
+  it.each([
+    ["Anacarsis Ramos / Pornotráfico", "Anacarsis Ramos"],
+    ["Ludwig van Beethoven", "Ludwig van Beethoven"],
+    ["Karla Sánchez Kiwi", "Karla Sánchez Kiwi"],
+    ["magu", "magu"],
+    ["Anacarsis Ramos Josefina Orlainetan arkistojen pohjalta", null],
+    ["  ", null],
+  ])("%s", (raw, expected) => {
+    expect(personName(raw)).toBe(expected);
   });
 });

@@ -18,7 +18,9 @@ export function planProduction(detail: RawProductionDetail) {
     title: detail.title,
     stage: detail.stage,
     subtitle: detail.subtitle,
+    typeHint: detail.typeHint,
     hasDirector: detail.credits.some((credit) => credit.roles.includes("DIRECTOR")),
+    hasChoreographer: detail.credits.some((credit) => credit.roles.includes("CHOREOGRAPHER")),
     castCount: detail.credits.filter((credit) => credit.roles.includes("CAST")).length,
   });
   return { detail, classification };
@@ -52,8 +54,27 @@ async function upsertPerson(db: PrismaClient, name: string) {
 }
 
 /**
+ * For sources that list only the next few performances: anything stored after the last
+ * one listed is not announced on the site yet, so it stays current instead of looking
+ * cancelled. A missing performance inside the listed window still goes stale.
+ */
+async function keepUnannounced(
+  db: PrismaClient,
+  productionId: string,
+  listed: RawProductionDetail["performances"],
+  seenAt: Date,
+): Promise<void> {
+  const horizon = listed.reduce((latest, performance) => (performance.startsAt > latest ? performance.startsAt : latest), seenAt);
+  await db.performance.updateMany({
+    where: { productionId, startsAt: { gt: horizon } },
+    data: { lastSeenAt: seenAt },
+  });
+}
+
+/**
  * Upsert one scraped production with its performances, credits and critic links.
- * Never deletes: performances that disappeared simply keep their old lastSeenAt.
+ * Never deletes: performances and credits that disappeared simply keep their old
+ * lastSeenAt, so readers can tell current rows from stale ones (see src/lib/current.ts).
  */
 export async function upsertProduction(
   db: PrismaClient,
@@ -81,7 +102,7 @@ export async function upsertProduction(
     runStart: detail.runStart ?? null,
     runEnd: detail.runEnd ?? null,
     durationText: detail.durationText ?? null,
-    ticketUrl: detail.performances.find((performance) => performance.ticketUrl)?.ticketUrl ?? null,
+    ticketUrl: detail.performances.find((performance) => performance.ticketUrl)?.ticketUrl ?? detail.ticketUrl ?? null,
     lastSeenAt: seenAt,
   };
 
@@ -100,15 +121,18 @@ export async function upsertProduction(
         startsAt: performance.startsAt,
         stageId: performanceStage?.id ?? null,
         ticketUrl: performance.ticketUrl ?? null,
+        subtitleLangs: performance.subtitleLangs ?? [],
         lastSeenAt: seenAt,
       },
       update: {
         stageId: performanceStage?.id ?? null,
         ticketUrl: performance.ticketUrl ?? null,
+        subtitleLangs: performance.subtitleLangs ?? [],
         lastSeenAt: seenAt,
       },
     });
   }
+  if (detail.performancesPartial) await keepUnannounced(db, production.id, detail.performances, seenAt);
 
   let creditCount = 0;
   for (const [index, credit] of detail.credits.entries()) {
@@ -122,8 +146,9 @@ export async function upsertProduction(
           role,
           characterName: credit.characterName ?? null,
           sortOrder: index,
+          lastSeenAt: seenAt,
         },
-        update: { characterName: credit.characterName ?? null, sortOrder: index },
+        update: { characterName: credit.characterName ?? null, sortOrder: index, lastSeenAt: seenAt },
       });
       creditCount += 1;
     }
@@ -132,8 +157,8 @@ export async function upsertProduction(
   for (const review of detail.criticReviews) {
     await db.criticReview.upsert({
       where: { url: review.url },
-      create: { productionId: production.id, outlet: review.outlet, url: review.url },
-      update: { outlet: review.outlet },
+      create: { productionId: production.id, outlet: review.outlet, url: review.url, publishedAt: review.publishedAt ?? null },
+      update: { outlet: review.outlet, ...(review.publishedAt ? { publishedAt: review.publishedAt } : {}) },
     });
   }
 

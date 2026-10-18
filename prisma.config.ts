@@ -8,8 +8,9 @@ export default defineConfig({
     seed: "tsx prisma/seed.ts",
   },
   datasource: {
-    // Optional so `prisma generate` (postinstall) works on builds without a database,
-    // e.g. a fresh Vercel project. Migrations and seeding still need it.
+    // Not env("DATABASE_URL"): that throws when the variable is missing, which
+    // breaks `prisma generate` in postinstall on a fresh clone before .env exists.
+    // Commands that need the database still fail loudly on an empty URL.
     url: process.env.DATABASE_URL ?? "",
   },
 });

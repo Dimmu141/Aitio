@@ -1,16 +1,30 @@
 import type { MetadataRoute } from "next";
-import { getSitemapData } from "@/lib/queries";
-import { siteUrl } from "@/lib/site";
+import { LOCALES, type Section } from "@/i18n/config";
+import { alternates } from "@/i18n/paths";
+import { getAllSlugs } from "@/lib/catalogue/queries";
+import { absoluteUrl } from "@/lib/site";
+
+type Entry = MetadataRoute.Sitemap[number];
+
+/** One entry per page and locale, each listing its siblings as hreflang alternates. */
+function entries(section: Section | undefined, slug: string | undefined, lastModified?: Date): Entry[] {
+  const paths = alternates(section, slug);
+  const languages = Object.fromEntries(LOCALES.map((locale) => [locale, absoluteUrl(paths[locale])]));
+  return LOCALES.map((locale) => ({
+    url: absoluteUrl(paths[locale]),
+    lastModified,
+    alternates: { languages },
+  }));
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = siteUrl();
-  const pages: MetadataRoute.Sitemap = [{ url: `${base}/` }, { url: `${base}/teatterit` }];
-  const result = await getSitemapData();
-  if (!result.ok) return pages;
+  const { productions, theatres, people } = await getAllSlugs();
   return [
-    ...pages,
-    ...result.data.productions.map((production) => ({ url: `${base}/esitys/${production.slug}`, lastModified: production.updatedAt })),
-    ...result.data.theatres.map((theatre) => ({ url: `${base}/teatteri/${theatre.slug}`, lastModified: theatre.updatedAt })),
-    ...result.data.people.map((person) => ({ url: `${base}/henkilo/${person.slug}` })),
+    ...entries(undefined, undefined),
+    ...entries("tietosuoja", undefined),
+    ...entries("tietoa", undefined),
+    ...productions.flatMap(({ slug, updatedAt }) => entries("esitys", slug, updatedAt)),
+    ...theatres.flatMap(({ slug, updatedAt }) => entries("teatteri", slug, updatedAt)),
+    ...people.flatMap(({ slug }) => entries("henkilo", slug)),
   ];
 }

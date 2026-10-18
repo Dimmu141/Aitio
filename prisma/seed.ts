@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { db } from "../src/lib/db";
+import { TAGS } from "../src/lib/diary/tags";
 import { THEATRES } from "../src/scrapers/theatres";
 
 async function main(): Promise<void> {
@@ -11,6 +12,10 @@ async function main(): Promise<void> {
     });
   }
   console.log(`Seeded ${THEATRES.length} theatres`);
+  for (const [sortOrder, tag] of TAGS.entries()) {
+    await db.tag.upsert({ where: { slug: tag.slug }, create: { ...tag, sortOrder }, update: { ...tag, sortOrder } });
+  }
+  console.log(`Seeded ${TAGS.length} tags`);
 }
 
 main()

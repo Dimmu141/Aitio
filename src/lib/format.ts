@@ -1,46 +1,80 @@
-const TIME_ZONE = "Europe/Helsinki";
+import { INTL_LOCALE, type Locale } from "@/i18n/config";
 
-type DateParts = { weekday: string; day: string; month: string; year: string; hour: string; minute: string };
+/** All display formatting is pinned to Helsinki; servers (Vercel) run in UTC. */
+export const TIME_ZONE = "Europe/Helsinki";
 
-function partsOf(date: Date): DateParts {
-  const formatter = new Intl.DateTimeFormat("fi-FI", {
+function helsinkiYear(date: Date): number {
+  return Number(new Intl.DateTimeFormat("en", { timeZone: TIME_ZONE, year: "numeric" }).format(date));
+}
+
+/** "pe 23.10. klo 18.30"; the year is added when it isn't the current one. */
+export function formatPerformance(date: Date, locale: Locale, asOf: Date): string {
+  return new Intl.DateTimeFormat(INTL_LOCALE[locale], {
     timeZone: TIME_ZONE,
     weekday: "short",
     day: "numeric",
     month: "numeric",
-    year: "numeric",
+    year: helsinkiYear(date) === helsinkiYear(asOf) ? undefined : "numeric",
     hour: "2-digit",
     minute: "2-digit",
-    hourCycle: "h23",
-  });
-  const parts = Object.fromEntries(formatter.formatToParts(date).map((part) => [part.type, part.value]));
-  return {
-    weekday: parts.weekday ?? "",
-    day: parts.day ?? "",
-    month: parts.month ?? "",
-    year: parts.year ?? "",
-    hour: parts.hour ?? "",
-    minute: parts.minute ?? "",
-  };
+  }).format(date);
 }
 
-/** "10.9." in the current year, "10.9.2025" otherwise. */
-export function formatDay(date: Date, now: Date): string {
-  const { day, month, year } = partsOf(date);
-  return year === partsOf(now).year ? `${day}.${month}.` : `${day}.${month}.${year}`;
+/** "la 14.11." (or "10.9." without the weekday); the year is added when it isn't the current one. */
+export function formatShortDate(date: Date, locale: Locale, asOf: Date, weekday = true): string {
+  return new Intl.DateTimeFormat(INTL_LOCALE[locale], {
+    timeZone: TIME_ZONE,
+    weekday: weekday ? "short" : undefined,
+    day: "numeric",
+    month: "numeric",
+    year: helsinkiYear(date) === helsinkiYear(asOf) ? undefined : "numeric",
+  }).format(date);
 }
 
-/** "la 14.11." with the weekday, for run ends and closing dates. */
-export function formatWeekdayDay(date: Date, now: Date): string {
-  return `${partsOf(date).weekday} ${formatDay(date, now)}`;
+/** "18.30": a performance time on a day that's already named by a heading. */
+export function formatTime(date: Date, locale: Locale): string {
+  return new Intl.DateTimeFormat(INTL_LOCALE[locale], { timeZone: TIME_ZONE, hour: "2-digit", minute: "2-digit" }).format(date);
 }
 
-/** "pe 23.10. klo 19.00": how people plan a theatre evening. */
-export function formatPerformance(date: Date, now: Date): string {
-  const { hour, minute } = partsOf(date);
-  return `${formatWeekdayDay(date, now)} klo ${hour}.${minute}`;
+/** "Keskiviikko 21.10.": a day heading, capitalised. */
+export function formatDayHeading(date: Date, locale: Locale): string {
+  const text = new Intl.DateTimeFormat(INTL_LOCALE[locale], {
+    timeZone: TIME_ZONE,
+    weekday: "long",
+    day: "numeric",
+    month: "numeric",
+  }).format(date);
+  return text.charAt(0).toLocaleUpperCase(INTL_LOCALE[locale]) + text.slice(1);
 }
 
-export function helsinkiYear(date: Date): number {
-  return Number(partsOf(date).year);
+/** "23. lokakuuta 2026". */
+export function formatDate(date: Date, locale: Locale): string {
+  return new Intl.DateTimeFormat(INTL_LOCALE[locale], {
+    timeZone: TIME_ZONE,
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(date);
+}
+
+/** Machine-readable value for <time dateTime>. */
+export function isoDateTime(date: Date): string {
+  return date.toISOString();
+}
+
+/** The Helsinki calendar day of a moment, as YYYY-MM-DD. */
+export function helsinkiDate(date: Date): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: TIME_ZONE, year: "numeric", month: "2-digit", day: "2-digit" }).format(
+    date,
+  );
+}
+
+/** A calendar date stored as UTC midnight (Postgres DATE), e.g. DiaryEntry.seenOn. */
+export function formatCalendarDate(date: Date, locale: Locale): string {
+  return new Intl.DateTimeFormat(INTL_LOCALE[locale], {
+    timeZone: "UTC",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(date);
 }

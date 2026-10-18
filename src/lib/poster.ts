@@ -1,12 +1,61 @@
-export const POSTER_COLOURS = ["coral", "ochre", "teal", "plum", "sage"] as const;
-export type PosterColour = (typeof POSTER_COLOURS)[number];
+/**
+ * Poster grounds, each with its fixed text colour: the design system's five plus "ink
+ * blue", added so each of the six theatres has its own. A production takes its
+ * theatre's colour, so the stripe on a card and the poster on its page say the same
+ * thing: which house it plays in.
+ */
+export const POSTER_TONES = [
+  { name: "coral", background: "#E8735A", text: "#1F1A14" },
+  { name: "ochre", background: "#D9A441", text: "#1F1A14" },
+  { name: "teal", background: "#2F6B67", text: "#FFFDF8" },
+  { name: "plum", background: "#5B3A5E", text: "#FFFDF8" },
+  { name: "sage", background: "#A9B79A", text: "#1F1A14" },
+  { name: "blue", background: "#2B4C7E", text: "#FFFDF8" },
+] as const;
 
-/** FNV-1a, so the same production gets the same poster colour everywhere, forever. */
-export function posterColour(slug: string): PosterColour {
-  let hash = 0x811c9dc5;
-  for (const char of slug) {
-    hash ^= char.codePointAt(0) ?? 0;
-    hash = Math.imul(hash, 0x01000193) >>> 0;
+export type PosterTone = (typeof POSTER_TONES)[number];
+type ToneName = PosterTone["name"];
+
+/**
+ * A colour per theatre in THEATRES (src/scrapers/theatres.ts). Six grounds, thirteen
+ * houses, so colours are shared in pairs that mean something: the national houses are
+ * plum, the Swedish-language stages teal, the independent groups ochre. The theatre's
+ * name next to the stripe tells pairs apart. A test keeps every theatre mapped.
+ */
+export const THEATRE_TONES: Readonly<Record<string, ToneName>> = {
+  kansallisteatteri: "plum",
+  "kansallisooppera-ja-baletti": "plum",
+  "svenska-teatern": "teal",
+  "teater-viirus": "teal",
+  "helsingin-kaupunginteatteri": "coral",
+  "q-teatteri": "coral",
+  ryhmateatteri: "ochre",
+  "teatteri-avoimet-ovet": "ochre",
+  "teatteri-takomo": "ochre",
+  "kom-teatteri": "sage",
+  zodiak: "sage",
+  "espoon-teatteri": "blue",
+  "tanssin-talo": "blue",
+};
+
+/** FNV-1a: tiny and stable across runtimes; only for a theatre missing from THEATRE_TONES. */
+function hash(input: string): number {
+  let value = 0x811c9dc5;
+  for (let index = 0; index < input.length; index += 1) {
+    value ^= input.charCodeAt(index);
+    value = Math.imul(value, 0x01000193);
   }
-  return POSTER_COLOURS[hash % POSTER_COLOURS.length];
+  return value >>> 0;
+}
+
+export function theatreTone(theatreSlug: string): PosterTone {
+  const name = THEATRE_TONES[theatreSlug];
+  return POSTER_TONES.find((tone) => tone.name === name) ?? POSTER_TONES[hash(theatreSlug) % POSTER_TONES.length];
+}
+
+/** Titles longer than this drop to the display size so a 360px poster keeps its shape. */
+export const LONG_TITLE = 18;
+
+export function isLongTitle(title: string): boolean {
+  return title.length > LONG_TITLE || title.split(/\s+/).some((word) => word.length > 11);
 }

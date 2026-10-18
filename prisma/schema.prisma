@@ -61,47 +61,51 @@ model Stage {
 }
 
 model Production {
-  id              String         @id @default(cuid())
-  slug            String         @unique
-  title           String
-  theatreId       String
-  theatre         Theatre        @relation(fields: [theatreId], references: [id])
-  stageId         String?
-  stage           Stage?         @relation(fields: [stageId], references: [id])
-  externalId      String
-  sourceUrl       String
-  type            ProductionType @default(OTHER)
-  typeConfidence  Float          @default(0)
-  typeOverride    ProductionType?
-  languages       String[]
-  subtitleLangs   String[]
-  premiereDate    DateTime?
-  runStart        DateTime?
-  runEnd          DateTime?
-  durationText    String?
-  ticketUrl       String?
-  lastSeenAt      DateTime
-  performances    Performance[]
-  credits         Credit[]
-  criticReviews   CriticReview[]
-  diaryEntries    DiaryEntry[]
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  id             String          @id @default(cuid())
+  slug           String          @unique
+  title          String
+  theatreId      String
+  theatre        Theatre         @relation(fields: [theatreId], references: [id])
+  stageId        String?
+  stage          Stage?          @relation(fields: [stageId], references: [id])
+  externalId     String
+  sourceUrl      String
+  type           ProductionType  @default(OTHER)
+  typeConfidence Float           @default(0)
+  typeOverride   ProductionType?
+  languages      String[]
+  subtitleLangs  String[]
+  premiereDate   DateTime?
+  runStart       DateTime?
+  runEnd         DateTime?
+  durationText   String?
+  ticketUrl      String?
+  /// Set when a complete run of the source no longer lists it (cancelled, removed); cleared if it returns.
+  delistedAt     DateTime?
+  lastSeenAt     DateTime
+  performances   Performance[]
+  credits        Credit[]
+  criticReviews  CriticReview[]
+  diaryEntries   DiaryEntry[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 
   @@unique([theatreId, externalId])
   @@index([runEnd])
 }
 
 model Performance {
-  id           String       @id @default(cuid())
-  productionId String
-  production   Production   @relation(fields: [productionId], references: [id])
-  startsAt     DateTime
-  stageId      String?
-  stage        Stage?       @relation(fields: [stageId], references: [id])
-  ticketUrl    String?
-  lastSeenAt   DateTime
-  diaryEntries DiaryEntry[]
+  id            String       @id @default(cuid())
+  productionId  String
+  production    Production   @relation(fields: [productionId], references: [id])
+  startsAt      DateTime
+  stageId       String?
+  stage         Stage?       @relation(fields: [stageId], references: [id])
+  ticketUrl     String?
+  /// Subtitles at this performance (e.g. only on Wednesdays); Production.subtitleLangs means every performance.
+  subtitleLangs String[]     @default([])
+  lastSeenAt    DateTime
+  diaryEntries  DiaryEntry[]
 
   @@unique([productionId, startsAt])
   @@index([startsAt])
@@ -124,42 +128,116 @@ model Credit {
   role          CreditRole
   characterName String?
   sortOrder     Int        @default(0)
+  /// Same value as Production.lastSeenAt when the credit is still on the theatre's page.
+  lastSeenAt    DateTime   @default(now())
 
   @@unique([personId, productionId, role])
+  @@index([productionId])
 }
 
 model CriticReview {
-  id            String     @id @default(cuid())
-  productionId  String
-  production    Production @relation(fields: [productionId], references: [id])
-  outlet        String
-  url           String     @unique
-  publishedAt   DateTime?
+  id           String     @id @default(cuid())
+  productionId String
+  production   Production @relation(fields: [productionId], references: [id])
+  outlet       String
+  url          String     @unique
+  publishedAt  DateTime?
+
+  @@index([productionId])
 }
 
+/// Better Auth's user table (src/lib/auth.ts). `name` is the public display name.
 model User {
-  id           String       @id @default(cuid())
-  email        String       @unique
-  displayName  String?
-  handle       String?      @unique
-  locale       String       @default("fi")
-  diaryEntries DiaryEntry[]
-  createdAt    DateTime     @default(now())
+  id            String       @id @default(cuid())
+  email         String       @unique
+  emailVerified Boolean      @default(false)
+  name          String       @default("")
+  image         String?
+  locale        String       @default("fi")
+  /// Opt-in weekly "closing soon" email; locale above decides its language.
+  digestOptIn   Boolean      @default(false)
+  digestSentAt  DateTime?
+  sessions      Session[]
+  accounts      Account[]
+  diaryEntries  DiaryEntry[]
+  reports       Report[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+/// Magic-link tokens (Better Auth).
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+}
+
+/// Fixed-window counters shared by Better Auth and our own limits (src/lib/rate-limit.ts).
+model RateLimit {
+  id          String @id @default(cuid())
+  key         String @unique
+  count       Int
+  lastRequest BigInt
 }
 
 model DiaryEntry {
   id            String       @id @default(cuid())
   userId        String
-  user          User         @relation(fields: [userId], references: [id])
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   productionId  String
   production    Production   @relation(fields: [productionId], references: [id])
   performanceId String?
   performance   Performance? @relation(fields: [performanceId], references: [id])
-  seenOn        DateTime
-  rating        Decimal?     @db.Decimal(2, 1)
+  /// The calendar day in Helsinki, not a moment.
+  seenOn        DateTime     @db.Date
+  /// Half-stars, 1–10 (0.5–5 stars). Integer so it survives caching and never rounds oddly.
+  rating        Int?
   review        String?
+  /// The review text and display name show on the production page unless unticked.
+  isPublic      Boolean      @default(true)
   isRewatch     Boolean      @default(false)
+  /// Set by moderation; hidden entries still count anonymously in ratings and tags.
+  hiddenAt      DateTime?
   tags          Tag[]
+  reports       Report[]
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
 
@@ -167,13 +245,35 @@ model DiaryEntry {
   @@index([userId, seenOn])
 }
 
+enum ReportReason {
+  SPOILER
+  OFFENSIVE
+  SPAM
+  OTHER
+}
+
+model Report {
+  id         String       @id @default(cuid())
+  entryId    String
+  entry      DiaryEntry   @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  reporterId String
+  reporter   User         @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+  reason     ReportReason
+  createdAt  DateTime     @default(now())
+  resolvedAt DateTime?
+
+  @@unique([entryId, reporterId])
+  @@index([resolvedAt])
+}
+
 model Tag {
-  id      String       @id @default(cuid())
-  slug    String       @unique
-  labelFi String
-  labelSv String
-  labelEn String
-  entries DiaryEntry[]
+  id        String       @id @default(cuid())
+  slug      String       @unique
+  sortOrder Int          @default(0)
+  labelFi   String
+  labelSv   String
+  labelEn   String
+  entries   DiaryEntry[]
 }
 
 model ScrapeRun {

@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { parseDetail, parseList } from "./kansallisteatteri";
+import { parseDetail, parseList, subtitleLanguages } from "./kansallisteatteri";
 
 // Fixtures captured from the live site on 2026-10-18. Refresh with `pnpm fixtures:refresh`.
 const fixture = (name: string) => readFileSync(`fixtures/kansallisteatteri/${name}`, "utf8");
@@ -72,5 +72,47 @@ describe("Kansallisteatteri production page", () => {
       critic: "Mika Pekkola",
       url: "https://www.ku.fi/artikkeli/5446878-viidakon-villit-naiset-osoittaa-etta-huipulla-voi-olla-yksinaista",
     });
+  });
+});
+
+describe("Kansallisteatteri subtitles", () => {
+  // Captured 2026-10-18: subtitles at every performance except the Saturday matinee on 12.12.
+  const ladyT = parseDetail(fixture("production-lady-t.html"), {
+    externalId: "lady-t-0",
+    url: "https://www.kansallisteatteri.fi/esitys/lady-t-0",
+    isVisiting: false,
+  });
+
+  it("marks each performance by its own subtitle indicator", () => {
+    expect(ladyT.performances).toHaveLength(10);
+    const withSubtitles = ladyT.performances.filter((performance) => performance.subtitleLangs?.length);
+    expect(withSubtitles).toHaveLength(9);
+    expect(withSubtitles[0].subtitleLangs).toEqual(["fi", "en"]);
+    const matinee = ladyT.performances.find((performance) => performance.startsAt.toISOString() === "2026-12-12T11:00:00.000Z");
+    expect(matinee?.subtitleLangs).toEqual([]);
+  });
+
+  it("keeps the production-wide list empty when not every performance has them", () => {
+    expect(ladyT.subtitleLangs).toEqual([]);
+  });
+
+  it("has no subtitles where the page shows no indicator", () => {
+    const viidakko = parseDetail(fixture("production-viidakon-villit-naiset.html"), {
+      externalId: "viidakon-villit-naiset",
+      url: "https://www.kansallisteatteri.fi/esitys/viidakon-villit-naiset",
+      isVisiting: false,
+    });
+    expect(viidakko.subtitleLangs).toEqual([]);
+    expect(viidakko.performances.every((performance) => performance.subtitleLangs?.length === 0)).toBe(true);
+  });
+
+  it("reads the languages from the sentence about subtitles only", () => {
+    expect(subtitleLanguages("Esityksessä on suomen- ja englanninkielinen tekstitys\nKesto: n. 1 h")).toEqual(["fi", "en"]);
+    expect(
+      subtitleLanguages(
+        "Kesto 2 h 50 min. Tekstitys saatavilla englanniksi ja suomeksi (Subtitle Mobile -sovellus) valituissa näytännöissä. Esitys on ruotsinkielisen romaanin sovitus.",
+      ),
+    ).toEqual(["fi", "en"]);
+    expect(subtitleLanguages("Kesto 2 h 15 min (sisältää väliajan)")).toEqual([]);
   });
 });

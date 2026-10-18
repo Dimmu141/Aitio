@@ -48,6 +48,8 @@ export const rawPerformanceSchema = z.object({
   startsAt: z.date(),
   stage: z.string().optional(),
   ticketUrl: z.url().optional(),
+  /** Subtitles at this performance only; leave out when they apply to every performance. */
+  subtitleLangs: z.array(z.string()).optional(),
 });
 export type RawPerformance = z.infer<typeof rawPerformanceSchema>;
 
@@ -55,6 +57,7 @@ export const rawCriticReviewSchema = z.object({
   outlet: z.string().min(1),
   critic: z.string().optional(),
   url: z.url(),
+  publishedAt: z.date().optional(),
 });
 export type RawCriticReview = z.infer<typeof rawCriticReviewSchema>;
 
@@ -65,7 +68,14 @@ export const rawProductionDetailSchema = z.object({
   url: z.url(),
   stage: z.string().optional(),
   subtitle: z.string().optional(),
+  /**
+   * The source's own category, when it states one (the Opera's "Baletti", a dance house
+   * whose programme is dance). Wins over the keyword rules; OTHER means "not stated".
+   */
+  typeHint: z.enum(PRODUCTION_TYPES).optional(),
   durationText: z.string().optional(),
+  /** The production's own ticket link, for sources whose performance rows have none (KOM). */
+  ticketUrl: z.url().optional(),
   premiereDate: z.date().optional(),
   runStart: z.date().optional(),
   runEnd: z.date().optional(),
@@ -75,6 +85,11 @@ export const rawProductionDetailSchema = z.object({
   performances: z.array(rawPerformanceSchema),
   criticReviews: z.array(rawCriticReviewSchema),
   isVisiting: z.boolean().default(false),
+  /**
+   * The source only shows the next few performances (Espoon Teatteri). Then a stored
+   * performance later than the last one listed is not "gone", just not announced here.
+   */
+  performancesPartial: z.boolean().default(false),
 });
 export type RawProductionDetail = z.infer<typeof rawProductionDetailSchema>;
 
