@@ -38,8 +38,8 @@ export default async function TheatreRoute({ params }: PageProps<"/[locale]/teat
   return (
     <div className="space-y-10">
       <header className="space-y-2 border-b-4 border-double border-ink pb-4">
-        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-ink-muted">{page.theatre.city}</p>
-        <h1 className="text-4xl font-semibold sm:text-5xl">{page.theatre.name}</h1>
+        <p className="text-label font-bold uppercase tracking-[0.06em] text-ink-muted">{page.theatre.city}</p>
+        <h1 className="text-display">{page.theatre.name}</h1>
         <p>
           <ExternalLink href={page.theatre.website} hint={t.production.externalLink} className="inline-flex min-h-tap items-center">
             {t.theatre.website}
@@ -48,7 +48,7 @@ export default async function TheatreRoute({ params }: PageProps<"/[locale]/teat
       </header>
 
       <section aria-labelledby="current">
-        <h2 id="current" className="text-3xl font-semibold">
+        <h2 id="current" className="text-section">
           {t.theatre.current}
         </h2>
         {page.current.length === 0 ? (
@@ -64,12 +64,12 @@ export default async function TheatreRoute({ params }: PageProps<"/[locale]/teat
 
       {page.stages.length > 0 && (
         <section aria-labelledby="stages">
-          <h2 id="stages" className="text-2xl font-semibold">
+          <h2 id="stages" className="text-section">
             {t.theatre.stages}
           </h2>
           <ul className="mt-2 flex flex-wrap gap-2">
             {page.stages.map((stage) => (
-              <li key={stage} className="rounded border border-rule bg-card px-3 py-1">
+              <li key={stage} className="rounded-md border border-rule bg-paper-raised px-3 py-1">
                 {stage}
               </li>
             ))}
@@ -79,7 +79,7 @@ export default async function TheatreRoute({ params }: PageProps<"/[locale]/teat
 
       {page.past.length > 0 && (
         <section aria-labelledby="past">
-          <h2 id="past" className="text-2xl font-semibold">
+          <h2 id="past" className="text-section">
             {t.theatre.past}
           </h2>
           <ul>

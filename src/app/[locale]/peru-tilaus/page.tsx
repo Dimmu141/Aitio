@@ -22,7 +22,7 @@ export default async function UnsubscribePage({ searchParams }: PageProps<"/[loc
 
   return (
     <div className="max-w-xl space-y-6">
-      <h1 className="border-b-4 border-double border-ink pb-4 text-4xl font-semibold">{t.digest.unsubscribeTitle}</h1>
+      <h1 className="border-b-4 border-double border-ink pb-4 text-display">{t.digest.unsubscribeTitle}</h1>
       {query.done ? (
         <Notice>{t.digest.unsubscribed}</Notice>
       ) : query.error || !userId || !signature ? (

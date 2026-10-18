@@ -36,7 +36,7 @@ export default async function DiaryPage({ searchParams }: PageProps<"/[locale]/p
     <div className="space-y-6">
       <header className="flex flex-wrap items-end justify-between gap-4 border-b-4 border-double border-ink pb-4">
         <div>
-          <h1 className="text-4xl font-semibold sm:text-5xl">{t.diary.title}</h1>
+          <h1 className="text-display">{t.diary.title}</h1>
           {user.name && <p className="text-lg text-ink-muted">{user.name}</p>}
         </div>
         <nav className="flex flex-wrap gap-x-6">
@@ -62,14 +62,14 @@ export default async function DiaryPage({ searchParams }: PageProps<"/[locale]/p
         byYear(entries).map(([year, items]) => (
           <section key={year} aria-labelledby={`year-${year}`} className="space-y-3">
             <div className="flex flex-wrap items-baseline justify-between gap-x-4">
-              <h2 id={`year-${year}`} className="text-2xl font-semibold">
+              <h2 id={`year-${year}`} className="text-section">
                 {t.diary.year(year, items.length)}
               </h2>
               <Link href={href(locale, "paivakirja", String(year))} className="inline-flex min-h-tap items-center">
                 {t.year.link(year)}
               </Link>
             </div>
-            <ul className="space-y-3">
+            <ul className="space-y-4">
               {items.map((entry) => (
                 <TicketStub key={entry.id} entry={entry} highlight={entry.id === saved} locale={locale} t={t} />
               ))}

@@ -81,6 +81,8 @@ export interface RatingSummary {
 }
 
 export const MIN_RATINGS_FOR_AVERAGE = 10;
+/** Below this a histogram shows individual votes more than a distribution. */
+export const MIN_RATINGS_FOR_HISTOGRAM = 5;
 
 export function summariseRatings(ratings: number[]): RatingSummary {
   const buckets = Array.from({ length: 10 }, () => 0);

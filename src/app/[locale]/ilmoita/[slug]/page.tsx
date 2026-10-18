@@ -40,7 +40,7 @@ export default async function ReportPage({ params, searchParams }: PageProps<"/[
 
   return (
     <div className="max-w-xl space-y-5">
-      <h1 className="text-4xl font-semibold">{t.report.title}</h1>
+      <h1 className="text-display">{t.report.title}</h1>
       <p>{back}</p>
       <blockquote className="whitespace-pre-line break-words border-l-4 border-rule pl-4 text-ink-muted">{entry.review}</blockquote>
       {query.error === "rate" && <Notice tone="error">{t.report.rate}</Notice>}
@@ -51,7 +51,7 @@ export default async function ReportPage({ params, searchParams }: PageProps<"/[
           <input type="hidden" name="locale" value={locale} />
           <input type="hidden" name="entryId" value={entryId} />
           <fieldset>
-            <legend className="mb-2 text-xl font-semibold">{t.report.reason}</legend>
+            <legend className="mb-2 text-card font-semibold">{t.report.reason}</legend>
             <div className="flex flex-col items-start gap-2">
               {Object.values(ReportReason).map((reason) => (
                 <label key={reason} className={chip}>

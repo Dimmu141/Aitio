@@ -5,17 +5,18 @@ import { ExternalLink } from "@/components/ExternalLink";
 import { AudienceSection } from "@/components/production/AudienceSection";
 import { CreditList } from "@/components/production/CreditList";
 import { CriticLinks } from "@/components/production/CriticLinks";
-import { PerformanceList } from "@/components/production/PerformanceList";
+import { PerformanceList, subtitleText } from "@/components/production/PerformanceList";
 import { PosterBlock } from "@/components/production/PosterBlock";
 import { RunProgress } from "@/components/production/RunProgress";
 import Link from "next/link";
 import { getDictionary } from "@/i18n";
+import type { CreditRole } from "@/generated/prisma/enums";
 import type { Dictionary } from "@/i18n/dictionaries/fi";
 import type { Locale } from "@/i18n/config";
 import { href } from "@/i18n/paths";
 import { getAllSlugs, getProduction, type ProductionPage } from "@/lib/catalogue/queries";
 import { withPlaceholder } from "@/lib/static-params";
-import { formatPerformance } from "@/lib/format";
+import { formatPerformance, formatShortDate } from "@/lib/format";
 import { productionJsonLd, serializeJsonLd } from "@/lib/jsonld";
 import { pageMetadata } from "@/lib/metadata";
 import { absoluteUrl } from "@/lib/site";
@@ -55,8 +56,17 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/esitys/[
   });
 }
 
-function languageList(codes: string[], t: Dictionary): string {
-  return codes.map((code) => t.languages[code] ?? code.toUpperCase()).join(", ");
+function hostname(url: string): string {
+  return new URL(url).hostname.replace(/^www\./, "");
+}
+
+/** Poster foot like a programme cover: "Writer · ohjaus Director". */
+function posterFoot(page: ProductionPage, t: Dictionary): string | null {
+  const first = (role: CreditRole) => page.credits.find((credit) => credit.role === role)?.person.name;
+  const writer = first("WRITER");
+  const director = first("DIRECTOR");
+  const parts = [writer, director && `${t.production.directedBy} ${director}`].filter(Boolean);
+  return parts.length > 0 ? parts.join(" · ") : null;
 }
 
 export default async function ProductionRoute({ params }: PageProps<"/[locale]/esitys/[slug]">) {
@@ -65,43 +75,59 @@ export default async function ProductionRoute({ params }: PageProps<"/[locale]/e
   const page = await getProduction(slug);
   if (!page) notFound();
 
-  const kicker = page.year ? `${t.types[page.type]} · ${t.production.performedIn(page.year)}` : t.types[page.type];
   const jsonLd = productionJsonLd(page, absoluteUrl(href(locale, "esitys", slug)));
+  const rowTickets = page.performances.some((row) => row.ticketUrl);
 
   return (
-    <article className="space-y-10">
-      <header className="space-y-5">
-        <PosterBlock slug={page.slug} title={page.title} theatre={page.theatre.name} stage={page.stage} kicker={kicker} />
+    <article>
+      <header>
+        <PosterBlock slug={page.slug} title={page.title} kicker={page.theatre.name} foot={posterFoot(page, t)} />
+        <p className="ai-facts">
+          <Link href={href(locale, "teatteri", page.theatre.slug)}>{page.theatre.name}</Link>
+          {[page.stage, page.durationText].filter(Boolean).map((fact) => ` · ${fact}`)}
+        </p>
         <BadgeRow>
-          {page.durationText && <Badge label={t.production.duration}>{page.durationText}</Badge>}
-          {page.languages.length > 0 && <Badge label={t.production.language}>{languageList(page.languages, t)}</Badge>}
+          {page.closingSoon && (
+            <Badge variant="urgent">
+              <span aria-hidden="true">⏳</span> {t.home.closingSoon}
+            </Badge>
+          )}
+          <Badge>{page.year ? `${t.types[page.type]} · ${t.production.performedIn(page.year)}` : t.types[page.type]}</Badge>
+          {page.languages.map((code) => (
+            <Badge key={code} title={`${t.production.language}: ${t.languages[code] ?? code}`}>
+              {code.length === 2 && <span className="ai-badge__code">{code.toUpperCase()}</span>}
+              {t.production.spokenIn[code] ?? t.languages[code] ?? code}
+            </Badge>
+          ))}
           {page.subtitleLangs.length > 0 && (
-            <Badge label={t.production.subtitles}>{languageList(page.subtitleLangs, t)}</Badge>
+            <Badge
+              title={`${t.production.subtitles}: ${page.subtitleLangs.map((code) => t.languages[code] ?? code).join(", ")}`}
+            >
+              {subtitleText(page.subtitleLangs, t)}
+            </Badge>
           )}
         </BadgeRow>
-        <p>
-          <Link href={href(locale, "teatteri", page.theatre.slug)} className="text-lg">
-            {page.theatre.name}
-          </Link>
-          {page.stage && <span className="text-ink-muted"> · {page.stage}</span>}
-        </p>
       </header>
 
-      <RunProgress
-        progress={page.progress}
-        premiere={page.premiereDate}
-        last={page.last}
-        next={page.next}
-        asOf={page.asOf}
-        locale={locale}
-        t={t}
-      />
+      <div className="mt-6">
+        <RunProgress
+          progress={page.progress}
+          premiere={page.premiereDate}
+          last={page.last}
+          next={page.next}
+          remaining={page.performances.length}
+          fullSchedule={page.fullSchedule}
+          asOf={page.asOf}
+          locale={locale}
+          t={t}
+        />
+      </div>
 
-      <div className="flex flex-col gap-3 sm:flex-row">
+      <div className="ai-actions mt-6 mb-2">
         <Link href={href(locale, "merkitse", page.slug)} className={buttonPrimary}>
-          {t.log.button}
+          <span aria-hidden="true">＋</span> {t.log.button}
         </Link>
-        {page.next && page.ticketUrl && (
+        {page.next && page.ticketUrl && !rowTickets && (
           <ExternalLink href={page.ticketUrl} hint={t.production.externalLink} className={buttonSecondary}>
             {t.production.buyTickets}
           </ExternalLink>
@@ -113,11 +139,12 @@ export default async function ProductionRoute({ params }: PageProps<"/[locale]/e
       <CriticLinks critics={page.critics} blogs={page.blogs} locale={locale} t={t} />
       <CreditList credits={page.credits} locale={locale} t={t} />
 
-      <p className="text-base text-ink-muted">
-        {t.production.source}:{" "}
+      <p className="ai-source">
+        {t.production.sourceLine}:{" "}
         <ExternalLink href={page.sourceUrl} hint={t.production.externalLink}>
-          {page.theatre.name}
-        </ExternalLink>
+          {hostname(page.sourceUrl)}
+        </ExternalLink>{" "}
+        · {t.production.updated} {formatShortDate(page.updatedAt, locale, page.asOf, false)}
       </p>
 
       {jsonLd.length > 0 && (

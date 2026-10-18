@@ -23,6 +23,8 @@ const page: ProductionPage = {
   next: null,
   last: null,
   progress: null,
+  fullSchedule: true,
+  closingSoon: false,
   year: null,
   credits: [
     { role: "DIRECTOR", person: { slug: "a", name: "Anna" }, characterName: null },

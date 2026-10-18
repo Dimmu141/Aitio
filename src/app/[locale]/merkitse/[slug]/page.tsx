@@ -64,7 +64,7 @@ function WhenField({
   const dateValue = entry && !known ? entry.seenOn.toISOString().slice(0, 10) : today;
   return (
     <fieldset className="space-y-2">
-      <legend className="mb-1 text-xl font-semibold">{t.log.when}</legend>
+      <legend className="mb-1 text-card font-semibold">{t.log.when}</legend>
       <div className="flex flex-wrap gap-2">
         {context.performances.map((performance) => (
           <label key={performance.id} className={chip}>
@@ -95,7 +95,7 @@ function RatingField({ entry, locale, t }: { entry: EditableEntry | null; locale
   const current = entry?.rating ?? null;
   return (
     <fieldset>
-      <legend className="mb-2 text-xl font-semibold">
+      <legend className="mb-2 text-card font-semibold">
         {t.log.rating} <span className="text-base font-normal text-ink-muted">({t.log.optional})</span>
       </legend>
       <div className="grid grid-cols-5 gap-2">
@@ -139,7 +139,7 @@ function MoreFields({
   const isPublic = entry ? entry.isPublic : true;
   const isRewatch = entry ? entry.isRewatch : context.earlier.length > 0;
   return (
-    <details open={open} className="group rounded border border-rule bg-card p-4">
+    <details open={open} className="group rounded-md border border-rule bg-paper-raised p-4">
       <summary className="flex min-h-tap cursor-pointer list-none items-center justify-between gap-4 text-lg font-semibold [&::-webkit-details-marker]:hidden">
         {t.log.more}
         <span aria-hidden="true" className="text-2xl group-open:rotate-180">
@@ -209,10 +209,10 @@ export default async function LogPage({ params, searchParams }: PageProps<"/[loc
   return (
     <div className="space-y-6">
       <header>
-        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-ink-muted">
+        <p className="text-label font-bold uppercase tracking-[0.06em] text-ink-muted">
           {[context.production.theatre, context.production.stage].filter(Boolean).join(" · ")}
         </p>
-        <h1 className="text-4xl font-semibold">
+        <h1 className="text-display">
           <Link href={href(locale, "esitys", slug)}>{context.production.title}</Link>
         </h1>
         <p className="mt-1 text-xl">{entry ? t.log.editTitle : t.log.title}</p>

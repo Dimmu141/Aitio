@@ -32,7 +32,7 @@ export default async function SignInPage({ searchParams }: PageProps<"/[locale]/
     // scanners following the link can't use up the token.
     return (
       <div className="max-w-xl space-y-5">
-        <h1 className="text-4xl font-semibold">{t.auth.confirmTitle}</h1>
+        <h1 className="text-display">{t.auth.confirmTitle}</h1>
         <p>{t.auth.confirmBody}</p>
         <form method="get" action="/api/auth/magic-link/verify">
           <input type="hidden" name="token" value={token} />
@@ -52,7 +52,7 @@ export default async function SignInPage({ searchParams }: PageProps<"/[locale]/
   if (param(params, "sent")) {
     return (
       <div className="max-w-xl space-y-5">
-        <h1 className="text-4xl font-semibold">{t.auth.sentTitle}</h1>
+        <h1 className="text-display">{t.auth.sentTitle}</h1>
         <p className="text-lg">{t.auth.sentBody(MAGIC_LINK_MINUTES)}</p>
         <p>
           <a href={`${href(locale, "kirjaudu")}?next=${encodeURIComponent(next)}`} className="inline-flex min-h-tap items-center">
@@ -72,7 +72,7 @@ export default async function SignInPage({ searchParams }: PageProps<"/[locale]/
 
   return (
     <div className="max-w-xl space-y-5">
-      <h1 className="text-4xl font-semibold">{t.auth.title}</h1>
+      <h1 className="text-display">{t.auth.title}</h1>
       {message && <Notice tone="error">{message}</Notice>}
       <p className="text-lg">{t.auth.intro}</p>
       <form action={signInAction} className="space-y-4">

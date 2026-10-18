@@ -74,7 +74,7 @@ test("the production page has event JSON-LD and outbound ticket links", async ({
   const jsonLd = await page.locator('script[type="application/ld+json"]').first().textContent();
   const events = JSON.parse(jsonLd ?? "[]") as Array<{ "@type": string }>;
   expect(events[0]["@type"]).toBe("TheaterEvent");
-  await expect(page.getByRole("link", { name: /Osta liput/ })).toHaveAttribute("rel", /noopener/);
+  await expect(page.getByRole("link", { name: /^Liput/ }).first()).toHaveAttribute("rel", /noopener/);
 });
 
 test("sitemap, robots and manifest are served", async ({ request }) => {

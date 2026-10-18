@@ -59,10 +59,10 @@ export default async function PersonRoute({ params }: PageProps<"/[locale]/henki
 
   return (
     <div className="space-y-10">
-      <h1 className="border-b-4 border-double border-ink pb-4 text-4xl font-semibold sm:text-5xl">{page.name}</h1>
+      <h1 className="border-b-4 border-double border-ink pb-4 text-display">{page.name}</h1>
       {page.current.length > 0 && (
         <section aria-labelledby="current">
-          <h2 id="current" className="text-3xl font-semibold">
+          <h2 id="current" className="text-section">
             {t.person.current}
           </h2>
           {list(page.current)}
@@ -70,7 +70,7 @@ export default async function PersonRoute({ params }: PageProps<"/[locale]/henki
       )}
       {page.past.length > 0 && (
         <section aria-labelledby="past">
-          <h2 id="past" className="text-2xl font-semibold">
+          <h2 id="past" className="text-section">
             {t.person.past}
           </h2>
           {list(page.past)}

@@ -36,7 +36,7 @@ const HEALTH_LABEL: Record<Health, string> = {
 
 function HealthBadge({ value }: { value: Health }) {
   const tone = value === "ok" ? "border-ink" : value === "running" || value === "never" ? "border-rule" : "border-accent text-accent";
-  return <span className={`rounded border-2 px-2 py-0.5 text-base font-semibold ${tone}`}>{HEALTH_LABEL[value]}</span>;
+  return <span className={`rounded-md border-2 px-2 py-0.5 text-base font-semibold ${tone}`}>{HEALTH_LABEL[value]}</span>;
 }
 
 async function ScrapeHealth({ now }: { now: Date }) {
@@ -48,7 +48,7 @@ async function ScrapeHealth({ now }: { now: Date }) {
   const bySource = (id: string): RunRow[] => runs.filter((run) => run.sourceId === id);
   return (
     <section aria-labelledby="haut" className="space-y-4">
-      <h2 id="haut" className="text-3xl font-semibold">
+      <h2 id="haut" className="text-section">
         Haut
       </h2>
       <ul className="space-y-4">
@@ -56,9 +56,9 @@ async function ScrapeHealth({ now }: { now: Date }) {
           const history = bySource(id);
           const latest = history[0];
           return (
-            <li key={id} className="space-y-2 rounded border border-rule bg-card p-4">
+            <li key={id} className="space-y-2 rounded-md border border-rule bg-paper-raised p-4">
               <p className="flex flex-wrap items-center justify-between gap-2">
-                <span className="text-xl font-semibold">{names.get(id) ?? id}</span>
+                <span className="text-card font-semibold">{names.get(id) ?? id}</span>
                 <HealthBadge value={health(latest, now)} />
               </p>
               {latest && (
@@ -94,7 +94,7 @@ async function TypeReview() {
   const rows = await typeReviewQueue();
   return (
     <section aria-labelledby="tyypit" className="space-y-4">
-      <h2 id="tyypit" className="text-3xl font-semibold">
+      <h2 id="tyypit" className="text-section">
         Lajityypit
       </h2>
       <p className="text-base text-ink-muted">Luokittelija on epävarma näistä, tai tyyppi on jo korjattu käsin.</p>
@@ -121,7 +121,7 @@ async function TypeReview() {
                   id={`type-${row.id}`}
                   name="type"
                   defaultValue={row.typeOverride ?? ""}
-                  className="min-h-tap min-w-0 flex-1 rounded border-2 border-rule bg-white px-2"
+                  className="min-h-tap min-w-0 flex-1 rounded-md border-2 border-rule bg-paper-raised px-2"
                 >
                   <option value="">Automaattinen ({t.types[row.type]})</option>
                   {Object.values(ProductionType).map((type) => (
@@ -146,7 +146,7 @@ async function Moderation() {
   const queue = await moderationQueue();
   return (
     <section aria-labelledby="ilmoitukset" className="space-y-4">
-      <h2 id="ilmoitukset" className="text-3xl font-semibold">
+      <h2 id="ilmoitukset" className="text-section">
         Ilmoitukset
       </h2>
       {queue.length === 0 ? (
@@ -154,7 +154,7 @@ async function Moderation() {
       ) : (
         <ul className="space-y-4">
           {queue.map((item) => (
-            <li key={item.entryId} className="space-y-2 rounded border border-rule bg-card p-4">
+            <li key={item.entryId} className="space-y-2 rounded-md border border-rule bg-paper-raised p-4">
               <p className="font-semibold">
                 {item.production}
                 {item.hidden && <span className="ml-2 text-accent">(piilotettu automaattisesti)</span>}
@@ -192,7 +192,7 @@ export default async function AdminPage({ searchParams }: PageProps<"/[locale]/y
 
   return (
     <div className="space-y-12">
-      <h1 className="border-b-4 border-double border-ink pb-4 text-4xl font-semibold">Ylläpito</h1>
+      <h1 className="border-b-4 border-double border-ink pb-4 text-display">Ylläpito</h1>
       {query.saved && <Notice>Tallennettu.</Notice>}
       <ScrapeHealth now={now} />
       <TypeReview />

@@ -1,13 +1,21 @@
 import type { ReactNode } from "react";
 
 export function BadgeRow({ children }: { children: ReactNode }) {
-  return <ul className="flex flex-wrap gap-2">{children}</ul>;
+  return <ul className="ai-badges">{children}</ul>;
 }
 
-export function Badge({ label, children }: { label?: string; children: ReactNode }) {
+export function Badge({
+  title,
+  variant,
+  children,
+}: {
+  /** The spelled-out meaning, for badges that show codes ("SV ruotsiksi"). */
+  title?: string;
+  variant?: "urgent" | "quiet";
+  children: ReactNode;
+}) {
   return (
-    <li className="rounded border border-rule bg-card px-2.5 py-1 text-base">
-      {label && <span className="text-ink-muted">{label}: </span>}
+    <li className={`ai-badge${variant ? ` ai-badge--${variant}` : ""}`} title={title}>
       {children}
     </li>
   );

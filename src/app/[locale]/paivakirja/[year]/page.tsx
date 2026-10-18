@@ -32,7 +32,7 @@ function tagLabel(slug: string, locale: Locale): string {
 
 function Figure({ value, label }: { value: ReactNode; label: string }) {
   return (
-    <div className="rounded border border-rule bg-card p-3">
+    <div className="rounded-md border border-rule bg-paper-raised p-3">
       <dd className="font-serif text-5xl font-semibold tabular-nums">{value}</dd>
       <dt className="text-base text-ink-muted">{label}</dt>
     </div>
@@ -42,7 +42,7 @@ function Figure({ value, label }: { value: ReactNode; label: string }) {
 function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return (
     <section aria-labelledby={id} className="space-y-3 border-t border-rule pt-4">
-      <h2 id={id} className="text-2xl font-semibold">
+      <h2 id={id} className="text-section">
         {title}
       </h2>
       {children}
@@ -176,7 +176,7 @@ export default async function YearPage({ params }: PageProps<"/[locale]/paivakir
   return (
     <div className="space-y-6">
       <header className="border-b-4 border-double border-ink pb-4">
-        <h1 className="text-4xl font-semibold sm:text-5xl">{t.year.title(year)}</h1>
+        <h1 className="text-display">{t.year.title(year)}</h1>
         <p className="text-base text-ink-muted">{t.year.privateNote}</p>
       </header>
 

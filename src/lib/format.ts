@@ -20,6 +20,17 @@ export function formatPerformance(date: Date, locale: Locale, asOf: Date): strin
   }).format(date);
 }
 
+/** "la 14.11." (or "10.9." without the weekday); the year is added when it isn't the current one. */
+export function formatShortDate(date: Date, locale: Locale, asOf: Date, weekday = true): string {
+  return new Intl.DateTimeFormat(INTL_LOCALE[locale], {
+    timeZone: TIME_ZONE,
+    weekday: weekday ? "short" : undefined,
+    day: "numeric",
+    month: "numeric",
+    year: helsinkiYear(date) === helsinkiYear(asOf) ? undefined : "numeric",
+  }).format(date);
+}
+
 /** "23. lokakuuta 2026". */
 export function formatDate(date: Date, locale: Locale): string {
   return new Intl.DateTimeFormat(INTL_LOCALE[locale], {

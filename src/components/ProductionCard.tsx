@@ -6,7 +6,7 @@ import type { ProductionCard as Card } from "@/lib/catalogue/types";
 import { formatPerformance, isoDateTime } from "@/lib/format";
 import { posterTone } from "@/lib/poster";
 
-/** One programme row: colour edge from the poster tone, serif title, where and when. */
+/** One programme row: colour edge from the poster ground, serif title, where and when. */
 export function ProductionCard({
   card,
   asOf,
@@ -26,15 +26,15 @@ export function ProductionCard({
   const where = [showTheatre ? card.theatre.name : null, card.stage].filter(Boolean).join(" · ");
   return (
     <li className="flex gap-3 border-b border-rule py-4">
-      <span aria-hidden="true" className="w-2 shrink-0 rounded-sm" style={{ backgroundColor: tone.background }} />
+      <span aria-hidden="true" className={`ai-poster--${tone.name} w-2 shrink-0 rounded-sm`} />
       <div className="min-w-0 space-y-1">
-        <h3 className="text-2xl font-semibold">
-          <Link href={href(locale, "esitys", card.slug)} className="break-words">
+        <h3 className="text-card">
+          <Link href={href(locale, "esitys", card.slug)} className="break-words text-ink decoration-rule-strong hover:text-ink hover:decoration-current">
             {card.title}
           </Link>
         </h3>
         {where && <p>{where}</p>}
-        <p className="text-base text-ink-muted">
+        <p className="text-meta text-ink-muted">
           {t.types[card.type]}
           {card.next && (
             <>
@@ -46,7 +46,7 @@ export function ProductionCard({
           )}
           {!card.next && card.year && <> · {t.production.performedIn(card.year)}</>}
         </p>
-        {note && <p className="text-base font-semibold text-accent">{note}</p>}
+        {note && <p className="text-meta font-bold">{note}</p>}
       </div>
     </li>
   );

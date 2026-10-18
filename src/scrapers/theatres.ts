@@ -57,3 +57,12 @@ export const THEATRES: readonly TheatreSeed[] = [
     sourceId: "espoon-teatteri",
   },
 ];
+
+/** Sources that list only the next few performances (adapters set `performancesPartial`). */
+const PARTIAL_SCHEDULE_SOURCES: ReadonlySet<string> = new Set(["espoon-teatteri"]);
+
+/** Whether a theatre's upcoming performances are complete enough to count what's left. */
+export function hasFullSchedule(theatreSlug: string): boolean {
+  const theatre = THEATRES.find((candidate) => candidate.slug === theatreSlug);
+  return theatre !== undefined && !PARTIAL_SCHEDULE_SOURCES.has(theatre.sourceId);
+}

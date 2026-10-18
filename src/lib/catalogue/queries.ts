@@ -1,6 +1,7 @@
 import { cacheLife, cacheTag } from "next/cache";
 import type { CreditRole, ProductionType } from "@/generated/prisma/enums";
 import { db } from "@/lib/db";
+import { hasFullSchedule } from "@/scrapers/theatres";
 import { cardSelect, toCard } from "./cards";
 import {
   effectiveType,
@@ -64,6 +65,9 @@ export interface ProductionPage {
   next: Date | null;
   last: Date | null;
   progress: number | null;
+  /** False when the source lists only the next few dates, so "N left" would be wrong. */
+  fullSchedule: boolean;
+  closingSoon: boolean;
   year: number | null;
   credits: CreditRow[];
   /** Press reviews; blog posts the theatre lists go to `blogs` (see review-kind.ts). */
@@ -150,6 +154,8 @@ export async function getProduction(slug: string): Promise<ProductionPage | null
     next: timing.next,
     last: timing.last,
     progress: runProgress(row.premiereDate, row.performances[0]?.startsAt ?? null, timing.last ?? row.runEnd, asOf),
+    fullSchedule: hasFullSchedule(row.theatre.slug),
+    closingSoon: timing.closingSoon,
     year: timing.next ? null : lastYear([row.performances.at(-1)?.startsAt, row.runEnd, row.premiereDate]),
     credits: row.credits
       .filter((credit) => isCurrent(credit, row))

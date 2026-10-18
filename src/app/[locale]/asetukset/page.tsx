@@ -21,13 +21,13 @@ export default async function SettingsPage({ searchParams }: PageProps<"/[locale
 
   return (
     <div className="max-w-xl space-y-10">
-      <h1 className="border-b-4 border-double border-ink pb-4 text-4xl font-semibold">{t.settings.title}</h1>
+      <h1 className="border-b-4 border-double border-ink pb-4 text-display">{t.settings.title}</h1>
       {query.saved === "1" && <Notice>{t.settings.saved}</Notice>}
 
       <form action={updateNameAction} className="space-y-3">
         <input type="hidden" name="locale" value={locale} />
         <label className="block space-y-1">
-          <span className="text-xl font-semibold">{t.settings.name}</span>
+          <span className="text-card font-semibold">{t.settings.name}</span>
           <input name="name" defaultValue={user.name} maxLength={MAX_NAME_LENGTH} autoComplete="nickname" className={input} />
           <span className="block text-base text-ink-muted">{t.settings.nameHint}</span>
         </label>
@@ -37,7 +37,7 @@ export default async function SettingsPage({ searchParams }: PageProps<"/[locale
       </form>
 
       <section id="kooste" aria-labelledby="kooste-title" className="scroll-mt-4 space-y-3">
-        <h2 id="kooste-title" className="text-xl font-semibold">
+        <h2 id="kooste-title" className="text-card font-semibold">
           {t.digest.settingsTitle}
         </h2>
         {query.saved === "digest" && <Notice>{t.settings.saved}</Notice>}
@@ -55,7 +55,7 @@ export default async function SettingsPage({ searchParams }: PageProps<"/[locale
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-xl font-semibold">{t.settings.email}</h2>
+        <h2 className="text-card font-semibold">{t.settings.email}</h2>
         <p className="break-all">{user.email}</p>
         <div className="flex flex-wrap gap-3">
           <form action={signOutAction}>
@@ -78,8 +78,8 @@ export default async function SettingsPage({ searchParams }: PageProps<"/[locale
         </p>
       )}
 
-      <section className="space-y-3 rounded border-2 border-ink p-4">
-        <h2 className="text-xl font-semibold">{t.settings.deleteTitle}</h2>
+      <section className="space-y-3 rounded-md border-2 border-ink p-4">
+        <h2 className="text-card font-semibold">{t.settings.deleteTitle}</h2>
         {query.error === "confirm" && <Notice tone="error">{t.settings.deleteConfirm}</Notice>}
         <p>{t.settings.deleteBody}</p>
         <form action={deleteAccountAction} className="space-y-3">

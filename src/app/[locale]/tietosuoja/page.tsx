@@ -27,13 +27,13 @@ export default async function PrivacyPage() {
   return (
     <article className="max-w-2xl space-y-8">
       <header className="space-y-3 border-b-4 border-double border-ink pb-4">
-        <h1 className="text-4xl font-semibold sm:text-5xl">{policy.title}</h1>
+        <h1 className="text-display">{policy.title}</h1>
         <p className="text-base text-ink-muted">{policy.updated}</p>
       </header>
       <p className="text-lg">{policy.intro}</p>
       {policy.sections.map((section) => (
         <section key={section.heading} className="space-y-3">
-          <h2 className="text-2xl font-semibold">{section.heading}</h2>
+          <h2 className="text-section">{section.heading}</h2>
           {section.blocks.map((block, index) => (
             <BlockView key={index} block={block} />
           ))}

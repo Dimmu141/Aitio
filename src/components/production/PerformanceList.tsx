@@ -1,34 +1,36 @@
-import { ExternalLink } from "@/components/ExternalLink";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/fi";
 import type { PerformanceRow } from "@/lib/catalogue/types";
 import { formatPerformance, isoDateTime } from "@/lib/format";
 
-const VISIBLE = 6;
+const VISIBLE = 3;
 
 function Row({ row, asOf, locale, t }: { row: PerformanceRow; asOf: Date; locale: Locale; t: Dictionary }) {
+  const meta = [row.stage, row.subtitleLangs.length > 0 ? subtitleText(row.subtitleLangs, t) : null].filter(Boolean);
   return (
-    <li className="flex min-h-tap flex-wrap items-center justify-between gap-x-4 border-b border-rule py-2">
-      <span>
-        <time dateTime={isoDateTime(row.startsAt)} className="font-semibold">
+    <li className="ai-perf">
+      <span className="ai-perf__when">
+        <time dateTime={isoDateTime(row.startsAt)} className="ai-perf__date">
           {formatPerformance(row.startsAt, locale, asOf)}
         </time>
-        {row.stage && <span className="text-ink-muted"> · {row.stage}</span>}
-        {row.subtitleLangs.length > 0 && (
-          <span className="block text-base">
-            {t.production.subtitles}: {row.subtitleLangs.map((code) => t.languages[code] ?? code.toUpperCase()).join(", ")}
-          </span>
-        )}
+        {meta.length > 0 && <span className="ai-perf__stage">{meta.join(" · ")}</span>}
       </span>
       {row.ticketUrl && (
-        <ExternalLink href={row.ticketUrl} hint={t.production.externalLink} className="inline-flex min-h-tap items-center">
+        <a href={row.ticketUrl} rel="noopener external" className="ai-perf__buy">
           {t.production.performanceTickets}
-        </ExternalLink>
+          <span aria-hidden="true">&nbsp;↗</span>
+          <span className="sr-only"> ({t.production.externalLink})</span>
+        </a>
       )}
     </li>
   );
 }
 
+export function subtitleText(codes: string[], t: Dictionary): string {
+  return `${t.production.subtitles} ${codes.map((code) => code.toUpperCase()).join(" · ")}`;
+}
+
+/** The next three dates; the rest open in place (no JavaScript needed). */
 export function PerformanceList({
   rows,
   asOf,
@@ -45,18 +47,19 @@ export function PerformanceList({
   const rest = rows.slice(VISIBLE);
   return (
     <section aria-labelledby="performances">
-      <h2 id="performances" className="mb-2 text-2xl font-semibold">
+      <h2 id="performances" className="sr-only">
         {t.production.performances}
       </h2>
-      <ul>
+      <ul className="ai-perfs">
         {first.map((row) => (
           <Row key={row.startsAt.toISOString()} row={row} asOf={asOf} locale={locale} t={t} />
         ))}
       </ul>
       {rest.length > 0 && (
         <details className="group">
-          <summary className="flex min-h-tap cursor-pointer items-center font-semibold text-accent underline group-open:hidden">
-            {t.production.showAllPerformances(rows.length)}
+          <summary className="ai-perf cursor-pointer list-none group-open:hidden [&::-webkit-details-marker]:hidden">
+            <span className="ai-perf__date">{t.production.moreDates(rest.length)}</span>
+            <span className="ai-perf__buy">{t.production.allDates}</span>
           </summary>
           <ul>
             {rest.map((row) => (

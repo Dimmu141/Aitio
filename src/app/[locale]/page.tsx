@@ -38,15 +38,18 @@ async function OnStage({
   const closing = shown.filter((card) => card.closingSoon);
 
   return (
-    <div className="space-y-8">
+    <div>
       <FilterBar options={options} filters={filters} locale={locale} t={t} />
 
       {closing.length > 0 && (
-        <section aria-labelledby="closing" className="rounded border-l-4 border-accent bg-card px-4 py-3">
-          <h2 id="closing" className="text-2xl font-semibold">
-            {t.home.closingSoon}
-          </h2>
-          <p className="text-base text-ink-muted">{t.home.closingSoonIntro}</p>
+        <section aria-labelledby="closing" className="ai-section">
+          <div className="ai-section__head">
+            <h2 id="closing" className="ai-section__title">
+              <span aria-hidden="true">⏳ </span>
+              {t.home.closingSoon}
+            </h2>
+            <p className="ai-section__aside">{t.home.closingSoonIntro}</p>
+          </div>
           <ul>
             {closing.map((card) => (
               <ProductionCard
@@ -67,10 +70,12 @@ async function OnStage({
         </section>
       )}
 
-      <section aria-labelledby="all">
-        <h2 id="all" className="text-lg font-semibold text-ink-muted" aria-live="polite">
-          {t.home.count(shown.length)}
-        </h2>
+      <section aria-labelledby="all" className="ai-section">
+        <div className="ai-section__head">
+          <h2 id="all" className="ai-section__title" aria-live="polite">
+            {t.home.count(shown.length)}
+          </h2>
+        </div>
         {shown.length === 0 ? (
           <p className="py-6">{t.home.empty}</p>
         ) : (
@@ -90,8 +95,8 @@ export default async function HomePage({ searchParams }: PageProps<"/[locale]">)
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-4xl font-semibold">{t.home.title}</h1>
-        <p className="mt-1 text-lg text-ink-muted">{t.home.intro}</p>
+        <h1 className="text-display">{t.home.title}</h1>
+        <p className="mt-1 text-ink-muted">{t.home.intro}</p>
       </header>
       <OnStage searchParams={searchParams} locale={locale} t={t} />
     </div>

@@ -1,6 +1,7 @@
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/fi";
 import { href } from "@/i18n/paths";
+import { buttonPrimary, chip } from "@/components/ui";
 import { type FilterOptions, type Filters, hasFilters } from "@/lib/catalogue/filters";
 
 interface Group {
@@ -13,13 +14,10 @@ function Chips({ group, selected, allLabel }: { group: Group; selected?: string;
   const choices = [{ value: "", label: allLabel }, ...group.values];
   return (
     <fieldset>
-      <legend className="mb-1 font-semibold">{group.legend}</legend>
+      <legend className="ai-credits__group mt-0 mb-2">{group.legend}</legend>
       <div className="flex flex-wrap gap-2">
         {choices.map((choice) => (
-          <label
-            key={choice.value || "all"}
-            className="inline-flex min-h-tap cursor-pointer items-center rounded-full border border-rule bg-paper px-4 has-[:checked]:border-ink has-[:checked]:bg-ink has-[:checked]:text-paper has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent"
-          >
+          <label key={choice.value || "all"} className={chip}>
             <input
               type="radio"
               name={group.name}
@@ -59,26 +57,23 @@ export function FilterBar({
 
   if (groups.length === 0) return null;
   return (
-    <details open={hasFilters(filters)} className="group rounded border border-rule bg-card p-4">
-      <summary className="flex min-h-tap cursor-pointer list-none items-center justify-between gap-4 text-lg font-semibold [&::-webkit-details-marker]:hidden">
+    <details open={hasFilters(filters)} className="group rounded-md border-[1.5px] border-rule-strong bg-paper-raised px-4 py-1">
+      <summary className="flex min-h-tap-primary cursor-pointer list-none items-center justify-between gap-4 font-bold [&::-webkit-details-marker]:hidden">
         {t.filters.legend}
         <span aria-hidden="true" className="text-2xl transition-transform group-open:rotate-180">
           ▾
         </span>
       </summary>
-      <form method="get" action={href(locale)} className="mt-3 space-y-5">
+      <form method="get" action={href(locale)} className="mt-1 mb-4 space-y-5">
         {groups.map((group) => (
           <Chips key={group.name} group={group} selected={filters[group.name]} allLabel={t.filters.all} />
         ))}
-        <div className="flex flex-wrap items-center gap-4">
-          <button
-            type="submit"
-            className="min-h-tap rounded bg-accent px-6 text-lg font-semibold text-paper hover:bg-ink"
-          >
+        <div className="ai-actions">
+          <button type="submit" className={buttonPrimary}>
             {t.filters.apply}
           </button>
           {hasFilters(filters) && (
-            <a href={href(locale)} className="inline-flex min-h-tap items-center">
+            <a href={href(locale)} className="inline-flex min-h-tap items-center justify-center">
               {t.filters.clear}
             </a>
           )}

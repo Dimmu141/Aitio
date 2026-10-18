@@ -6,7 +6,7 @@ export default async function NotFound() {
   const { locale, t } = await getDictionary();
   return (
     <div className="space-y-4">
-      <h1 className="text-4xl font-semibold">{t.notFound.title}</h1>
+      <h1 className="text-display">{t.notFound.title}</h1>
       <p>{t.notFound.body}</p>
       <p>
         <Link href={href(locale)} className="inline-flex min-h-tap items-center text-lg">

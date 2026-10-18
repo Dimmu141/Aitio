@@ -53,6 +53,6 @@ pnpm launch:check <env file>  # validate a production environment (see LAUNCH.md
 - **Ops**: cron logic is pure and tested in `src/lib/ops/schedule.ts`; admins are `ADMIN_EMAILS`. Admin UI strings are Finnish-only by design.
 - **Audience**: many users are 55–74. Light mode by default, body text 17–18px, high contrast, big tap targets, usable at 360px width.
 - **Languages**: UI in Finnish (default), Swedish and English. Content stays in its original language.
-- **Design**: printed theatre programme, not Netflix. Warm off-white, serif titles, sans UI, one accent colour. No masks, curtains or gradients.
+- **Design**: printed theatre programme, not Netflix. No masks, curtains, gradients or shadows. The Aitio design system (https://claude.ai/artifact/P8RU9CHVFfvPRLkiQax68J) is the source: its tokens are in `src/app/globals.css` (`@theme`) and `src/lib/tokens.ts` (contrast-tested; change both together), its component classes (`ai-*`) in `globals.css`. Newsreader for titles, Atkinson Hyperlegible for UI; 16px is the floor for any text. Hide empty sections instead of showing empty states. The specimen's "N esitystä jäljellä" is only shown for sources with a full schedule (`hasFullSchedule` in `src/scrapers/theatres.ts`).
 - TypeScript strict, no `any`. Keep functions small.
 - Commit messages: short imperative subject, body explaining why.

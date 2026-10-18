@@ -10,7 +10,7 @@ export function ReviewList({ reviews, locale, t }: { reviews: PublicReview[]; lo
   if (reviews.length === 0) return null;
   return (
     <div className="space-y-2">
-      <h3 className="text-xl font-semibold">{t.reviews.title}</h3>
+      <h3 className="text-card font-semibold">{t.reviews.title}</h3>
       <ul>
         {reviews.map((review) => (
           <li key={review.id} className="space-y-1 border-b border-rule py-3">

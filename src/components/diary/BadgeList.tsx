@@ -8,9 +8,9 @@ function Stamp({ badge, locale, t }: { badge: Badge; locale: Locale; t: Dictiona
   const earned = badge.earnedOn !== null;
   return (
     <li
-      className={`rounded p-3 ${earned ? "border-[6px] border-double border-ink bg-white" : "border-2 border-dashed border-rule"}`}
+      className={`rounded-md p-3 ${earned ? "border-[6px] border-double border-ink bg-paper-raised" : "border-2 border-dashed border-rule"}`}
     >
-      <p className="font-serif text-xl font-semibold">{text.name}</p>
+      <p className="font-serif text-card font-semibold">{text.name}</p>
       <p className="text-base">{text.description}</p>
       <p className="text-base text-ink-muted">
         {badge.earnedOn
@@ -27,7 +27,7 @@ export function BadgeList({ badges, locale, t }: { badges: Badge[]; locale: Loca
   const locked = badges.filter((badge) => badge.earnedOn === null);
   return (
     <section aria-labelledby="badges" className="space-y-3">
-      <h2 id="badges" className="text-2xl font-semibold">
+      <h2 id="badges" className="text-section">
         {t.badges.title} <span className="text-lg font-normal text-ink-muted">{t.badges.earned(earned.length, badges.length)}</span>
       </h2>
       {earned.length === 0 ? (

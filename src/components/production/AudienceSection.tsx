@@ -1,10 +1,15 @@
-import type { Locale } from "@/i18n/config";
+import { starText } from "@/components/Stars";
+import { INTL_LOCALE, type Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/fi";
 import type { ProductionPage } from "@/lib/catalogue/queries";
-import { MIN_RATINGS_FOR_AVERAGE } from "@/lib/catalogue/select";
+import { MIN_RATINGS_FOR_AVERAGE, MIN_RATINGS_FOR_HISTOGRAM } from "@/lib/catalogue/select";
 import { ReviewList } from "./ReviewList";
+import { Section } from "./Section";
 
-/** Rating histogram and tag counts. The average stays hidden until it means something. */
+/**
+ * What the audience thinks, revealed in steps: the count and tags first, the histogram
+ * from five ratings, the average from ten.
+ */
 export function AudienceSection({
   ratings,
   tags,
@@ -19,47 +24,55 @@ export function AudienceSection({
   t: Dictionary;
 }) {
   const max = Math.max(1, ...ratings.buckets);
+  // Highest first, like the specimen; empty half-star rows are left out.
+  const rows = ratings.buckets
+    .map((count, index) => ({ halfStars: index + 1, count }))
+    .filter((row) => row.count > 0)
+    .reverse();
   return (
-    <section aria-labelledby="audience" className="space-y-3">
-      <h2 id="audience" className="text-2xl font-semibold">
-        {t.production.audience}
-      </h2>
+    <Section id="audience" title={t.production.audience}>
       {ratings.count === 0 ? (
         <p className="text-ink-muted">{t.production.noRatings}</p>
       ) : (
-        <>
-          <p>
-            {ratings.average !== null && <span className="mr-3 font-serif text-3xl font-semibold">{ratings.average}</span>}
-            {t.production.ratingsCount(ratings.count)}
-          </p>
-          <ol aria-label={t.production.histogramLabel} className="flex h-24 items-end gap-1">
-            {ratings.buckets.map((count, index) => (
-              <li
-                key={index}
-                className="flex-1 rounded-t-sm bg-accent"
-                style={{ height: `${Math.max(4, (count / max) * 100)}%`, opacity: count === 0 ? 0.2 : 1 }}
-              >
-                <span className="sr-only">
-                  {t.production.stars((index + 1) / 2)}: {count}
-                </span>
-              </li>
-            ))}
-          </ol>
-          {ratings.average === null && (
-            <p className="text-base text-ink-muted">{t.production.averageHidden(MIN_RATINGS_FOR_AVERAGE)}</p>
-          )}
-        </>
+        <p className="ai-score">
+          <span className="ai-score__num">
+            {ratings.average !== null
+              ? ratings.average.toLocaleString(INTL_LOCALE[locale], { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+              : ratings.count}
+          </span>
+          <span className="ai-score__note">
+            {ratings.average !== null
+              ? t.production.ratingsCount(ratings.count)
+              : `${t.production.ratingsNoun(ratings.count)} · ${t.production.averageHidden(MIN_RATINGS_FOR_AVERAGE)}`}
+          </span>
+        </p>
       )}
       {tags.length > 0 && (
-        <ul className="flex flex-wrap gap-2">
+        <ul className="ai-tags mb-6">
           {tags.map((tag) => (
-            <li key={tag.slug} className="rounded-full border border-rule px-3 py-1 text-base">
-              {tag.labels[locale]} <span className="text-ink-muted">{tag.count}</span>
+            <li key={tag.slug} className="ai-tag">
+              {tag.labels[locale]} <span className="ai-tag__n">{tag.count}</span>
             </li>
           ))}
         </ul>
       )}
+      {ratings.count >= MIN_RATINGS_FOR_HISTOGRAM && (
+        <dl aria-label={t.production.histogramLabel} className="ai-hist mb-6">
+          {rows.map((row) => (
+            <div key={row.halfStars} className="contents">
+              <dt className="ai-hist__label">
+                <span aria-hidden="true">{starText(row.halfStars)}</span>
+                <span className="sr-only">{t.production.stars(row.halfStars / 2)}</span>
+              </dt>
+              <dd className="ai-hist__track" aria-hidden="true">
+                <div className="ai-hist__bar" style={{ width: `${(row.count / max) * 100}%` }} />
+              </dd>
+              <dd className="ai-hist__n">{row.count}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
       <ReviewList reviews={reviews} locale={locale} t={t} />
-    </section>
+    </Section>
   );
 }
