@@ -6,7 +6,7 @@ them with our own polite fetcher; do that whenever a site changes, then run `pnp
 | Fixtures | Captured | How |
 |---|---|---|
 | `kansallisteatteri/`, `svenska-teatern/` | 18 Oct 2026 | own fetcher (milestone 1) |
-| `hkt/`, `ryhmateatteri/` | 18 Oct 2026 | **Firecrawl**, because this environment's network policy blocks the theatre sites |
+| `hkt/`, `ryhmateatteri/`, `kom-teatteri/` | 18 Oct 2026 | **Firecrawl**, because this environment's network policy blocks the theatre sites |
 
 **Firecrawl captures are rendered after JavaScript.** Our fetcher gets the server HTML,
 which can differ (on hkt.fi, for example, the performance list and calendar are filled

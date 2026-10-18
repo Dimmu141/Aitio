@@ -1,6 +1,7 @@
 import type { PrismaClient } from "@/generated/prisma/client";
 import { hktAdapter } from "./adapters/hkt";
 import { kansallisteatteriAdapter } from "./adapters/kansallisteatteri";
+import { komTeatteriAdapter } from "./adapters/kom-teatteri";
 import { ryhmateatteriAdapter } from "./adapters/ryhmateatteri";
 import { svenskaTeaternAdapter } from "./adapters/svenska-teatern";
 import { planProduction, upsertProduction } from "./normalise";
@@ -11,6 +12,7 @@ export const ADAPTERS: Record<string, SourceAdapter> = {
   [svenskaTeaternAdapter.id]: svenskaTeaternAdapter,
   [hktAdapter.id]: hktAdapter,
   [ryhmateatteriAdapter.id]: ryhmateatteriAdapter,
+  [komTeatteriAdapter.id]: komTeatteriAdapter,
 };
 
 /** Error text including the `cause` chain, so "fetch failed" also says why (DNS, TLS, proxy...). */

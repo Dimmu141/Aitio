@@ -2,6 +2,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { LIST_URL as KT_LIST_URL } from "../src/scrapers/adapters/kansallisteatteri";
 import { LIST_URL as HKT_LIST_URL } from "../src/scrapers/adapters/hkt";
+import { CALENDAR_URL as KOM_CALENDAR_URL, LIST_URL as KOM_LIST_URL } from "../src/scrapers/adapters/kom-teatteri";
 import { listUrl as ryhmaListUrl } from "../src/scrapers/adapters/ryhmateatteri";
 import { showsUrl } from "../src/scrapers/adapters/svenska-teatern";
 import { politeFetch } from "../src/scrapers/http";
@@ -29,6 +30,9 @@ const FIXTURES: Array<{ url: string; file: string }> = [
     url: "https://www.ryhmateatteri.fi/ohjelma/aitisi-klytaimestra/",
     file: "fixtures/ryhmateatteri/production-aitisi-klytaimestra.html",
   },
+  { url: KOM_LIST_URL, file: "fixtures/kom-teatteri/ohjelmisto.html" },
+  { url: KOM_CALENDAR_URL, file: "fixtures/kom-teatteri/kalenteri.html" },
+  { url: "https://kom-teatteri.fi/ohjelmisto/mysteriobuffo/", file: "fixtures/kom-teatteri/production-mysteriobuffo.html" },
 ];
 
 async function main(): Promise<void> {
