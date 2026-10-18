@@ -74,7 +74,15 @@ export function languageCodes(text: string): string[] {
     [/engl|engel/, "en"],
     [/ven[äa]j|rysk/, "ru"],
     [/ukrain/, "uk"],
+    [/espanj|spansk|spanish/, "es"],
+    [/arabi/, "ar"],
+    [/latvi|lettisk/, "lv"],
+    [/viro|eesti|estnisk/, "et"],
+    [/ranska|fransk|french/, "fr"],
+    [/saksa|tysk|german/, "de"],
     [/viittomakiel|teckenspr/, "sign"],
+    // ISO 639-2 "no linguistic content": wordless performances.
+    [/sanaton|ordlös|wordless/, "zxx"],
   ];
   for (const [pattern, code] of table) {
     if (pattern.test(lower)) found.add(code);
@@ -107,4 +115,21 @@ export function weekdaysIn(text: string): number[] {
 export function helsinkiWeekday(instant: Date): number {
   const name = new Intl.DateTimeFormat("en-US", { timeZone: HELSINKI, weekday: "short" }).format(instant);
   return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(name);
+}
+
+const WEEKDAY_ABBREVIATIONS: Record<string, number> = { su: 0, ma: 1, ti: 2, ke: 3, to: 4, pe: 5, la: 6 };
+
+/**
+ * The year of "la 14.11." with no year printed: the year near `near` (within one year
+ * either way) whose 14 November is a Saturday. The weekday makes this exact rather than
+ * a guess; returns null when no candidate year matches.
+ */
+export function yearFromWeekday(day: number, month: number, weekday: string, near: Date): number | null {
+  const wanted = WEEKDAY_ABBREVIATIONS[weekday.toLowerCase().slice(0, 2)];
+  if (wanted === undefined) return null;
+  const base = near.getUTCFullYear();
+  const candidates = [base, base + 1, base - 1].filter(
+    (year) => new Date(Date.UTC(year, month - 1, day)).getUTCDay() === wanted,
+  );
+  return candidates[0] ?? null;
 }

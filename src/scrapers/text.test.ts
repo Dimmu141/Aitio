@@ -8,6 +8,7 @@ import {
   slugify,
   stripGuestMarker,
   weekdaysIn,
+  yearFromWeekday,
 } from "./text";
 
 describe("helsinkiToUtc", () => {
@@ -73,5 +74,29 @@ describe("weekdays", () => {
   it("uses the Helsinki weekday, not the UTC one", () => {
     // 23:30 UTC on Tuesday is already Wednesday in Helsinki.
     expect(helsinkiWeekday(new Date("2026-10-20T23:30:00Z"))).toBe(3);
+  });
+});
+
+describe("languageCodes, more languages", () => {
+  it("reads Espoo's language labels", () => {
+    expect(languageCodes("suomi, englanti ja latvia")).toEqual(["fi", "en", "lv"]);
+    expect(languageCodes("espanja")).toEqual(["es"]);
+    expect(languageCodes("arabia")).toEqual(["ar"]);
+    expect(languageCodes("sanaton")).toEqual(["zxx"]);
+  });
+});
+
+describe("yearFromWeekday", () => {
+  const near = new Date("2026-10-18T12:00:00Z");
+
+  it("finds the year whose date falls on that weekday", () => {
+    expect(yearFromWeekday(14, 11, "la", near)).toBe(2026); // Saturday 14.11.2026
+    expect(yearFromWeekday(12, 1, "ti", near)).toBe(2027); // Tuesday 12.1.2027
+  });
+
+  it("returns null when no nearby year fits", () => {
+    // 14.11. is a Friday in 2025, Saturday in 2026 and Sunday in 2027: never a Monday.
+    expect(yearFromWeekday(14, 11, "ma", near)).toBeNull();
+    expect(yearFromWeekday(14, 11, "xx", near)).toBeNull();
   });
 });

@@ -1,4 +1,5 @@
 import type { PrismaClient } from "@/generated/prisma/client";
+import { espoonTeatteriAdapter } from "./adapters/espoon-teatteri";
 import { hktAdapter } from "./adapters/hkt";
 import { kansallisteatteriAdapter } from "./adapters/kansallisteatteri";
 import { komTeatteriAdapter } from "./adapters/kom-teatteri";
@@ -13,6 +14,7 @@ export const ADAPTERS: Record<string, SourceAdapter> = {
   [hktAdapter.id]: hktAdapter,
   [ryhmateatteriAdapter.id]: ryhmateatteriAdapter,
   [komTeatteriAdapter.id]: komTeatteriAdapter,
+  [espoonTeatteriAdapter.id]: espoonTeatteriAdapter,
 };
 
 /** Error text including the `cause` chain, so "fetch failed" also says why (DNS, TLS, proxy...). */

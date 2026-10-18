@@ -1,6 +1,7 @@
 import * as cheerio from "cheerio";
 import { z } from "zod";
 import { politeFetch } from "../http";
+import { collectPages } from "../paginate";
 import { mapRoleText } from "../roles";
 import { cleanText, helsinkiToUtc, languageCodes, parseFinnishDate, stripGuestMarker } from "../text";
 import {
@@ -230,14 +231,7 @@ export function parseDetail(
 export const hktAdapter: SourceAdapter = {
   id: "hkt",
   async fetchProductions() {
-    const all = new Map<string, RawProduction>();
-    let url: string | null = LIST_URL;
-    for (let page = 0; url && page < MAX_LIST_PAGES; page += 1) {
-      const html = await politeFetch(url);
-      for (const production of parseList(html)) all.set(production.externalId, production);
-      url = parseNextPage(html);
-    }
-    return [...all.values()];
+    return collectPages(LIST_URL, (url) => politeFetch(url), parseList, parseNextPage, MAX_LIST_PAGES);
   },
   async fetchProductionDetail(ref) {
     const html = await politeFetch(ref.url);

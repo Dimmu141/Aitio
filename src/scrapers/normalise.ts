@@ -52,6 +52,24 @@ async function upsertPerson(db: PrismaClient, name: string) {
 }
 
 /**
+ * For sources that list only the next few performances: anything stored after the last
+ * one listed is not announced on the site yet, so it stays current instead of looking
+ * cancelled. A missing performance inside the listed window still goes stale.
+ */
+async function keepUnannounced(
+  db: PrismaClient,
+  productionId: string,
+  listed: RawProductionDetail["performances"],
+  seenAt: Date,
+): Promise<void> {
+  const horizon = listed.reduce((latest, performance) => (performance.startsAt > latest ? performance.startsAt : latest), seenAt);
+  await db.performance.updateMany({
+    where: { productionId, startsAt: { gt: horizon } },
+    data: { lastSeenAt: seenAt },
+  });
+}
+
+/**
  * Upsert one scraped production with its performances, credits and critic links.
  * Never deletes: performances and credits that disappeared simply keep their old
  * lastSeenAt, so readers can tell current rows from stale ones (see src/lib/current.ts).
@@ -112,6 +130,7 @@ export async function upsertProduction(
       },
     });
   }
+  if (detail.performancesPartial) await keepUnannounced(db, production.id, detail.performances, seenAt);
 
   let creditCount = 0;
   for (const [index, credit] of detail.credits.entries()) {

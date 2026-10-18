@@ -44,6 +44,7 @@ describe("runSource (dry run, no database)", () => {
         credits: [],
         performances: [],
         criticReviews: [],
+        performancesPartial: false,
       };
     },
   };

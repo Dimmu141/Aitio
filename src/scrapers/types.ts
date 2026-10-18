@@ -78,6 +78,11 @@ export const rawProductionDetailSchema = z.object({
   performances: z.array(rawPerformanceSchema),
   criticReviews: z.array(rawCriticReviewSchema),
   isVisiting: z.boolean().default(false),
+  /**
+   * The source only shows the next few performances (Espoon Teatteri). Then a stored
+   * performance later than the last one listed is not "gone", just not announced here.
+   */
+  performancesPartial: z.boolean().default(false),
 });
 export type RawProductionDetail = z.infer<typeof rawProductionDetailSchema>;
 

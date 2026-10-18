@@ -1,6 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { LIST_URL as KT_LIST_URL } from "../src/scrapers/adapters/kansallisteatteri";
+import { LIST_URL as ESPOO_LIST_URL } from "../src/scrapers/adapters/espoon-teatteri";
 import { LIST_URL as HKT_LIST_URL } from "../src/scrapers/adapters/hkt";
 import { CALENDAR_URL as KOM_CALENDAR_URL, LIST_URL as KOM_LIST_URL } from "../src/scrapers/adapters/kom-teatteri";
 import { listUrl as ryhmaListUrl } from "../src/scrapers/adapters/ryhmateatteri";
@@ -33,6 +34,16 @@ const FIXTURES: Array<{ url: string; file: string }> = [
   { url: KOM_LIST_URL, file: "fixtures/kom-teatteri/ohjelmisto.html" },
   { url: KOM_CALENDAR_URL, file: "fixtures/kom-teatteri/kalenteri.html" },
   { url: "https://kom-teatteri.fi/ohjelmisto/mysteriobuffo/", file: "fixtures/kom-teatteri/production-mysteriobuffo.html" },
+  { url: ESPOO_LIST_URL, file: "fixtures/espoon-teatteri/ohjelmisto.html" },
+  { url: `${ESPOO_LIST_URL}page/2/`, file: "fixtures/espoon-teatteri/ohjelmisto-page-2.html" },
+  {
+    url: "https://espoonteatteri.fi/ohjelmisto/rakastavaisten-kuoro/",
+    file: "fixtures/espoon-teatteri/production-rakastavaisten-kuoro.html",
+  },
+  {
+    url: "https://espoonteatteri.fi/ohjelmisto/legend-of-harri-kala/",
+    file: "fixtures/espoon-teatteri/production-legend-of-harri-kala.html",
+  },
 ];
 
 async function main(): Promise<void> {

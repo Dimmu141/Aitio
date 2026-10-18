@@ -77,4 +77,18 @@ describe.skipIf(!url)("upsertProduction (integration)", () => {
     const staleCredits = saved.credits.filter((row) => row.lastSeenAt < saved.lastSeenAt);
     expect(staleCredits.length).toBe(detail.credits[0].roles.length);
   });
+
+  it("keeps performances beyond a partial list's horizon current", async () => {
+    const sorted = [...detail.performances].sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime());
+    await upsertProduction(db, theatre, detail, new Date(Date.now() + 120_000));
+    // A later run lists only the second performance: the first one is gone.
+    const later = new Date(Date.now() + 180_000);
+    await upsertProduction(db, theatre, { ...detail, performances: [sorted[1]], performancesPartial: true }, later);
+
+    const rows = await db.performance.findMany({ where: { production: { slug: "nattland-svenska-teatern" } }, orderBy: { startsAt: "asc" } });
+    const current = rows.filter((row) => row.lastSeenAt.getTime() === later.getTime()).map((row) => row.startsAt.getTime());
+    expect(current).not.toContain(sorted[0].startsAt.getTime()); // inside the window and missing: cancelled
+    expect(current).toContain(sorted[1].startsAt.getTime());
+    expect(current).toContain(sorted.at(-1)?.startsAt.getTime()); // beyond the window: not announced yet
+  });
 });
