@@ -74,7 +74,20 @@ digest is a newsletter. Resend works as a fallback and is still supported (`RESE
    `List-Unsubscribe` may be replaced by Brevo's own. If it is missing, the link in the text
    still works; tell Claude and we'll look at Brevo's unsubscribe setting.
 
-## 3. Vercel project
+## 3. Vercel project ✓ done 18 Oct 2026 (except the custom domain)
+
+Project **aitio** (`prj_9bVcICSGk9YAz1TVEVPue1aEDaKg`), linked to `dimmu141/aitio`, functions
+in `fra1`, Node 22, Vercel Authentication on preview deployments only. Live at
+**https://aitio-eight.vercel.app** (`aitio.vercel.app` belongs to someone else). Production
+env vars set: `DATABASE_URL` (Neon, pooled), `BETTER_AUTH_SECRET`, `CRON_SECRET`,
+`REVALIDATE_SECRET`, `EMAIL_WEBHOOK_SECRET` (all sensitive), `SITE_URL`, `ADMIN_EMAILS`,
+`SCRAPER_USER_AGENT`. Still missing: `BREVO_API_KEY`, `EMAIL_FROM`, `PRIVACY_CONTROLLER`,
+`PRIVACY_EMAIL`, so sign-in emails and the privacy contact don't work yet. Previews have no
+database on purpose (they would write to production), so preview builds fail.
+
+The first production deployment was made from the PR branch; once PR #1 is merged, pushes
+to `main` deploy production.
+
 
 - Plan: **Hobby is enough.** Since January 2026 every plan allows 100 cron jobs per project.
   Hobby runs each at most once a day (ours are daily and weekly) and fires them somewhere
