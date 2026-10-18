@@ -36,6 +36,9 @@
     font-family: var(--font-serif);
     line-height: 1.15;
     text-wrap: balance;
+    /* Finnish compounds ("Kansallisteatteri") are longer than a 360px screen at display sizes. */
+    hyphens: auto;
+    overflow-wrap: break-word;
   }
 
   a {
