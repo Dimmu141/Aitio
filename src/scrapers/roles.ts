@@ -17,7 +17,7 @@ export function mapRoleText(roleText: string): CreditRoleName[] {
   const text = lower.replace(new RegExp(SKIP_WORDS.source, "g"), " ");
   const roles = new Set<CreditRoleName>();
   // "Ohjaajan assistentti", "Apulaisohjaaja", "Koreografinen assistentti" are not the lead.
-  const isAssistant = /assist|apulais/.test(text);
+  const isAssistant = /assist|apulais|apuohjaa/.test(text);
   if (!isAssistant && /ohjaa|ohjaus|\bregi\b|regiss|\bdirect/.test(text)) roles.add("DIRECTOR");
   if (
     /käsikirjoit|dramatisoin|\bteksti\b|kirjoittaja|kirjailija|^näytelmä(?:$|[\s:,])|\bwriter|^av\b|^text\b|\bmanus\b|dramatis|librett|alkuperäis|författ|bearbetning/.test(text)
@@ -25,11 +25,12 @@ export function mapRoleText(roleText: string): CreditRoleName[] {
     roles.add("WRITER");
   }
   // A conductor ("Musiikinjohto", "Kapellimestari") leads the music but did not write it.
-  const conducts = /musiikinjoht|kapellimest|dirigent|conduct/.test(text);
+  // Live musicians ("Livemusiikki", "Muusikot") play the music; they are not its composer either.
+  const conducts = /musiikinjoht|kapellimest|dirigent|conduct|livemusiik|muusiko|soittaj/.test(text);
   if (!conducts && /sävel|musiikki|kompo|\bmusik\b/.test(text)) roles.add("COMPOSER");
   if (/suomennos|käännös|översättning/.test(text)) roles.add("TRANSLATOR");
   if (!isAssistant && /koreograf/.test(text)) roles.add("CHOREOGRAPHER");
-  if (/suunnittel|design|lavastu|scenografi|kostym|puku|valo|ljus|ääni|ljud|naamio|mask|video/.test(text)) {
+  if (/suunnittel|design|lavastu|lavastaj|scenografi|kostym|puku|valo|ljus|ääni|ljud|naamio|mask|video/.test(text)) {
     roles.add("DESIGNER");
   }
   // Dance credits name dancers and performers instead of roles.

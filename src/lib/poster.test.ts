@@ -5,9 +5,14 @@ import { THEATRES } from "@/scrapers/theatres";
 import { TOKENS } from "./tokens";
 
 describe("theatreTone", () => {
-  it("gives every theatre its own colour", () => {
-    const tones = THEATRES.map((theatre) => theatreTone(theatre.slug).name);
-    expect(new Set(tones).size).toBe(THEATRES.length);
+  it("uses every colour, and none for more than three theatres", () => {
+    const counts = new Map<string, number>();
+    for (const theatre of THEATRES) {
+      const name = theatreTone(theatre.slug).name;
+      counts.set(name, (counts.get(name) ?? 0) + 1);
+    }
+    expect(counts.size).toBe(POSTER_TONES.length);
+    expect(Math.max(...counts.values())).toBeLessThanOrEqual(3);
   });
 
   it("has an entry for every theatre, so none falls back to the hash", () => {

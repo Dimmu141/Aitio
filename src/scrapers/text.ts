@@ -134,7 +134,7 @@ export function yearFromWeekday(day: number, month: number, weekday: string, nea
   return candidates[0] ?? null;
 }
 
-const NAME_PARTICLES = new Set(["af", "av", "da", "de", "del", "della", "der", "di", "dos", "du", "la", "le", "van", "von", "y", "zu"]);
+const NAME_PARTICLES = new Set(["af", "av", "da", "de", "del", "della", "der", "di", "do", "dos", "du", "la", "le", "van", "von", "y", "zu"]);
 
 /**
  * A credit candidate as a person's name, or null when it is a phrase instead.

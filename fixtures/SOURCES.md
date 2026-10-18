@@ -45,3 +45,42 @@ Things these captures taught us, which a refresh must keep true:
 | Kansallisteatteri | no subtitle data | per-performance indicators | parsed, `production-lady-t.html` |
 | HKT credits | – | rights agencies, "Kirjailija" | skipped / WRITER |
 | KOM | – | ticket link only on the page; one dead link | production ticket link; 404 = missing |
+
+## Sources added 18 Oct 2026 (dance, opera and independent theatres)
+
+All captured with `politeFetch` on 18 Oct 2026 from server HTML; robots.txt allows every
+path used. None of these sources lists only the next few dates (`hasFullSchedule` is true).
+
+- **oopperabaletti.fi** (Kansallisooppera ja -baletti) disallows `/wp-json/`. The season is a
+  JSON array in `data-posts` on `/ohjelmisto/`; performances are schema.org `Event` JSON-LD
+  on each production page (`startDate` is Helsinki wall-clock without an offset). The printed
+  genre sets `typeHint` (Ooppera → OPERA, Baletti/Nykytanssi → DANCE). "Kieli" holds the sung
+  language and surtitles. Tours, tea dances, free foyer events, Stage24 streams and concerts
+  at other venues are skipped. Conductors ("Musiikinjohto") are OTHER, not COMPOSER.
+- **zodiak.fi** lists each current production with every date on `/fi/ohjelmisto`; dates carry
+  `data-date="YYYY-MM-DD"`. Only `type-esitykset` items are kept (no panels, seminars or free
+  Z-Lab showings). Some productions play at Tanssin talo (Ghosts of Rosegarden, Oct 2026), so
+  the same evening can come from both sources.
+- **tanssintalo.fi** (Craft CMS): `/ohjelma` is an empty shell filled from the site's own
+  public GraphQL endpoint at `/api`; we send the same query as a GET (entries ending on or after
+  today). Performances, categories and organisers come from the API (`date` + the clock part of
+  `time`, Helsinki time); title, stage, duration, ticket link and credits from the page.
+  Workshops, talks, seminars, screenings and professional events are skipped, and so are
+  entries organised by Zodiak, which the zodiak source owns. Category Tanssi → DANCE,
+  Musiikki → CONCERT.
+- **q-teatteri.fi** (with a hyphen) is Webflow without an API. Dates are hand-written: month
+  rows with starred matinees, or one line per date; the year comes from the weekday or the
+  season box. Announced cancellations ("PERUUTUS!") are dropped. Puoli-Q is its small stage.
+- **teatteritakomo.fi** (takomo.fi does not resolve): the REST `shows` posts have no
+  performances, so `/ohjelmisto/` and each page's `.show` rows are read. Years come from the
+  printed weekday. Off-site venues are only named in prose; `KNOWN_VENUES` in the adapter
+  lists the ones seen (Hanasaari, Teatterimuseo, …). Two rows at one time are ticket types.
+- **viirus.fi** is Next.js over headless WordPress: every page carries its WPGraphQL data in
+  `__NEXT_DATA__`. Swedish pages only (fi/en are translations of the same posts). `showType`
+  "guest" marks visiting productions. No stage is named. Languages and subtitles come from
+  the "Språk" and "Textning" lines.
+- **avoimetovet.fi** (Teatteri Avoimet Ovet): the whole season is `data-events` JSON on
+  `/kalenteri/`, with full dates. Guest stand-up nights link straight to lippu.fi and become
+  visiting productions grouped by title (the ticket link is stored, never fetched).
+  "Visiting" otherwise comes from the VIERAILUOHJELMISTO menu, so a guest show that has left
+  the menu reads as the theatre's own.

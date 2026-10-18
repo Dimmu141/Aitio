@@ -1,10 +1,17 @@
 import type { PrismaClient } from "@/generated/prisma/client";
+import { avoimetOvetAdapter } from "./adapters/avoimet-ovet";
 import { espoonTeatteriAdapter } from "./adapters/espoon-teatteri";
 import { hktAdapter } from "./adapters/hkt";
+import { kansallisoopperaAdapter } from "./adapters/kansallisooppera";
 import { kansallisteatteriAdapter } from "./adapters/kansallisteatteri";
 import { komTeatteriAdapter } from "./adapters/kom-teatteri";
+import { qTeatteriAdapter } from "./adapters/q-teatteri";
 import { ryhmateatteriAdapter } from "./adapters/ryhmateatteri";
 import { svenskaTeaternAdapter } from "./adapters/svenska-teatern";
+import { takomoAdapter } from "./adapters/takomo";
+import { tanssinTaloAdapter } from "./adapters/tanssin-talo";
+import { viirusAdapter } from "./adapters/viirus";
+import { zodiakAdapter } from "./adapters/zodiak";
 import { HttpError } from "./http";
 import { planProduction, upsertProduction } from "./normalise";
 import type { RawProductionDetail, SourceAdapter } from "./types";
@@ -16,6 +23,13 @@ export const ADAPTERS: Record<string, SourceAdapter> = {
   [ryhmateatteriAdapter.id]: ryhmateatteriAdapter,
   [komTeatteriAdapter.id]: komTeatteriAdapter,
   [espoonTeatteriAdapter.id]: espoonTeatteriAdapter,
+  [kansallisoopperaAdapter.id]: kansallisoopperaAdapter,
+  [zodiakAdapter.id]: zodiakAdapter,
+  [tanssinTaloAdapter.id]: tanssinTaloAdapter,
+  [qTeatteriAdapter.id]: qTeatteriAdapter,
+  [takomoAdapter.id]: takomoAdapter,
+  [viirusAdapter.id]: viirusAdapter,
+  [avoimetOvetAdapter.id]: avoimetOvetAdapter,
 };
 
 /** Error text including the `cause` chain, so "fetch failed" also says why (DNS, TLS, proxy...). */

@@ -16,17 +16,29 @@ export const POSTER_TONES = [
 export type PosterTone = (typeof POSTER_TONES)[number];
 type ToneName = PosterTone["name"];
 
-/** One colour per theatre in THEATRES (src/scrapers/theatres.ts); a test keeps them distinct. */
+/**
+ * A colour per theatre in THEATRES (src/scrapers/theatres.ts). Six grounds, thirteen
+ * houses, so colours are shared in pairs that mean something: the national houses are
+ * plum, the Swedish-language stages teal, the independent groups ochre. The theatre's
+ * name next to the stripe tells pairs apart. A test keeps every theatre mapped.
+ */
 export const THEATRE_TONES: Readonly<Record<string, ToneName>> = {
   kansallisteatteri: "plum",
+  "kansallisooppera-ja-baletti": "plum",
   "svenska-teatern": "teal",
+  "teater-viirus": "teal",
   "helsingin-kaupunginteatteri": "coral",
+  "q-teatteri": "coral",
   ryhmateatteri: "ochre",
+  "teatteri-avoimet-ovet": "ochre",
+  "teatteri-takomo": "ochre",
   "kom-teatteri": "sage",
+  zodiak: "sage",
   "espoon-teatteri": "blue",
+  "tanssin-talo": "blue",
 };
 
-/** FNV-1a: tiny and stable across runtimes; only for theatres added before THEATRE_TONES. */
+/** FNV-1a: tiny and stable across runtimes; only for a theatre missing from THEATRE_TONES. */
 function hash(input: string): number {
   let value = 0x811c9dc5;
   for (let index = 0; index < input.length; index += 1) {
