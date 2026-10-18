@@ -17,6 +17,8 @@ export const sv: Dictionary = {
     closingSoonIntro: "De här slutar spelas inom två veckor.",
     empty: "Inga föreställningar med de här valen. Prova bredare val.",
     count: (n: number) => (n === 1 ? "1 föreställning" : `${n} föreställningar`),
+    closes: (date: string) => `Sista föreställningen ${date}`,
+    loading: "Hämtar föreställningar…",
   },
   filters: {
     legend: "Avgränsa föreställningar",

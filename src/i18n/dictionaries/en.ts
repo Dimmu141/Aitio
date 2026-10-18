@@ -17,6 +17,8 @@ export const en: Dictionary = {
     closingSoonIntro: "These close within two weeks.",
     empty: "No performances match these choices. Try widening them.",
     count: (n: number) => (n === 1 ? "1 production" : `${n} productions`),
+    closes: (date: string) => `Last performance ${date}`,
+    loading: "Loading productions…",
   },
   filters: {
     legend: "Narrow down",
