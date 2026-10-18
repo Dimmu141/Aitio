@@ -78,7 +78,7 @@ export const en: Dictionary = {
     TALK: "Talk",
     OTHER: "Other",
   },
-  languages: { fi: "Finnish", sv: "Swedish", en: "English" },
+  languages: { fi: "Finnish", sv: "Swedish", en: "English", ru: "Russian", uk: "Ukrainian", es: "Spanish", ar: "Arabic", lv: "Latvian", et: "Estonian", fr: "French", de: "German", sign: "sign language", zxx: "wordless" },
   theatre: {
     current: "On now",
     past: "Earlier productions",

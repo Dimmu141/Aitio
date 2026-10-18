@@ -5,6 +5,7 @@ import { getDictionary } from "@/i18n";
 import { href } from "@/i18n/paths";
 import { deleteAccountAction, signOutAction, updateNameAction } from "@/lib/actions";
 import { MAX_NAME_LENGTH } from "@/lib/diary/service";
+import { isAdmin } from "@/lib/ops/admin";
 import { requireUser } from "@/lib/session";
 
 /** Personal and per request. */
@@ -48,6 +49,14 @@ export default async function SettingsPage({ searchParams }: PageProps<"/[locale
           </a>
         </div>
       </section>
+
+      {isAdmin(user.email) && (
+        <p>
+          <a href={href("fi", "yllapito")} className="inline-flex min-h-tap items-center font-semibold">
+            Ylläpito
+          </a>
+        </p>
+      )}
 
       <section className="space-y-3 rounded border-2 border-ink p-4">
         <h2 className="text-xl font-semibold">{t.settings.deleteTitle}</h2>

@@ -78,7 +78,7 @@ export const sv: Dictionary = {
     TALK: "Samtal",
     OTHER: "Övrigt",
   },
-  languages: { fi: "finska", sv: "svenska", en: "engelska" },
+  languages: { fi: "finska", sv: "svenska", en: "engelska", ru: "ryska", uk: "ukrainska", es: "spanska", ar: "arabiska", lv: "lettiska", et: "estniska", fr: "franska", de: "tyska", sign: "teckenspråk", zxx: "ordlös" },
   theatre: {
     current: "På repertoaren nu",
     past: "Tidigare föreställningar",

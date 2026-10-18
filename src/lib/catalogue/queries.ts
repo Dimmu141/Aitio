@@ -182,6 +182,7 @@ export async function getProduction(slug: string): Promise<ProductionPage | null
       startsAt: performance.startsAt,
       stage: performance.stage?.name ?? null,
       ticketUrl: performance.ticketUrl,
+      subtitleLangs: performance.subtitleLangs,
     })),
     next: timing.next,
     last: timing.last,

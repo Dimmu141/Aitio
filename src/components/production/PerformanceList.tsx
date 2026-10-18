@@ -14,6 +14,11 @@ function Row({ row, asOf, locale, t }: { row: PerformanceRow; asOf: Date; locale
           {formatPerformance(row.startsAt, locale, asOf)}
         </time>
         {row.stage && <span className="text-ink-muted"> · {row.stage}</span>}
+        {row.subtitleLangs.length > 0 && (
+          <span className="block text-base">
+            {t.production.subtitles}: {row.subtitleLangs.map((code) => t.languages[code] ?? code.toUpperCase()).join(", ")}
+          </span>
+        )}
       </span>
       {row.ticketUrl && (
         <ExternalLink href={row.ticketUrl} hint={t.production.externalLink} className="inline-flex min-h-tap items-center">

@@ -6,6 +6,9 @@ import { expect, type Page } from "@playwright/test";
 /** Where the server under test writes outgoing emails (DEV_EMAIL_LOG_FILE). */
 export const EMAIL_LOG = process.env.DEV_EMAIL_LOG_FILE ?? join(tmpdir(), "aitio-e2e-emails.jsonl");
 
+/** Listed in ADMIN_EMAILS for the server under test; removed by the teardown like other test users. */
+export const ADMIN_EMAIL = "admin-e2e@example.fi";
+
 export function uniqueEmail(label: string): string {
   return `${label}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example.fi`;
 }

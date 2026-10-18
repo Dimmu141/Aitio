@@ -27,6 +27,8 @@ export interface PerformanceRow {
   startsAt: Date;
   stage: string | null;
   ticketUrl: string | null;
+  /** Subtitles at this performance only (e.g. Wednesdays); production-wide ones are on the production. */
+  subtitleLangs: string[];
 }
 
 export interface CreditRow {

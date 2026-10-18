@@ -1,5 +1,5 @@
 import { defineConfig } from "@playwright/test";
-import { EMAIL_LOG } from "./e2e/helpers";
+import { ADMIN_EMAIL, EMAIL_LOG } from "./e2e/helpers";
 
 /**
  * Smoke tests against a production build, at the narrowest phone width we support.
@@ -25,7 +25,12 @@ export default defineConfig({
   webServer: {
     command: "pnpm start",
     // Sign-in emails go to a file the tests read instead of being sent.
-    env: { DEV_EMAIL_LOG_FILE: EMAIL_LOG, REVALIDATE_SECRET: "e2e-revalidate-secret" },
+    env: {
+      DEV_EMAIL_LOG_FILE: EMAIL_LOG,
+      REVALIDATE_SECRET: "e2e-revalidate-secret",
+      CRON_SECRET: "e2e-cron-secret",
+      ADMIN_EMAILS: ADMIN_EMAIL,
+    },
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
   },

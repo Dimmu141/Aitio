@@ -17,8 +17,8 @@ const page: ProductionPage = {
   ticketUrl: "https://tickets.example/1",
   premiereDate: null,
   performances: [
-    { startsAt: new Date("2026-10-20T16:00:00Z"), stage: null, ticketUrl: null },
-    { startsAt: new Date("2026-10-21T16:00:00Z"), stage: "Stora scenen", ticketUrl: "https://tickets.example/2" },
+    { startsAt: new Date("2026-10-20T16:00:00Z"), stage: null, ticketUrl: null, subtitleLangs: [] },
+    { startsAt: new Date("2026-10-21T16:00:00Z"), stage: "Stora scenen", ticketUrl: "https://tickets.example/2", subtitleLangs: [] },
   ],
   next: null,
   last: null,

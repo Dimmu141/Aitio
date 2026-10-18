@@ -80,7 +80,7 @@ export const fi = {
     OTHER: "Muut tekijät",
   },
   types,
-  languages: { fi: "suomi", sv: "ruotsi", en: "englanti" } as Record<string, string>,
+  languages: { fi: "suomi", sv: "ruotsi", en: "englanti", ru: "venäjä", uk: "ukraina", es: "espanja", ar: "arabia", lv: "latvia", et: "viro", fr: "ranska", de: "saksa", sign: "viittomakieli", zxx: "sanaton" } as Record<string, string>,
   theatre: {
     current: "Ohjelmistossa nyt",
     past: "Aiemmin esitetty",
