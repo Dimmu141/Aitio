@@ -91,4 +91,15 @@ describe.skipIf(!url)("upsertProduction (integration)", () => {
     expect(current).toContain(sorted[1].startsAt.getTime());
     expect(current).toContain(sorted.at(-1)?.startsAt.getTime()); // beyond the window: not announced yet
   });
+
+  it("delists a production the theatre stopped listing, and relists it when it returns", async () => {
+    const { syncListing } = await import("@/scrapers/run");
+    const at = new Date();
+    expect(await syncListing(db, theatre.id, ["some-other-show"], at)).toBe(1);
+    expect((await db.production.findUniqueOrThrow({ where: { slug: "nattland-svenska-teatern" } })).delistedAt).toEqual(at);
+    // Already delisted: not counted again.
+    expect(await syncListing(db, theatre.id, [], new Date())).toBe(0);
+    expect(await syncListing(db, theatre.id, ["34985"], new Date())).toBe(0);
+    expect((await db.production.findUniqueOrThrow({ where: { slug: "nattland-svenska-teatern" } })).delistedAt).toBeNull();
+  });
 });

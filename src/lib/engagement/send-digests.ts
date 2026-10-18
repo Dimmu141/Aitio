@@ -46,7 +46,7 @@ export function unsubscribePageUrl(userId: string, locale: Locale): string {
 
 async function closingCards(asOf: Date) {
   const rows = await db.production.findMany({
-    where: { performances: { some: { startsAt: { gte: asOf } } } },
+    where: { delistedAt: null, performances: { some: { startsAt: { gte: asOf } } } },
     select: cardSelect,
   });
   return rows.map((row) => toCard(row, asOf)).filter((card) => card.closingSoon);

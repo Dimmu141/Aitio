@@ -14,6 +14,7 @@ function source(performances: Array<{ startsAt: Date; subtitleLangs: string[] }>
     languages: ["fi"],
     subtitleLangs,
     lastSeenAt: seen,
+    delistedAt: null as Date | null,
     premiereDate: null,
     runEnd: null,
     theatre: { slug: "kansallisteatteri", name: "Kansallisteatteri", city: "Helsinki" },
@@ -42,5 +43,12 @@ describe("toCard subtitles", () => {
 
   it("keeps production-wide subtitles", () => {
     expect(toCard(source([{ startsAt: day(1), subtitleLangs: [] }], ["sv"]), asOf).subtitleLangs).toEqual(["sv"]);
+  });
+});
+
+describe("toCard for a delisted production", () => {
+  it("has no upcoming performances, whatever is stored", () => {
+    const card = toCard({ ...source([{ startsAt: day(2), subtitleLangs: [] }]), delistedAt: seen }, asOf);
+    expect(card).toMatchObject({ next: null, onSoon: false, subtitleLangs: [] });
   });
 });

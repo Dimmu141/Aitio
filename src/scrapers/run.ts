@@ -42,6 +42,24 @@ export interface RunResult {
 }
 
 /**
+ * Productions the theatre stopped listing (cancelled, removed) are marked delisted so
+ * their stored future dates stop counting as "on stage"; a listed one is cleared again.
+ * A listed production whose page failed to load stays as it is. Returns how many were
+ * newly delisted.
+ */
+export async function syncListing(db: PrismaClient, theatreId: string, listed: string[], at: Date): Promise<number> {
+  await db.production.updateMany({
+    where: { theatreId, externalId: { in: listed }, delistedAt: { not: null } },
+    data: { delistedAt: null },
+  });
+  const result = await db.production.updateMany({
+    where: { theatreId, externalId: { notIn: listed }, delistedAt: null },
+    data: { delistedAt: at },
+  });
+  return result.count;
+}
+
+/**
  * Safety check: a source that suddenly returns nothing, or less than half of
  * what the previous successful run found, is probably broken (site redesign).
  */
@@ -117,6 +135,12 @@ export async function runSource(
       const summary = await upsertProduction(db, theatre, detail, seenAt);
       result.saved += 1;
       log(`  ${summary.created ? "+" : "~"} ${summary.slug} (${summary.performances} perf, ${summary.credits} credits)`);
+    }
+
+    // Only a complete run knows what the theatre no longer lists.
+    if (db && theatre && !options.dryRun && !options.limit) {
+      const delisted = await syncListing(db, theatre.id, list.map((ref) => ref.externalId), seenAt);
+      if (delisted > 0) log(`  ${delisted} no longer listed by the theatre`);
     }
 
     if (run && db) {

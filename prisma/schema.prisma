@@ -80,6 +80,8 @@ model Production {
   runEnd         DateTime?
   durationText   String?
   ticketUrl      String?
+  /// Set when a complete run of the source no longer lists it (cancelled, removed); cleared if it returns.
+  delistedAt     DateTime?
   lastSeenAt     DateTime
   performances   Performance[]
   credits        Credit[]

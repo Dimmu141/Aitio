@@ -13,6 +13,7 @@ export const cardSelect = {
   languages: true,
   subtitleLangs: true,
   lastSeenAt: true,
+  delistedAt: true,
   premiereDate: true,
   runEnd: true,
   theatre: theatreSelect,
@@ -28,6 +29,7 @@ interface CardSource {
   languages: string[];
   subtitleLangs: string[];
   lastSeenAt: Date;
+  delistedAt: Date | null;
   premiereDate: Date | null;
   runEnd: Date | null;
   theatre: TheatreRef;
@@ -43,7 +45,7 @@ function subtitlesSoon(source: CardSource, upcoming: CardSource["performances"],
 }
 
 export function toCard(source: CardSource, asOf: Date): ProductionCard {
-  const upcoming = upcomingPerformances(source.performances, source, asOf);
+  const upcoming = source.delistedAt ? [] : upcomingPerformances(source.performances, source, asOf);
   const timing = schedule(upcoming, asOf);
   return {
     slug: source.slug,

@@ -40,7 +40,7 @@ export async function getOnStage(): Promise<{ asOf: Date; cards: ProductionCard[
   cacheCatalogue();
   const asOf = new Date();
   const rows = await db.production.findMany({
-    where: { performances: { some: { startsAt: { gte: asOf } } } },
+    where: { delistedAt: null, performances: { some: { startsAt: { gte: asOf } } } },
     select: cardSelect,
   });
   const cards = rows.map((row) => toCard(row, asOf)).filter((card) => card.onSoon);
@@ -123,7 +123,8 @@ export async function getProduction(slug: string): Promise<ProductionPage | null
   });
   if (!row) return null;
 
-  const upcoming = upcomingPerformances(row.performances, row, asOf);
+  // A production the theatre no longer lists has no performances to sell, whatever is stored.
+  const upcoming = row.delistedAt ? [] : upcomingPerformances(row.performances, row, asOf);
   const timing = schedule(upcoming, asOf);
   const ratings = row.diaryEntries.flatMap((entry) => (entry.rating === null ? [] : [entry.rating / 2]));
 
