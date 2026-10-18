@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyFilters, filterOptions, hasFilters, parseFilters } from "./filters";
+import { applyFilters, filterOptions, hasFilters, parseFilters, SUBTITLE_FILTER_ENABLED } from "./filters";
 import type { ProductionCard } from "./types";
 
 function card(overrides: Partial<ProductionCard>): ProductionCard {
@@ -33,7 +33,7 @@ describe("filterOptions", () => {
       city: ["Espoo", "Helsinki"],
       type: ["PLAY", "MUSICAL", "CONCERT"],
       lang: ["fi", "sv"],
-      subs: ["en", "fi"],
+      subs: SUBTITLE_FILTER_ENABLED ? ["en", "fi"] : [],
     });
   });
 });
@@ -48,6 +48,10 @@ describe("parseFilters", () => {
 });
 
 describe("applyFilters", () => {
+  it("ignores the subtitle choice while that filter is off", () => {
+    expect(parseFilters({ subs: "fi" }, options)).toEqual(SUBTITLE_FILTER_ENABLED ? { subs: "fi" } : {});
+  });
+
   it("combines filters with AND", () => {
     expect(applyFilters(cards, { lang: "sv", subs: "fi" }).map((c) => c.slug)).toEqual(["b"]);
     expect(applyFilters(cards, { city: "Helsinki" }).map((c) => c.slug)).toEqual(["a", "b"]);

@@ -19,6 +19,13 @@ export interface FilterOptions {
 
 const TYPE_ORDER = Object.values(ProductionType);
 
+/**
+ * Off until Kansallisteatteri's per-performance subtitles are parsed: its rows have an
+ * empty subtitle column in every fixture we have, so the filter would silently miss the
+ * biggest theatre. Turn on together with Performance-level subtitle data.
+ */
+export const SUBTITLE_FILTER_ENABLED = false;
+
 /** Only offer choices that match something, so no filter ever leads to an empty page by itself. */
 export function filterOptions(cards: ProductionCard[]): FilterOptions {
   const unique = <T,>(values: T[]) => [...new Set(values)];
@@ -26,7 +33,7 @@ export function filterOptions(cards: ProductionCard[]): FilterOptions {
     city: unique(cards.map((card) => card.theatre.city)).sort((a, b) => a.localeCompare(b, "fi")),
     type: unique(cards.map((card) => card.type)).sort((a, b) => TYPE_ORDER.indexOf(a) - TYPE_ORDER.indexOf(b)),
     lang: unique(cards.flatMap((card) => card.languages)).sort(),
-    subs: unique(cards.flatMap((card) => card.subtitleLangs)).sort(),
+    subs: SUBTITLE_FILTER_ENABLED ? unique(cards.flatMap((card) => card.subtitleLangs)).sort() : [],
   };
 }
 
