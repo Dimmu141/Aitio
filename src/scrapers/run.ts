@@ -9,6 +9,12 @@ export const ADAPTERS: Record<string, SourceAdapter> = {
   [svenskaTeaternAdapter.id]: svenskaTeaternAdapter,
 };
 
+/** Error text including the `cause` chain, so "fetch failed" also says why (DNS, TLS, proxy...). */
+export function describeError(error: unknown): string {
+  if (!(error instanceof Error)) return String(error);
+  return error.cause === undefined ? error.message : `${error.message}: ${describeError(error.cause)}`;
+}
+
 export interface RunOptions {
   dryRun: boolean;
   /** Only fetch details for the first N productions (handy while developing). */
@@ -75,7 +81,7 @@ export async function runSource(
       try {
         detail = await adapter.fetchProductionDetail(ref);
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
+        const message = describeError(error);
         result.failed.push({ url: ref.url, error: message });
         log(`  ✗ ${ref.title}: ${message}`);
         continue;
@@ -118,7 +124,7 @@ export async function runSource(
           status: "FAILED",
           finishedAt: new Date(),
           itemsFound: result.found,
-          errors: { message: error instanceof Error ? error.message : String(error), failed: result.failed },
+          errors: { message: describeError(error), failed: result.failed },
         },
       });
     }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { looksBroken, runSource } from "./run";
+import { describeError, looksBroken, runSource } from "./run";
 import type { SourceAdapter } from "./types";
 
 describe("looksBroken", () => {
@@ -14,6 +14,17 @@ describe("looksBroken", () => {
   it("accepts normal variation", () => {
     expect(looksBroken(18, 21)).toBeUndefined();
     expect(looksBroken(5, undefined)).toBeUndefined();
+  });
+});
+
+describe("describeError", () => {
+  it("follows the cause chain", () => {
+    const error = new TypeError("fetch failed", { cause: new Error("getaddrinfo ENOTFOUND example.fi") });
+    expect(describeError(error)).toBe("fetch failed: getaddrinfo ENOTFOUND example.fi");
+  });
+
+  it("handles non-errors", () => {
+    expect(describeError("boom")).toBe("boom");
   });
 });
 
