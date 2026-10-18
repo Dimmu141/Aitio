@@ -14,7 +14,11 @@ Read `BRIEF.md` before starting new work. It holds the product decisions, data s
   - "Merkitse nähdyksi" is hidden until auth exists (milestone 3); no dead buttons.
   - Past productions are indexed and in the sitemap with an "Esitetty <year>" label, but stay out of "Ohjelmassa".
   - The subtitle filter stays off until Kansallisteatteri per-performance subtitles are parsed from a real fixture.
-- **Next: milestone 3**, users and diary (BRIEF.md section 8). Propose the auth setup and the "Merkitse nähdyksi" flow first and wait for Dimmu's OK.
+- **Milestone 3 is done** (users and diary, see README.md "Status: milestone 3" and its known gaps). Decisions agreed with Dimmu:
+  - Better Auth instead of Auth.js (BRIEF.md section 2 updated), email magic links only, no passwords or social login.
+  - Reviews are public by default with a visible opt-out checkbox; ratings and tags always count anonymously.
+- **Before launch:** a privacy policy page and a decision on the email provider (Resend is US-based).
+- **Next: milestone 4**, remaining adapters, cron, monitoring, admin page (BRIEF.md section 8). Propose first and wait for Dimmu's OK.
 
 ## Commands
 
@@ -26,6 +30,7 @@ pnpm typecheck && pnpm lint  # typecheck runs next typegen first (LayoutProps et
 pnpm db:seed:fixtures        # dev only: fixture productions into the database
 pnpm scrape [sourceId] [--dry-run] [--limit N]
 pnpm fixtures:refresh        # re-download the pages the parser tests use
+pnpm moderation [hide|show <entryId>]  # reported reviews
 ```
 
 ## Conventions and gotchas
@@ -35,6 +40,8 @@ pnpm fixtures:refresh        # re-download the pages the parser tests use
 - **Scraping rules are non-negotiable**: facts only (titles, dates, stages, credits, ticket links, review links); never store marketing texts, press photos or review text; always go through `politeFetch` (robots.txt, 1 req/s per host, own User-Agent); never scrape lippu.fi.
 - **Times**: store UTC; convert Helsinki wall-clock times with `helsinkiToUtc` in `src/scrapers/text.ts` (DST-safe). Display only through `src/lib/format.ts` (pinned to Europe/Helsinki; Vercel renders in UTC).
 - **Cache Components is on.** Read `node_modules/next/dist/docs` before touching rendering. Detail pages use `ensureStatic = "navigation"` (real 404s); anything reading `searchParams` must not hide its content behind Suspense (invisible without JS). Time-dependent logic takes an explicit `asOf` from the cached query.
+- **Auth**: Better Auth in `src/lib/auth.ts`; read the user with `getCurrentUser`/`requireUser` (`src/lib/session.ts`) only on dynamic pages and in actions. Never read the session on public pages: they are static. Personal sections are listed in `src/lib/auth-gate.ts` for the proxy redirect. Mutations are server actions in `src/lib/actions.ts`; after changing diary data call `updateTag(productionTag(slug))`.
+- **Forms work without JavaScript** (plain server-action forms, `<details>`, radio chips). Keep it that way; `pnpm test:e2e` runs a no-JS project.
 - **Current rows**: performances and credits whose `lastSeenAt` is older than the production's are stale; filter with `isCurrent` in `src/lib/catalogue/select.ts`.
 - **Never hard-delete** scraped data; use `lastSeenAt`.
 - **Audience**: many users are 55–74. Light mode by default, body text 17–18px, high contrast, big tap targets, usable at 360px width.

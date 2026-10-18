@@ -72,7 +72,7 @@ We store facts only: titles, dates, stages, credits, ticket links and links to r
 | SEO | canonical and hreflang on every page, `sitemap.xml`, `robots.txt`, real HTTP 404s |
 | PWA | `manifest.webmanifest`, icons in `public/icons` (`node scripts/generate-icons.mjs` re-renders them) |
 | Design | warm paper, Source Serif 4 titles, Source Sans 3 UI, oxblood accent, 18px base, 54px tap targets, AAA contrast checked in tests |
-| Tests | 117 unit tests (`pnpm test`) and 40 Playwright smoke tests at 360px with and without JavaScript (`pnpm test:e2e`) |
+| Tests | 117 unit tests (`pnpm test`) and 40 Playwright smoke tests at 360px with and without JavaScript (`pnpm test:e2e`) at the end of milestone 2 |
 
 ### Running it
 
@@ -102,6 +102,48 @@ pnpm build && pnpm test:e2e             # smoke tests against the production bui
 - **No OpenGraph image yet.** A typographic poster image (`opengraph-image.tsx`) would suit the brief.
 - **Theatre pages without data** (four of six theatres until milestone 4) show only "Ei esityksiä ohjelmistossa juuri nyt".
 
-## Next: milestone 3
+## Status: milestone 3 (users and diary)
 
-Users and diary: auth, the "Merkitse nähdyksi" flow, diary as ticket stubs, ratings, tags, short reviews, moderation. See `BRIEF.md` section 8.
+| Done | Notes |
+|---|---|
+| Sign-in with email links | Better Auth (not Auth.js, see BRIEF.md section 2), magic-link plugin, Prisma adapter, 20-minute links, 90-day sessions, no passwords |
+| Merkitse nähdyksi | `/merkitse/<slug>`: two taps (preselected date, sticky Tallenna); optional half-star rating, review (500 chars), up to 3 tags, rewatch |
+| Diary | `/paivakirja`: ticket stubs grouped by year, edit and delete |
+| Production page | "Merkitse nähdyksi" + "Osta liput", rating histogram, tag counts, public reviews with a report link; still fully static |
+| Moderation | report page, three distinct reporters auto-hide a review, `pnpm moderation` to list, hide or show |
+| Rate limits | sign-in emails per address and per IP, diary saves and reports per user per day; stored in Postgres |
+| GDPR | settings page: display name, sign out, download all data (JSON), delete account |
+| Tests | 161 unit and integration tests, 54 Playwright tests with and without JavaScript |
+
+### Configuration
+
+| Variable | Needed | What for |
+|---|---|---|
+| `BETTER_AUTH_SECRET` | production | signs session cookies; `openssl rand -base64 32` |
+| `SITE_URL` | production | public origin for links in emails, canonical URLs, sitemap |
+| `RESEND_API_KEY`, `EMAIL_FROM` | production | sends sign-in emails; without a key dev prints links to the console |
+| `REVALIDATE_SECRET` | optional | lets `pnpm moderation` (and later the scraper) clear cached pages at once |
+| `DEV_EMAIL_LOG_FILE` | tests only | e2e tests read sign-in links from this file; refused on Vercel production |
+
+Sign in locally: `pnpm dev`, enter any address on `/kirjaudu`, copy the link from the terminal.
+
+### How it fits together
+
+- **Public pages stay static.** Nothing personal is rendered on them; "Merkitse nähdyksi" is a link to a separate dynamic page. Saving or deleting an entry calls `updateTag("production:<slug>")`, so the production page shows the change on the next request.
+- **Signed-out visitors** of personal pages are redirected in `proxy.ts` (cookie present or not), because a redirect from a page arrives after the prerendered layout and only works with JavaScript. Pages still verify the session (`requireUser`).
+- **Email links land on a confirmation page** with a button instead of signing in straight away: Outlook Safe Links and similar scanners open links in incoming mail and would use up the one-time token.
+- **Forms are plain server-action forms**, so every flow, including sign-in, works without JavaScript; the e2e suite runs all of it both ways.
+- **Ratings** are stored as half-stars 1-10, `seenOn` as a calendar date.
+
+### Known gaps
+
+- **No privacy policy page.** We now store email addresses, names and reviews, so a tietosuojaseloste is required before launch, plus a decision on Resend: it is a US company. Resend can send from an EU region, but check its DPA, or switch `src/lib/email.ts` to a Finnish/EU SMTP provider.
+- **Form errors lose the input.** A rejected form (e.g. a future date) redirects back with the message but without what was typed; the inputs are constrained enough that this is rare.
+- **No public profiles or following.** Reviews show a display name only; the diary is private.
+- **Moderation is a CLI.** Fine for a handful of reports a week; an admin page belongs in milestone 4 with the type-override page.
+- **An expired session cookie without JavaScript** on a personal page shows the sign-in redirect only with JS (the proxy sees a cookie and lets it through).
+- **e2e tests need the dev database** and delete their own `@example.fi` users afterwards; point `DATABASE_URL` at a disposable database if you'd rather not touch dev data.
+
+## Next: milestone 4
+
+Remaining adapters (HKT, Ryhmäteatteri, KOM, Espoo), Vercel Cron, ScrapeRun monitoring, admin page for type overrides and moderation. The cron route should POST to `/api/revalidate` after a run. See `BRIEF.md` section 8.
