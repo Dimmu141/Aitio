@@ -18,8 +18,9 @@ Read `BRIEF.md` before starting new work. It holds the product decisions, data s
   - Better Auth instead of Auth.js (BRIEF.md section 2 updated), email magic links only, no passwords or social login.
   - Reviews are public by default with a visible opt-out checkbox; ratings and tags always count anonymously.
 - **Milestone 4 is done** (all six adapters, Vercel Cron, monitoring, `/yllapito`; see README.md "Status: milestone 4"). The new fixtures came from Firecrawl (post-JavaScript), so **the first session with network access must run `pnpm fixtures:refresh && pnpm test` and a dry-run per source** before the cron is trusted.
-- **Before launch:** a privacy policy page, a decision on the email provider (Resend is US-based), `CRON_SECRET` and `ADMIN_EMAILS` in Vercel, and confirming the plan allows six cron jobs of up to 300 s.
-- **Next: milestone 5**, engagement (BRIEF.md section 8). Propose first and wait for Dimmu's OK.
+- **Before launch:** a privacy policy page (it must now also cover the opt-in digest), a decision on the email provider (Resend is US-based), `CRON_SECRET` and `ADMIN_EMAILS` in Vercel, and confirming the plan allows seven cron jobs of up to 300 s.
+- **Milestone 5 is done** (year in review, badges, "closing soon" email; see README.md "Status: milestone 5"). Badges are computed on every view, never stored. The digest is opt-in, and its unsubscribe link is signed, needs no sign-in and never acts on GET.
+- **All milestones in BRIEF.md are built.** Next is launch readiness (live scrape, privacy policy, email provider, Vercel limits); ask Dimmu before starting anything new.
 
 ## Commands
 
@@ -46,6 +47,7 @@ pnpm moderation [hide|show <entryId>]  # reported reviews
 - **Current rows**: performances and credits whose `lastSeenAt` is older than the production's are stale; filter with `isCurrent` in `src/lib/catalogue/select.ts`.
 - **Never hard-delete** scraped data; use `lastSeenAt`. Sources that only list upcoming performances set `performancesPartial` so unlisted later dates are not treated as cancelled.
 - **Theatre-site endpoints**: HKT performances come from `/wp-json/hkt/ticket-list/<post id>/` (its `timestamp` is Helsinki wall-clock posing as UTC: use `date` + `time`); Espoo's from `POST admin-ajax.php`. Dates without a year: use the printed weekday (`yearFromWeekday`) or month headings, never "next occurrence" guesses.
+- **Engagement** (`src/lib/engagement/`): pure `yearInReview` and `badges` over `getEntryFacts`; badge texts live in the dictionaries under `badges.items`. A new badge needs an id in `BADGE_IDS`, a rule, and strings in all three languages.
 - **Ops**: cron logic is pure and tested in `src/lib/ops/schedule.ts`; admins are `ADMIN_EMAILS`. Admin UI strings are Finnish-only by design.
 - **Audience**: many users are 55–74. Light mode by default, body text 17–18px, high contrast, big tap targets, usable at 360px width.
 - **Languages**: UI in Finnish (default), Swedish and English. Content stays in its original language.

@@ -190,6 +190,33 @@ Every adapter has fixtures and tests (`src/scrapers/adapters/*.test.ts`); `fixtu
 - **Admins are an environment variable**, with no audit log of overrides or moderation decisions.
 - **The admin page answers non-admins with HTTP 200** and the not-found page (the status is sent before the page decides); none of its content is sent, which the e2e tests check.
 
-## Next: milestone 5
+## Status: milestone 5 (engagement)
 
-Engagement: year-in-review page, badges, "closing soon" email digest. See `BRIEF.md` section 8.
+### Year in review
+
+- `/paivakirja/<year>` (`/sv/dagbok/<year>`, `/en/diary/<year>`), linked from each year heading in the diary. Personal only, like the diary.
+- Shows, theatres, average rating (from two ratings up), reviews written, productions and rewatches, a month-by-month bar chart (one sentence per month for screen readers), highest ratings, theatres, performers seen in two or more productions, tags, genres, languages, and the first and last show of the year.
+- Computed by the pure `yearInReview` (`src/lib/engagement/year.ts`) over `getEntryFacts`.
+
+### Badges
+
+- Twelve badges (`src/lib/engagement/badges.ts`), each dated by the entry that earned it, and counting badges show progress ("7 / 10"). They are listed at the bottom of the diary, with the locked ones behind a `<details>`.
+- **Computed on every view, never stored**: deleting an entry takes its badge away, and a new rule applies to old diaries with no backfill.
+- "Just in time" (seen on the final day) counts only once that day is in the past, because a run's last known date can still move. "The whole city" compares against the number of theatres in the database, not a hard-coded six.
+
+### "Closing soon" email
+
+- Opt-in checkbox in the settings (`#kooste`), also linked from the front page's "Viimeiset esitykset" box. The email uses the language of the page where the user opted in.
+- Vercel Cron `/api/cron/digest` on Thursdays at 05:00 UTC: productions whose last known performance is within 14 days, minus what the user has already logged, closing first. Plain text, with production links. Nothing is sent when nothing is closing.
+- **Idempotent**: `User.digestSentAt` means a retry within six days sends nothing; a failed send stays due. Up to 200 users per run, spaced for Resend's default rate of 2 requests per second.
+- **Unsubscribing works without signing in**: the email links to `/peru-tilaus?u=…&s=…`, signed with an HMAC of the user id under `BETTER_AUTH_SECRET`. The page has a button, so link scanners can't unsubscribe anyone. `List-Unsubscribe` and `List-Unsubscribe-Post` point at `/api/digest/unsubscribe` for one-click unsubscribe in mail clients (RFC 8058).
+- The data export includes the digest settings.
+
+### Known gaps
+
+- **Over 200 subscribers** need more than one run a week: add a second cron job, or move to Resend's batch API.
+- **The email lists every closing production in the region**, not just the user's theatres. With six theatres that's a handful; with more, it should follow the theatres in the diary.
+- **No bounce or complaint handling**: a hard-bouncing address keeps getting tried each week. Resend webhooks can switch `digestOptIn` off.
+- **Seven cron jobs now**: the plan-limit question from milestone 4 still stands.
+- **The year review is private.** A shareable version would need public profiles, which is a privacy decision for later.
+- **The Resend sender address** (`EMAIL_FROM`) is the sign-in one; a separate `uutiset@` address would protect sign-in deliverability if the digest ever gets marked as spam.
