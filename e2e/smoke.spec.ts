@@ -12,6 +12,8 @@ const PAGES = [
   { path: "/sv/teater/svenska-teatern", lang: "sv" },
   { path: "/henkilo/kristian-smeds", lang: "fi" },
   { path: "/en/person/anna-maria-lipponen", lang: "en" },
+  { path: "/haku?q=smeds", lang: "fi" },
+  { path: "/sv/sok", lang: "sv" },
 ];
 
 async function horizontalOverflow(page: Page): Promise<number> {
@@ -67,6 +69,32 @@ test("filters work as a plain form", async ({ page }) => {
   const swedish = await count();
   expect(swedish).toBeGreaterThan(0);
   expect(swedish).toBeLessThan(all);
+});
+
+test("time chips are one-tap links that keep the other choices", async ({ page }) => {
+  await page.goto("/?lang=sv");
+  const chips = page.getByRole("navigation", { name: "Milloin" });
+  await expect(chips.getByRole("link", { name: "2 viikkoa" })).toHaveAttribute("aria-current", "true");
+  const week = chips.getByRole("link", { name: "7 päivää" });
+  // A chip is only offered when something plays then; fixture dates may not cover the week.
+  test.skip((await week.count()) === 0, "nothing plays within seven days in this data");
+  await week.click();
+  await expect(page).toHaveURL(/lang=sv&when=week/);
+  await expect(chips.getByRole("link", { name: "7 päivää" })).toHaveAttribute("aria-current", "true");
+});
+
+test("search finds theatres, people and shows, accents forgiven", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("navigation", { name: "Päävalikko" }).first().getByRole("link", { name: "Haku" }).click();
+  await expect(page).toHaveURL(/\/haku$/);
+  await page.getByLabel("Esitys, tekijä tai teatteri").fill("kansallis");
+  await page.getByRole("button", { name: "Hae" }).click();
+  await expect(page).toHaveURL(/\/haku\?q=kansallis/);
+  await page.getByRole("region", { name: "Teatterit" }).getByRole("link", { name: /Kansallisteatteri/ }).click();
+  await expect(page).toHaveURL(/\/teatteri\/kansallisteatteri$/);
+
+  await page.goto("/en/search?q=zzzzqx");
+  await expect(page.getByText("Nothing found for “zzzzqx”")).toBeVisible();
 });
 
 test("the production page has event JSON-LD and outbound ticket links", async ({ page }) => {

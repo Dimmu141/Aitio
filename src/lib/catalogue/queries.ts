@@ -16,6 +16,7 @@ import {
   type RatingSummary,
 } from "./select";
 import { reviewKind } from "./review-kind";
+import type { SearchIndex } from "./search";
 import { productionTag } from "./tags";
 import type { CreditRow, PerformanceRow, ProductionCard, TheatreRef } from "./types";
 
@@ -284,6 +285,38 @@ export async function getPerson(slug: string): Promise<PersonPage | null> {
     name: row.name,
     current: all.filter((entry) => entry.card.next).sort((a, b) => byNext(a.card, b.card)),
     past: all.filter((entry) => !entry.card.next).sort((a, b) => byYearDesc(a.card, b.card)),
+  };
+}
+
+/** Everything search looks through. People count only with current credits, so no result leads to a 404. */
+export async function getSearchIndex(): Promise<{ asOf: Date; index: SearchIndex }> {
+  "use cache";
+  cacheCatalogue();
+  const asOf = new Date();
+  const [productions, people, theatres] = await Promise.all([
+    db.production.findMany({ select: cardSelect }),
+    db.person.findMany({
+      where: { credits: { some: {} } },
+      select: {
+        slug: true,
+        name: true,
+        credits: { select: { productionId: true, lastSeenAt: true, production: { select: { lastSeenAt: true } } } },
+      },
+    }),
+    db.theatre.findMany({ select: { slug: true, name: true, city: true }, orderBy: { name: "asc" } }),
+  ]);
+  return {
+    asOf,
+    index: {
+      productions: productions.map((row) => toCard(row, asOf)),
+      people: people.flatMap((person) => {
+        const current = new Set(
+          person.credits.filter((credit) => isCurrent(credit, credit.production)).map((credit) => credit.productionId),
+        );
+        return current.size > 0 ? [{ slug: person.slug, name: person.name, productions: current.size }] : [];
+      }),
+      theatres,
+    },
   };
 }
 

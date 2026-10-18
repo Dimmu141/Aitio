@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { groupByNextDay } from "./days";
+import { groupByNextDay, premieresSoon } from "./days";
 import type { ProductionCard } from "./types";
 
 function card(slug: string, next: string | null): ProductionCard {
@@ -17,6 +17,9 @@ function card(slug: string, next: string | null): ProductionCard {
     end: date,
     onSoon: true,
     closingSoon: false,
+    soon: [],
+    duration: null,
+    premiere: null,
     year: null,
   };
 }
@@ -49,5 +52,20 @@ describe("groupByNextDay", () => {
 
   it("leaves out productions with nothing upcoming", () => {
     expect(groupByNextDay([card("past", null)], asOf)).toEqual([]);
+  });
+});
+
+describe("premieresSoon", () => {
+  const withPremiere = (slug: string, premiere: string | null) => ({ ...card(slug, "2026-10-25T16:00:00Z"), premiere: premiere ? new Date(premiere) : null });
+
+  it("keeps stated premieres from today to the end of the window, earliest first", () => {
+    const cards = [
+      withPremiere("later", "2026-10-29T00:00:00Z"),
+      withPremiere("today", "2026-10-18T00:00:00Z"), // a date-only premiere earlier today still counts
+      withPremiere("past", "2026-10-10T00:00:00Z"),
+      withPremiere("beyond", "2026-11-20T00:00:00Z"),
+      withPremiere("unknown", null),
+    ];
+    expect(premieresSoon(cards, asOf).map((c) => c.slug)).toEqual(["today", "later"]);
   });
 });

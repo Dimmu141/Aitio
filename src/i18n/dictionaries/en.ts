@@ -11,6 +11,9 @@ export const en: Dictionary = {
     home: "Home",
   },
   home: {
+    premieres: "Premieres",
+    premieresAside: "within two weeks",
+    morePremieres: (n: number) => (n === 1 ? "+ 1 more premiere" : `+ ${n} more premieres`),
     title: "What's on",
     intro: "Performances in the next two weeks.",
     closingSoon: "Last chance",
@@ -22,6 +25,10 @@ export const en: Dictionary = {
     count: (n: number) => (n === 1 ? "1 production" : `${n} productions`),
   },
   filters: {
+    when: "When",
+    whenAll: "2 weeks",
+    whenLabels: { today: "Today", tomorrow: "Tomorrow", weekend: "This weekend", week: "7 days" },
+    english: "Understandable in English",
     legend: "Narrow down",
     city: "City",
     type: "Genre",
@@ -32,6 +39,12 @@ export const en: Dictionary = {
     clear: "Clear choices",
   },
   production: {
+    durationShort: (minutes: number) => {
+      const h = Math.floor(minutes / 60);
+      const m = minutes % 60;
+      return [h > 0 && `${h} h`, m > 0 && `${m} min`].filter(Boolean).join(" ");
+    },
+    intervals: (n: number) => (n === 0 ? "no interval" : n === 1 ? "interval" : `${n} intervals`),
     nextPerformance: "Next performance",
     noUpcoming: "No upcoming performances.",
     performedIn: (year: number) => `Performed ${year}`,
@@ -53,7 +66,7 @@ export const en: Dictionary = {
     criticsAside: "links to the originals",
     sourceLine: "Details",
     updated: "updated",
-    spokenIn: { fi: "in Finnish", sv: "in Swedish", en: "in English", ru: "in Russian", uk: "in Ukrainian", es: "in Spanish", ar: "in Arabic", lv: "in Latvian", et: "in Estonian", fr: "in French", de: "in German", sign: "in sign language", zxx: "wordless" },
+    spokenIn: { it: "in Italian", fi: "in Finnish", sv: "in Swedish", en: "in English", ru: "in Russian", uk: "in Ukrainian", es: "in Spanish", ar: "in Arabic", lv: "in Latvian", et: "in Estonian", fr: "in French", de: "in German", sign: "in sign language", zxx: "wordless" },
     histogramLabel: "Rating distribution",
     stars: (value: number) => `${value} stars`,
     stage: "Stage",
@@ -93,7 +106,7 @@ export const en: Dictionary = {
     TALK: "Talk",
     OTHER: "Other",
   },
-  languages: { fi: "Finnish", sv: "Swedish", en: "English", ru: "Russian", uk: "Ukrainian", es: "Spanish", ar: "Arabic", lv: "Latvian", et: "Estonian", fr: "French", de: "German", sign: "sign language", zxx: "wordless" },
+  languages: { it: "Italian", fi: "Finnish", sv: "Swedish", en: "English", ru: "Russian", uk: "Ukrainian", es: "Spanish", ar: "Arabic", lv: "Latvian", et: "Estonian", fr: "French", de: "German", sign: "sign language", zxx: "wordless" },
   theatre: {
     current: "On now",
     past: "Earlier productions",
@@ -106,7 +119,18 @@ export const en: Dictionary = {
     past: "Earlier productions",
     as: (character: string) => `as ${character}`,
   },
-  nav: { diary: "Diary", label: "Main menu" },
+  nav: { diary: "Diary", search: "Search", label: "Main menu" },
+  search: {
+    title: "Search",
+    label: "Show, artist or theatre",
+    submit: "Search",
+    hint: "Type at least two characters.",
+    none: (q: string) => `Nothing found for “${q}”. Check the spelling or try a shorter word.`,
+    productions: "Shows",
+    people: "Artists",
+    theatres: "Theatres",
+    credits: (n: number) => (n === 1 ? "1 production" : `${n} productions`),
+  },
   auth: {
     title: "Sign in",
     intro: "We'll email you a sign-in link. No password, and no separate account to create.",

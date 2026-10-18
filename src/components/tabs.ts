@@ -1,7 +1,7 @@
 import type { Locale } from "@/i18n/config";
 import { href } from "@/i18n/paths";
 
-export const TABS = ["programme", "diary", "settings"] as const;
+export const TABS = ["programme", "search", "diary", "settings"] as const;
 export type Tab = (typeof TABS)[number];
 
 function within(pathname: string, base: string): boolean {
@@ -12,6 +12,8 @@ function within(pathname: string, base: string): boolean {
 export function activeTab(pathname: string, locale: Locale): Tab | null {
   const diary = [href(locale, "paivakirja"), `/${locale}/paivakirja`];
   const settings = [href(locale, "asetukset"), `/${locale}/asetukset`];
+  const search = [href(locale, "haku"), `/${locale}/haku`];
+  if (search.some((base) => within(pathname, base))) return "search";
   if (diary.some((base) => within(pathname, base))) return "diary";
   if (settings.some((base) => within(pathname, base))) return "settings";
   const programme = (["esitys", "teatteri", "henkilo"] as const).flatMap((section) => [

@@ -6,6 +6,7 @@ import { typeLabel } from "@/lib/catalogue/type-label";
 import type { ProductionCard as Card } from "@/lib/catalogue/types";
 import { formatPerformance, formatShortDate, formatTime, isoDateTime } from "@/lib/format";
 import { theatreTone } from "@/lib/poster";
+import { subtitleText } from "./production/PerformanceList";
 
 /**
  * One programme row: colour edge of its theatre, serif title, where and when.
@@ -36,6 +37,12 @@ export function ProductionCard({
   const stage = card.stage === card.theatre.name ? null : card.stage;
   const where = [showTheatre ? card.theatre.name : null, stage].filter(Boolean).join(" · ");
   const type = typeLabel(card.type, t);
+  const duration = durationText(card, t);
+  // Finnish is the default and goes unsaid; anything else is worth knowing before clicking.
+  const language = [
+    ...card.languages.filter((code) => code !== "fi").map((code) => t.production.spokenIn[code] ?? t.languages[code] ?? code),
+    card.subtitleLangs.length > 0 ? subtitleText(card.subtitleLangs, t) : null,
+  ].filter(Boolean);
   return (
     <li className="flex gap-3 border-b border-rule py-4">
       <span aria-hidden="true" className={`ai-poster--${tone.name} w-2 shrink-0 rounded-sm`} />
@@ -56,9 +63,14 @@ export function ProductionCard({
             </time>
           )}
           {!card.next && card.year && t.production.performedIn(card.year)}
-          {type && (card.next || card.year) && " · "}
-          {type}
+          {[type, duration].filter(Boolean).map((fact, index) => (
+            <span key={index}>
+              {(index > 0 || card.next || card.year) && " · "}
+              {fact}
+            </span>
+          ))}
         </p>
+        {language.length > 0 && <p className="text-meta text-ink-muted">{language.join(" · ")}</p>}
         {card.closingSoon && card.end && (
           <p className="ai-badge ai-badge--urgent">
             {t.production.ends} {formatShortDate(card.end, locale, asOf, false)}
@@ -68,4 +80,12 @@ export function ProductionCard({
       </div>
     </li>
   );
+}
+
+/** "2 t 30 min, väliaika": the running time in the reader's language. */
+function durationText(card: Card, t: Dictionary): string | null {
+  if (!card.duration?.minutes) return null;
+  const intervals = card.duration.intervals;
+  const length = t.production.durationShort(card.duration.minutes);
+  return intervals === null ? length : `${length}, ${t.production.intervals(intervals)}`;
 }

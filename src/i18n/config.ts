@@ -25,6 +25,7 @@ export const SEGMENTS = {
   yllapito: { fi: "yllapito", sv: "admin", en: "admin" },
   tietosuoja: { fi: "tietosuoja", sv: "dataskydd", en: "privacy" },
   tietoa: { fi: "tietoa", sv: "om", en: "about" },
+  haku: { fi: "haku", sv: "sok", en: "search" },
   "peru-tilaus": { fi: "peru-tilaus", sv: "avsluta-prenumeration", en: "unsubscribe" },
 } as const satisfies Record<string, Record<Locale, string>>;
 

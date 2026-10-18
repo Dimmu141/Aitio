@@ -11,6 +11,9 @@ export const sv: Dictionary = {
     home: "Startsidan",
   },
   home: {
+    premieres: "Premiärer",
+    premieresAside: "inom två veckor",
+    morePremieres: (n: number) => (n === 1 ? "+ 1 premiär till" : `+ ${n} premiärer till`),
     title: "På repertoaren",
     intro: "Föreställningar under de kommande två veckorna.",
     closingSoon: "Sista chansen",
@@ -22,6 +25,10 @@ export const sv: Dictionary = {
     count: (n: number) => (n === 1 ? "1 föreställning" : `${n} föreställningar`),
   },
   filters: {
+    when: "När",
+    whenAll: "2 veckor",
+    whenLabels: { today: "I dag", tomorrow: "I morgon", weekend: "I helgen", week: "7 dagar" },
+    english: "Kan följas på engelska",
     legend: "Avgränsa föreställningar",
     city: "Stad",
     type: "Genre",
@@ -32,6 +39,12 @@ export const sv: Dictionary = {
     clear: "Rensa valen",
   },
   production: {
+    durationShort: (minutes: number) => {
+      const h = Math.floor(minutes / 60);
+      const m = minutes % 60;
+      return [h > 0 && `${h} h`, m > 0 && `${m} min`].filter(Boolean).join(" ");
+    },
+    intervals: (n: number) => (n === 0 ? "ingen paus" : n === 1 ? "paus" : `${n} pauser`),
     nextPerformance: "Nästa föreställning",
     noUpcoming: "Inga kommande föreställningar.",
     performedIn: (year: number) => `Spelades ${year}`,
@@ -53,7 +66,7 @@ export const sv: Dictionary = {
     criticsAside: "länkar till originalen",
     sourceLine: "Uppgifter",
     updated: "uppdaterad",
-    spokenIn: { fi: "på finska", sv: "på svenska", en: "på engelska", ru: "på ryska", uk: "på ukrainska", es: "på spanska", ar: "på arabiska", lv: "på lettiska", et: "på estniska", fr: "på franska", de: "på tyska", sign: "på teckenspråk", zxx: "ordlös" },
+    spokenIn: { it: "på italienska", fi: "på finska", sv: "på svenska", en: "på engelska", ru: "på ryska", uk: "på ukrainska", es: "på spanska", ar: "på arabiska", lv: "på lettiska", et: "på estniska", fr: "på franska", de: "på tyska", sign: "på teckenspråk", zxx: "ordlös" },
     histogramLabel: "Betygsfördelning",
     stars: (value: number) => `${value.toLocaleString("sv-FI")} stjärnor`,
     stage: "Scen",
@@ -93,7 +106,7 @@ export const sv: Dictionary = {
     TALK: "Samtal",
     OTHER: "Övrigt",
   },
-  languages: { fi: "finska", sv: "svenska", en: "engelska", ru: "ryska", uk: "ukrainska", es: "spanska", ar: "arabiska", lv: "lettiska", et: "estniska", fr: "franska", de: "tyska", sign: "teckenspråk", zxx: "ordlös" },
+  languages: { it: "italienska", fi: "finska", sv: "svenska", en: "engelska", ru: "ryska", uk: "ukrainska", es: "spanska", ar: "arabiska", lv: "lettiska", et: "estniska", fr: "franska", de: "tyska", sign: "teckenspråk", zxx: "ordlös" },
   theatre: {
     current: "På repertoaren nu",
     past: "Tidigare föreställningar",
@@ -106,7 +119,18 @@ export const sv: Dictionary = {
     past: "Tidigare produktioner",
     as: (character: string) => `som ${character}`,
   },
-  nav: { diary: "Dagbok", label: "Huvudmeny" },
+  nav: { diary: "Dagbok", search: "Sök", label: "Huvudmeny" },
+  search: {
+    title: "Sök",
+    label: "Föreställning, upphovsperson eller teater",
+    submit: "Sök",
+    hint: "Skriv minst två tecken.",
+    none: (q: string) => `Sökningen ”${q}” gav inga träffar. Kontrollera stavningen eller prova ett kortare sökord.`,
+    productions: "Föreställningar",
+    people: "Upphovspersoner",
+    theatres: "Teatrar",
+    credits: (n: number) => (n === 1 ? "1 produktion" : `${n} produktioner`),
+  },
   auth: {
     title: "Logga in",
     intro: "Vi skickar en inloggningslänk till din e-post. Inget lösenord behövs och du behöver inte skapa ett konto separat.",

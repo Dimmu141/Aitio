@@ -20,6 +20,9 @@ function card(slug: string, last: string | null, closingSoon = true): Production
     end: lastDate,
     onSoon: true,
     closingSoon,
+    soon: [],
+    duration: null,
+    premiere: null,
     year: null,
   };
 }

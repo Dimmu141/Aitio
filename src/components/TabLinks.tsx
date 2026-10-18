@@ -12,6 +12,12 @@ const ICONS: Record<Tab, ReactNode> = {
       <path d="M3.5 9.5h17M8 3v4M16 3v4" />
     </>
   ),
+  search: (
+    <>
+      <circle cx="10.5" cy="10.5" r="6.5" />
+      <path d="m15.5 15.5 5 5" />
+    </>
+  ),
   diary: (
     <>
       <path d="M3 7.5V5h18v2.5a2.5 2.5 0 0 0 0 5V19H3v-6.5a2.5 2.5 0 0 0 0-5Z" />
@@ -33,9 +39,10 @@ export interface TabItem {
 }
 
 export function tabItems(locale: Locale, t: Dictionary): TabItem[] {
-  const labels: Record<Tab, string> = { programme: t.home.title, diary: t.nav.diary, settings: t.settings.title };
+  const labels: Record<Tab, string> = { programme: t.home.title, search: t.nav.search, diary: t.nav.diary, settings: t.settings.title };
   const targets: Record<Tab, string> = {
     programme: href(locale),
+    search: href(locale, "haku"),
     diary: href(locale, "paivakirja"),
     settings: href(locale, "asetukset"),
   };

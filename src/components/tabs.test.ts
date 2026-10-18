@@ -12,6 +12,8 @@ describe("activeTab", () => {
     ["/en/diary", "en", "diary"],
     ["/sv/installningar", "sv", "settings"],
     ["/fi/asetukset", "fi", "settings"],
+    ["/haku", "fi", "search"],
+    ["/en/search", "en", "search"],
     ["/tietosuoja", "fi", null],
     ["/paivakirjat", "fi", null],
   ] as const)("%s (%s) → %s", (pathname, locale, tab) => {

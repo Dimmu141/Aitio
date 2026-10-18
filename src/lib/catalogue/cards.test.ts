@@ -13,6 +13,7 @@ function source(performances: Array<{ startsAt: Date; subtitleLangs: string[] }>
     typeOverride: null,
     languages: ["fi"],
     subtitleLangs,
+    durationText: "2 t 30 min, sis. väliajan" as string | null,
     lastSeenAt: seen,
     delistedAt: null as Date | null,
     premiereDate: null,
@@ -50,5 +51,11 @@ describe("toCard for a delisted production", () => {
   it("has no upcoming performances, whatever is stored", () => {
     const card = toCard({ ...source([{ startsAt: day(2), subtitleLangs: [] }]), delistedAt: seen }, asOf);
     expect(card).toMatchObject({ next: null, onSoon: false, subtitleLangs: [] });
+  });
+
+  it("keeps the performances within the window and reads the running time", () => {
+    const card = toCard(source([{ startsAt: day(1), subtitleLangs: [] }, { startsAt: day(20), subtitleLangs: [] }]), asOf);
+    expect(card.soon).toEqual([day(1)]);
+    expect(card.duration).toEqual({ minutes: 150, intervals: 1 });
   });
 });

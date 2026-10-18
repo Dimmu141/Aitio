@@ -1,5 +1,6 @@
 import type { ProductionType } from "@/generated/prisma/enums";
 import { hasFullSchedule } from "@/scrapers/theatres";
+import { parseDuration } from "./duration";
 import { effectiveType, isClosingSoon, knownEnd, lastYear, schedule, upcomingPerformances, windowEnd } from "./select";
 import type { ProductionCard, TheatreRef } from "./types";
 
@@ -13,6 +14,7 @@ export const cardSelect = {
   typeOverride: true,
   languages: true,
   subtitleLangs: true,
+  durationText: true,
   lastSeenAt: true,
   delistedAt: true,
   premiereDate: true,
@@ -29,6 +31,7 @@ interface CardSource {
   typeOverride: ProductionType | null;
   languages: string[];
   subtitleLangs: string[];
+  durationText: string | null;
   lastSeenAt: Date;
   delistedAt: Date | null;
   premiereDate: Date | null;
@@ -39,15 +42,14 @@ interface CardSource {
 }
 
 /** Production-wide subtitles plus those at any performance within the window. */
-function subtitlesSoon(source: CardSource, upcoming: CardSource["performances"], asOf: Date): string[] {
-  const end = windowEnd(asOf);
-  const soon = upcoming.filter((performance) => performance.startsAt < end).flatMap((performance) => performance.subtitleLangs);
-  return [...new Set([...source.subtitleLangs, ...soon])];
+function subtitlesSoon(source: CardSource, soon: CardSource["performances"]): string[] {
+  return [...new Set([...source.subtitleLangs, ...soon.flatMap((performance) => performance.subtitleLangs)])];
 }
 
 export function toCard(source: CardSource, asOf: Date): ProductionCard {
   const upcoming = source.delistedAt ? [] : upcomingPerformances(source.performances, source, asOf);
   const timing = schedule(upcoming, asOf);
+  const soon = upcoming.filter((performance) => performance.startsAt < windowEnd(asOf));
   const fullSchedule = hasFullSchedule(source.theatre.slug);
   return {
     slug: source.slug,
@@ -56,8 +58,11 @@ export function toCard(source: CardSource, asOf: Date): ProductionCard {
     stage: source.stage?.name ?? null,
     type: effectiveType(source),
     languages: source.languages,
-    subtitleLangs: subtitlesSoon(source, upcoming, asOf),
+    subtitleLangs: subtitlesSoon(source, soon),
     ...timing,
+    soon: soon.map((performance) => performance.startsAt),
+    duration: parseDuration(source.durationText),
+    premiere: source.premiereDate,
     end: knownEnd(timing.last, source.runEnd, fullSchedule),
     closingSoon: isClosingSoon(timing, source.runEnd, fullSchedule, asOf),
     year: timing.next ? null : lastYear([source.performances.at(-1)?.startsAt, source.runEnd, source.premiereDate]),

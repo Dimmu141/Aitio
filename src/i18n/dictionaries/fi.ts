@@ -22,6 +22,9 @@ export const fi = {
     home: "Etusivu",
   },
   home: {
+    premieres: "Ensi-illat",
+    premieresAside: "kahden viikon sisällä",
+    morePremieres: (n: number) => (n === 1 ? "+ 1 muu ensi-ilta" : `+ ${n} muuta ensi-iltaa`),
     title: "Ohjelmassa",
     intro: "Esitykset seuraavan kahden viikon aikana.",
     closingSoon: "Viimeiset esitykset",
@@ -33,6 +36,10 @@ export const fi = {
     count: (n: number) => (n === 1 ? "1 esitys ohjelmassa" : `${n} esitystä ohjelmassa`),
   },
   filters: {
+    when: "Milloin",
+    whenAll: "2 viikkoa",
+    whenLabels: { today: "Tänään", tomorrow: "Huomenna", weekend: "Viikonloppuna", week: "7 päivää" },
+    english: "Seurattavissa englanniksi",
     legend: "Rajaa esityksiä",
     city: "Kaupunki",
     type: "Lajityyppi",
@@ -43,6 +50,12 @@ export const fi = {
     clear: "Tyhjennä valinnat",
   },
   production: {
+    durationShort: (minutes: number) => {
+      const h = Math.floor(minutes / 60);
+      const m = minutes % 60;
+      return [h > 0 && `${h} t`, m > 0 && `${m} min`].filter(Boolean).join(" ");
+    },
+    intervals: (n: number) => (n === 0 ? "ei väliaikaa" : n === 1 ? "väliaika" : `${n} väliaikaa`),
     nextPerformance: "Seuraava esitys",
     noUpcoming: "Ei tulevia esityksiä.",
     performedIn: (year: number) => `Esitetty ${year}`,
@@ -64,7 +77,7 @@ export const fi = {
     criticsAside: "linkit alkuperäisiin",
     sourceLine: "Tiedot",
     updated: "päivitetty",
-    spokenIn: { fi: "suomeksi", sv: "ruotsiksi", en: "englanniksi", ru: "venäjäksi", uk: "ukrainaksi", es: "espanjaksi", ar: "arabiaksi", lv: "latviaksi", et: "viroksi", fr: "ranskaksi", de: "saksaksi", sign: "viittomakielellä", zxx: "sanaton" } as Record<string, string>,
+    spokenIn: { it: "italiaksi", fi: "suomeksi", sv: "ruotsiksi", en: "englanniksi", ru: "venäjäksi", uk: "ukrainaksi", es: "espanjaksi", ar: "arabiaksi", lv: "latviaksi", et: "viroksi", fr: "ranskaksi", de: "saksaksi", sign: "viittomakielellä", zxx: "sanaton" } as Record<string, string>,
     histogramLabel: "Arvosanojen jakauma",
     stars: (value: number) => `${value.toLocaleString("fi-FI")} tähteä`,
     stage: "Näyttämö",
@@ -95,7 +108,7 @@ export const fi = {
     OTHER: "Muut tekijät",
   },
   types,
-  languages: { fi: "suomi", sv: "ruotsi", en: "englanti", ru: "venäjä", uk: "ukraina", es: "espanja", ar: "arabia", lv: "latvia", et: "viro", fr: "ranska", de: "saksa", sign: "viittomakieli", zxx: "sanaton" } as Record<string, string>,
+  languages: { it: "italia", fi: "suomi", sv: "ruotsi", en: "englanti", ru: "venäjä", uk: "ukraina", es: "espanja", ar: "arabia", lv: "latvia", et: "viro", fr: "ranska", de: "saksa", sign: "viittomakieli", zxx: "sanaton" } as Record<string, string>,
   theatre: {
     current: "Ohjelmistossa nyt",
     past: "Aiemmin esitetty",
@@ -108,7 +121,18 @@ export const fi = {
     past: "Aiemmat produktiot",
     as: (character: string) => `roolissa ${character}`,
   },
-  nav: { diary: "Päiväkirja", label: "Päävalikko" },
+  nav: { diary: "Päiväkirja", search: "Haku", label: "Päävalikko" },
+  search: {
+    title: "Haku",
+    label: "Esitys, tekijä tai teatteri",
+    submit: "Hae",
+    hint: "Kirjoita vähintään kaksi merkkiä.",
+    none: (q: string) => `Haulla ”${q}” ei löytynyt mitään. Tarkista kirjoitusasu tai kokeile lyhyempää hakusanaa.`,
+    productions: "Esitykset",
+    people: "Tekijät",
+    theatres: "Teatterit",
+    credits: (n: number) => (n === 1 ? "1 produktio" : `${n} produktiota`),
+  },
   auth: {
     title: "Kirjaudu",
     intro: "Lähetämme sähköpostiisi kirjautumislinkin. Salasanaa ei tarvita, eikä tiliä tarvitse luoda erikseen.",

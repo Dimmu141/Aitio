@@ -239,3 +239,19 @@ The step-by-step launch is in **`LAUNCH.md`**. What the code now has for it:
 - **Brevo and `List-Unsubscribe`**: Brevo's API documentation says it doesn't accept standard headers, so our one-click unsubscribe header might be dropped or replaced. Step 2 of `LAUNCH.md` says how to check.
 - **The privacy policy is not legal advice**; have it read before launch.
 - **No error tracking** beyond Vercel's logs and the scrape alerts.
+
+## Status: findability (18 Oct 2026)
+
+After comparing Aitio with foreign listing sites (Official London Theatre, Berlin Bühnen, TodayTix, Show-Score):
+
+- **Search** at `/haku` (`/sv/sok`, `/en/search`), a fourth tab. It runs in memory over a cached index (`getSearchIndex`, `src/lib/catalogue/search.ts`): every word must match, accents are forgiven both ways, playing shows rank before past ones. People are listed only with current credits, so no result leads to a 404. Result pages are `noindex`.
+- **Time chips** on the front page (Tänään, Huomenna, Viikonloppuna, 7 päivää): plain links outside the filter panel that keep the other choices (`filterQuery`). The weekend is Friday to Sunday, or what's left of it (`src/lib/catalogue/when.ts`). With a chip, a card sits under its first performance on those days.
+- **"Seurattavissa englanniksi"** (understandable in English) is a choice in the language filter: spoken in English, wordless (`zxx`), or English subtitles within the window.
+- **Running time and intervals** on cards, parsed from the theatre's own text by `parseDuration` (tested against every text in the live data). The production page keeps the original text.
+- **Premieres** ("Ensi-illat") above the programme: only the date the theatre states (`premiereDate`), never the first performance we happened to store. Four rows, the rest behind a toggle.
+- Cards say the language when it isn't Finnish, and the subtitles.
+
+### Known gaps
+
+- **Premiere dates** come from HKT, Svenska Teatern, Espoo, KOM, Q, Takomo, Viirus and Zodiak. Kansallisteatteri, the opera and Tanssin talo don't print one we parse yet, so their openings are missing from the strip.
+- **Espoo** prints no running time we parse.

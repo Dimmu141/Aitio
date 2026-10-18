@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FilterBar } from "@/components/FilterBar";
+import { FilterBar, WhenChips } from "@/components/FilterBar";
 import { ProductionCard } from "@/components/ProductionCard";
 import { getDictionary } from "@/i18n";
 import type { Locale } from "@/i18n/config";
@@ -8,7 +8,8 @@ import { href } from "@/i18n/paths";
 import { applyFilters, filterOptions, parseFilters } from "@/lib/catalogue/filters";
 import { getOnStage } from "@/lib/catalogue/queries";
 import { formatDayHeading, formatShortDate } from "@/lib/format";
-import { type Day, groupByNextDay } from "@/lib/catalogue/days";
+import { type Day, groupByNextDay, premieresSoon } from "@/lib/catalogue/days";
+import type { ProductionCard as Card } from "@/lib/catalogue/types";
 import { pageMetadata } from "@/lib/metadata";
 
 /**
@@ -33,9 +34,10 @@ async function OnStage({
   t: Dictionary;
 }) {
   const [{ asOf, cards }, params] = await Promise.all([getOnStage(), searchParams]);
-  const options = filterOptions(cards);
+  const options = filterOptions(cards, asOf);
   const filters = parseFilters(params, options);
-  const shown = applyFilters(cards, filters);
+  const shown = applyFilters(cards, filters, asOf);
+  const premieres = premieresSoon(shown, asOf);
   const closing = shown.filter((card) => card.closingSoon).length;
   const days = groupByNextDay(shown, asOf);
   const dayName = (day: Day) =>
@@ -46,8 +48,11 @@ async function OnStage({
         : formatDayHeading(day.sample, locale);
 
   return (
-    <div>
+    <div className="space-y-4">
+      <WhenChips options={options} filters={filters} locale={locale} t={t} />
       <FilterBar options={options} filters={filters} locale={locale} t={t} />
+
+      {premieres.length > 0 && <Premieres cards={premieres} asOf={asOf} locale={locale} t={t} />}
 
       <section aria-labelledby="all" className="ai-section">
         <div className="ai-section__head">
@@ -85,6 +90,60 @@ async function OnStage({
         )}
       </section>
     </div>
+  );
+}
+
+const PREMIERES_SHOWN = 4;
+
+function PremiereRow({ card, asOf, locale }: { card: Card; asOf: Date; locale: Locale }) {
+  return (
+    <li className="flex gap-3 border-b border-rule py-3">
+      <span className="w-24 shrink-0 font-bold">{card.premiere && formatShortDate(card.premiere, locale, asOf)}</span>
+      <span className="min-w-0">
+        <Link
+          href={href(locale, "esitys", card.slug)}
+          className="font-serif text-card break-words text-ink decoration-rule-strong hover:text-ink hover:decoration-current"
+        >
+          {card.title}
+        </Link>
+        <span className="block text-meta text-ink-muted">{card.theatre.name}</span>
+      </span>
+    </li>
+  );
+}
+
+/**
+ * The openings in the window, above the programme (each show is in it too). Four at
+ * most before a "more" toggle, so on a phone the programme still starts on the first screen.
+ */
+function Premieres({ cards, asOf, locale, t }: { cards: Card[]; asOf: Date; locale: Locale; t: Dictionary }) {
+  const rest = cards.slice(PREMIERES_SHOWN);
+  return (
+    <section aria-labelledby="premieres" className="ai-section">
+      <div className="ai-section__head">
+        <h2 id="premieres" className="ai-section__title">
+          {t.home.premieres}
+        </h2>
+        <p className="ai-section__aside">{t.home.premieresAside}</p>
+      </div>
+      <ul className="md:grid md:grid-cols-2 md:gap-x-10">
+        {cards.slice(0, PREMIERES_SHOWN).map((card) => (
+          <PremiereRow key={card.slug} card={card} asOf={asOf} locale={locale} />
+        ))}
+      </ul>
+      {rest.length > 0 && (
+        <details className="group">
+          <summary className="flex min-h-tap cursor-pointer list-none items-center font-bold text-accent group-open:hidden [&::-webkit-details-marker]:hidden">
+            {t.home.morePremieres(rest.length)}
+          </summary>
+          <ul className="md:grid md:grid-cols-2 md:gap-x-10">
+            {rest.map((card) => (
+              <PremiereRow key={card.slug} card={card} asOf={asOf} locale={locale} />
+            ))}
+          </ul>
+        </details>
+      )}
+    </section>
   );
 }
 
