@@ -1,26 +1,160 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * Aitio design tokens, converted from the design system's tokens.json.
+ * Source of truth: https://claude.ai/artifact/P8RU9CHVFfvPRLkiQax68J
+ * Change a value there first, then mirror it here.
+ *
+ * Spacing needs no tokens: the system's space-1…space-12 (4, 8, 12, 16, 24,
+ * 32, 48px) are exactly Tailwind's default 4px scale (p-1 … p-12).
+ */
+
+/* Dark mode ("Ilta") is opt-in from Profiili, never automatic. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@theme {
+  /* Reset Tailwind's palette so only Aitio colours exist as utilities. */
+  --color-*: initial;
+
+  /* Surfaces */
+  --color-paper: #f7f2e8;
+  --color-paper-raised: #fffdf8;
+  --color-paper-sunk: #ede5d6;
+
+  /* Text */
+  --color-ink: #1f1a14;
+  --color-ink-muted: #5a5045;
+
+  /* Lines: rule is decorative only; rule-strong edges controls (>= 3:1) */
+  --color-rule: #cfc3ae;
+  --color-rule-strong: #8a7d68;
+
+  /* The one accent */
+  --color-accent: #b93a26;
+  --color-accent-strong: #962c1c;
+  --color-on-accent: #ffffff;
+  --color-accent-tint: #f6dcd3;
+
+  /* Signals: always paired with a word or glyph */
+  --color-focus: #1f4fbf;
+  --color-success: #2e6b3a;
+  --color-urgent: #d9a441;
+
+  /* Fixed in both themes: text on urgent and poster grounds */
+  --color-ink-fixed: #1f1a14;
+  --color-paper-fixed: #fffdf8;
+
+  /* Poster grounds are content, not UI chrome; pick with hash(slug) % 5 */
+  --color-poster-coral: #e8735a;
+  --color-poster-ochre: #d9a441;
+  --color-poster-teal: #2f6b67;
+  --color-poster-plum: #5b3a5e;
+  --color-poster-sage: #a9b79a;
+
+  /* Families: the variables come from next/font in layout.tsx */
+  --font-serif: var(--font-newsreader), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-atkinson), "Segoe UI", system-ui, sans-serif;
+
+  /* Type scale; titles also take font-serif */
+  --text-poster-title: 44px;
+  --text-poster-title--line-height: 46px;
+  --text-poster-title--letter-spacing: -0.01em;
+  --text-poster-title--font-weight: 600;
+  --text-display: 34px;
+  --text-display--line-height: 40px;
+  --text-display--font-weight: 600;
+  --text-section: 26px;
+  --text-section--line-height: 32px;
+  --text-section--font-weight: 600;
+  --text-card-title: 21px;
+  --text-card-title--line-height: 27px;
+  --text-card-title--font-weight: 600;
+  --text-body: 18px;
+  --text-body--line-height: 28px;
+  --text-button: 18px;
+  --text-button--line-height: 24px;
+  --text-button--font-weight: 700;
+  --text-meta: 16px;
+  --text-meta--line-height: 24px;
+  --text-label: 15px;
+  --text-label--line-height: 20px;
+  --text-label--letter-spacing: 0.06em;
+  --text-label--font-weight: 700;
+  --text-numeral: 28px;
+  --text-numeral--line-height: 32px;
+  --text-numeral--font-weight: 700;
+
+  /* Near-square print corners; tag chips use rounded-full */
+  --radius-sm: 3px;
+  --radius-md: 6px;
+
+  /* Touch targets (h-tap, min-h-tap-primary …) and the column width */
+  --spacing-tap: 48px;
+  --spacing-tap-primary: 56px;
+  --container-measure: 640px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+[data-theme="dark"] {
+  --color-paper: #1b1814;
+  --color-paper-raised: #24201b;
+  --color-paper-sunk: #14110e;
+  --color-ink: #f3ece0;
+  --color-ink-muted: #b9ad9b;
+  --color-rule: #3d362d;
+  --color-rule-strong: #7d715f;
+  --color-accent: #f08a6c;
+  --color-accent-strong: #f6a68e;
+  --color-on-accent: #1b1814;
+  --color-accent-tint: #3a221b;
+  --color-focus: #8fb0ff;
+  --color-success: #7cc48a;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    color-scheme: light;
   }
-}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  html[data-theme="dark"] {
+    color-scheme: dark;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-serif);
+  }
+
+  a {
+    color: var(--color-accent);
+    text-underline-offset: 3px;
+  }
+
+  a:hover {
+    color: var(--color-accent-strong);
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 }
