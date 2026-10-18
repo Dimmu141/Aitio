@@ -2,12 +2,12 @@ import { isLocale, type Locale } from "@/i18n/config";
 import { href } from "@/i18n/paths";
 import { cardSelect, toCard } from "@/lib/catalogue/cards";
 import { db } from "@/lib/db";
-import { type EmailMessage, sendEmail } from "@/lib/email";
+import { bulkPauseMs, type EmailMessage, sendEmail } from "@/lib/email";
 import { absoluteUrl } from "@/lib/site";
 import { composeDigest, digestItems, RESEND_AFTER_DAYS } from "./digest";
 import { isValidUnsubscribe, unsubscribeSignature } from "./unsubscribe";
 
-/** One run stays well inside the cron's 300 s at Resend's default 2 requests per second. */
+/** One run stays well inside the cron's 300 s even at Resend's default 2 requests per second. */
 export const BATCH_SIZE = 200;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -27,7 +27,7 @@ export interface DigestDeps {
 
 const defaultDeps: DigestDeps = {
   send: sendEmail,
-  pause: () => new Promise((resolve) => setTimeout(resolve, process.env.RESEND_API_KEY ? 550 : 0)),
+  pause: () => new Promise((resolve) => setTimeout(resolve, bulkPauseMs())),
 };
 
 function unsubscribeQuery(userId: string): string {
@@ -108,6 +108,19 @@ export async function unsubscribe(userId: string, signature: string): Promise<bo
   if (!userId || !isValidUnsubscribe(userId, signature)) return false;
   await db.user.updateMany({ where: { id: userId }, data: { digestOptIn: false } });
   return true;
+}
+
+/**
+ * The provider reports an address as undeliverable or the user marked us as spam:
+ * stop the digest, so a dead address doesn't drag down the sender reputation the
+ * sign-in links depend on. Returns how many accounts it switched off.
+ */
+export async function stopDigestFor(email: string): Promise<number> {
+  const result = await db.user.updateMany({
+    where: { email: email.trim().toLowerCase(), digestOptIn: true },
+    data: { digestOptIn: false },
+  });
+  return result.count;
 }
 
 export async function setDigest(userId: string, optIn: boolean, locale: Locale): Promise<void> {
