@@ -64,6 +64,14 @@ describe.skipIf(!url)("upsertProduction (integration)", () => {
     expect(await db.performance.count()).toBe(7);
   });
 
+  it("keeps a stated premiere when a later scrape no longer prints it", async () => {
+    const premiere = new Date("2026-09-12T00:00:00Z");
+    await upsertProduction(db, theatre, { ...detail, premiereDate: premiere }, new Date());
+    await upsertProduction(db, theatre, { ...detail, premiereDate: undefined }, new Date());
+    const saved = await db.production.findUniqueOrThrow({ where: { slug: "nattland-svenska-teatern" } });
+    expect(saved.premiereDate).toEqual(premiere);
+  });
+
   it("keeps dropped performances and credits but leaves their lastSeenAt behind", async () => {
     const later = new Date(Date.now() + 60_000);
     const trimmed = { ...detail, performances: detail.performances.slice(1), credits: detail.credits.slice(1) };

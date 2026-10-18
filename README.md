@@ -253,7 +253,7 @@ After comparing Aitio with foreign listing sites (Official London Theatre, Berli
 
 ### Known gaps
 
-- **Premiere dates** come from HKT, Svenska Teatern, Espoo, KOM, Q, Takomo, Viirus and Zodiak. Kansallisteatteri, the opera and Tanssin talo don't print one we parse yet, so their openings are missing from the strip.
+- **Premiere dates** come from HKT, Svenska Teatern, Espoo, KOM, Q, Takomo, Viirus, Zodiak, Kansallisteatteri (the "Kantaesitys"/"Ensi-ilta" line or the row marked Ensi-ilta) and Tanssin talo (only when its schedule labels a date "Ensi-ilta", which is rare). The opera states none, so its openings are missing from the strip. Once stated, a premiere is kept even when a later scrape no longer prints it (`normalise.ts`), since Tanssin talo's label and the row fallback disappear after the night.
 - **Espoo** prints no running time we parse.
 
 ## Status: want to see and calendar (18 Oct 2026)

@@ -8,6 +8,7 @@ import {
   parseDetail,
   parseList,
   parseListing,
+  schedulePremiere,
   showTime,
   typeHintFor,
   type ListingEntry,
@@ -176,5 +177,37 @@ describe("helpers", () => {
     expect(danceRoles("Koreografinen assistentti ja harjoituttaja")).toEqual([]);
     expect(danceRoles("Valokuvat")).toEqual([]);
     expect(danceRoles("Ohjaus, koreografinen praktiikka, libretto")).toEqual(["DIRECTOR", "CHOREOGRAPHER", "WRITER"]);
+  });
+});
+
+describe("Tanssin talo premiere", () => {
+  const asOf = new Date("2026-10-18T09:00:00Z");
+
+  it("takes the performance the schedule labels Ensi-ilta", () => {
+    // "Ti 22.9. klo 19 | Ensi-ilta I, TSC 30 vuotta juhlanäytös"; the weekday gives 2026.
+    const bill = parseDetail(fixture("production-wild-is-the-wind.html"), ref("wild-is-the-wind"), { asOf });
+    expect(bill.premiereDate).toEqual(new Date("2026-09-22T16:00:00Z"));
+  });
+
+  it("leaves it unset when the schedule labels none", () => {
+    // Its prose says pieces get a "Uusintaensi-ilta" and a "Suomen ensi-ilta", but no date is labelled.
+    const solos = parseDetail(fixture("production-kolmen-soolon-juhla.html"), ref("alpo-aaltokoski-company-kolmen-soolon-juhla"), {
+      listing: entry("alpo-aaltokoski-company-kolmen-soolon-juhla"),
+      asOf,
+    });
+    expect(solos.premiereDate).toBeUndefined();
+    // A complete run from the listing, but its first date is not labelled a premiere.
+    const circus = parseDetail(fixture("production-talvisirkus-vari.html"), ref("talvisirkus-väri"), {
+      listing: entry("talvisirkus-väri"),
+      asOf,
+    });
+    expect(circus.premiereDate).toBeUndefined();
+  });
+
+  it("prefers the listing's time on that day and accepts a revival's opening", () => {
+    const listed = [new Date("2026-10-27T16:30:00Z"), new Date("2026-10-28T16:30:00Z")];
+    expect(schedulePremiere(["ti 27.10. klo 18.30", "ke 28.10. klo 18 | Uusintaensi-ilta"], listed, asOf)).toEqual(listed[1]);
+    expect(schedulePremiere(["ti 27.10. klo 18.30", "ke 28.10. klo 18.30"], listed, asOf)).toBeUndefined();
+    expect(schedulePremiere(["9.12.2026–24.1.2027"], [], asOf)).toBeUndefined();
   });
 });

@@ -1,7 +1,7 @@
 import * as cheerio from "cheerio";
 import { politeFetch } from "../http";
 import { mapRoleText } from "../roles";
-import { cleanText, helsinkiToUtc, personName } from "../text";
+import { cleanText, helsinkiToUtc, personName, yearFromWeekday } from "../text";
 import {
   rawProductionDetailSchema,
   rawProductionSchema,
@@ -276,6 +276,44 @@ function parseCredits($: Page): RawCredit[] {
 export interface DetailOptions {
   /** The production's row from the listing: performances and categories come from there. */
   listing?: ListingEntry;
+  /** Dates the year of a printed weekday when the listing has no row for it (default: now). */
+  asOf?: Date;
+}
+
+/** The lines under "Esitysajat": "Ti 22.9. klo 19 | Ensi-ilta I, …", or just "9.12.2026–24.1.2027". */
+function scheduleLines($: Page): string[] {
+  const block = $(".experience__info-box h6")
+    .filter((_, element) => /^esitysajat$/i.test(cleanText($(element).text())))
+    .first()
+    .next();
+  return (block.html() ?? "")
+    .split(/<br\s*\/?>|<\/p>/i)
+    .map((line) => cleanText(cheerio.load(`<div>${line}</div>`)("div").text()))
+    .filter(Boolean);
+}
+
+/** "Ti 22.9. klo 19 | Ensi-ilta I": weekday, day, month, optional year and time, then the note. */
+const SCHEDULE_LINE = /^(\p{L}{2})\p{L}*\.?\s+(\d{1,2})\.(\d{1,2})\.(\d{4})?\s*(?:klo\s+(\d{1,2})(?:[.:](\d{2}))?)?(.*)$/u;
+
+/**
+ * The performance the schedule labels "Ensi-ilta" (also "Suomen ensi-ilta", and
+ * "Uusintaensi-ilta", which opens this run of a revival). Only a label counts: the first
+ * date of a guest run is not a premiere. The listing's show time on that day gives the
+ * year and time; without one, the printed weekday dates it.
+ */
+export function schedulePremiere(lines: string[], showTimes: Date[], asOf: Date): Date | undefined {
+  for (const line of lines) {
+    const match = SCHEDULE_LINE.exec(line);
+    if (!match || !/ensi-ilta|premiär|premiere/i.test(match[7])) continue;
+    const [, weekday, day, month, printedYear, hour, minute] = match;
+    const listed = showTimes.find((startsAt) => helsinkiDate(startsAt).endsWith(`-${month.padStart(2, "0")}-${day.padStart(2, "0")}`));
+    if (listed) return listed;
+    const year = printedYear ? Number(printedYear) : yearFromWeekday(Number(day), Number(month), weekday, asOf);
+    if (!year) continue;
+    const date = `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+    return hour ? helsinkiToUtc(date, `${hour.padStart(2, "0")}:${minute ?? "00"}`) : new Date(`${date}T00:00:00Z`);
+  }
+  return undefined;
 }
 
 export function parseDetail(
@@ -299,6 +337,7 @@ export function parseDetail(
     subtitle: listing?.categories.join(", ") || undefined,
     typeHint: listing ? typeHintFor(listing.categories) : undefined,
     durationText: infoText($, /kesto/i),
+    premiereDate: schedulePremiere(scheduleLines($), listing?.showTimes ?? [], options.asOf ?? new Date()),
     ticketUrl,
     runStart: performances[0]?.startsAt,
     runEnd: performances.at(-1)?.startsAt,

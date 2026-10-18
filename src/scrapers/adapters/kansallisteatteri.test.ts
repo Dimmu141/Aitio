@@ -116,3 +116,34 @@ describe("Kansallisteatteri subtitles", () => {
     expect(subtitleLanguages("Kesto 2 h 15 min (sisältää väliajan)")).toEqual([]);
   });
 });
+
+describe("Kansallisteatteri premiere", () => {
+  const detail = (slug: string, file: string) =>
+    parseDetail(fixture(file), { externalId: slug, url: `https://www.kansallisteatteri.fi/esitys/${slug}`, isVisiting: false });
+
+  it("reads the stated premiere, which stays on the page after it has passed", () => {
+    // "Kantaesitys Maalaamosalissa 15.4.2026"; the run now listed starts in October.
+    expect(detail("lady-t-0", "production-lady-t.html").premiereDate).toEqual(new Date("2026-04-15T00:00:00Z"));
+    expect(detail("viidakon-villit-naiset", "production-viidakon-villit-naiset.html").premiereDate).toEqual(
+      new Date("2026-09-16T00:00:00Z"),
+    );
+  });
+
+  it("does not take a preview for the premiere", () => {
+    // Previews from 14.11.; the row of 18.11. is marked "Ensi-ilta", as is the bold line.
+    const taru = detail("taru-hohtavasta-helmesta", "production-taru-hohtavasta-helmesta.html");
+    expect(taru.performances[0].startsAt).toEqual(new Date("2026-11-14T11:00:00Z"));
+    expect(taru.premiereDate).toEqual(new Date("2026-11-18T00:00:00Z"));
+  });
+
+  it("falls back to the performance row marked Ensi-ilta", () => {
+    const html = fixture("production-taru-hohtavasta-helmesta.html").replace("<strong>Kantaesitys ", "<strong>");
+    const taru = parseDetail(html, { externalId: "taru", url: "https://www.kansallisteatteri.fi/esitys/taru", isVisiting: false });
+    expect(taru.premiereDate).toEqual(new Date("2026-11-18T16:30:00Z")); // klo 18:30
+  });
+
+  it("leaves it unset for a premiere elsewhere", () => {
+    // "Kantaesitys oli Tampereen Työväen Teatterissa 23.1.2025."
+    expect(detail("karpaset", "production-karpaset.html").premiereDate).toBeUndefined();
+  });
+});

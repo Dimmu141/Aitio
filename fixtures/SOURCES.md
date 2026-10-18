@@ -84,3 +84,25 @@ path used. None of these sources lists only the next few dates (`hasFullSchedule
   visiting productions grouped by title (the ticket link is stored, never fetched).
   "Visiting" otherwise comes from the VIERAILUOHJELMISTO menu, so a guest show that has left
   the menu reads as the theatre's own.
+
+## Premiere dates (18 Oct 2026)
+
+Only a date the theatre labels as the premiere becomes `premiereDate`; the first stored
+performance never does (previews, revivals and runs that began before our history).
+
+- **kansallisteatteri.fi**: a bold line at the end of the description, "Kantaesitys Suurella
+  näyttämöllä 18.11.2026", "Ensi-ilta Taivassalissa 2.9.2026", "Helsingin ensi-ilta …" or
+  "Suomen kantaesitys …" (date only, stored at 00:00 UTC). It stays on the page after the
+  premiere. "Kantaesitys oli Lahden kaupunginteatterissa …" is a premiere elsewhere and is
+  skipped. Without the line, the performance row marked `<div class="premiere">Ensi-ilta</div>`
+  gives date and time. `production-taru-hohtavasta-helmesta.html` has previews before its
+  premiere; `production-karpaset.html` (a guest run) has none of its own. 13 of 21
+  productions state one.
+- **oopperabaletti.fi** states no premiere date anywhere (fi, sv or en pages, JSON-LD or the
+  repertoire JSON); "Milloin" is the run, and some runs are revivals (Dracula). Left unset.
+- **tanssintalo.fi**: a line under "Esitysajat" labelled "Ensi-ilta" ("Ti 22.9. klo 19 |
+  Ensi-ilta I", in `production-wild-is-the-wind.html`); "Uusintaensi-ilta" there counts as
+  this run's opening. Year and time come from the API's show time on that day, else from the
+  printed weekday. "Ensi-ilta: 23.4.2026, Teatro della Tosse" in a credit block is one
+  piece's premiere elsewhere and is not used. The API includes a running entry's past show
+  times, but an unlabelled first date is still not a premiere. No current page labels one.
