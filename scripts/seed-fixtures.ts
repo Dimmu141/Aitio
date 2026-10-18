@@ -1,7 +1,10 @@
 import "dotenv/config";
 import { readFileSync } from "node:fs";
+import * as espoo from "../src/scrapers/adapters/espoon-teatteri";
 import * as hkt from "../src/scrapers/adapters/hkt";
 import * as kansallisteatteri from "../src/scrapers/adapters/kansallisteatteri";
+import * as kom from "../src/scrapers/adapters/kom-teatteri";
+import * as ryhma from "../src/scrapers/adapters/ryhmateatteri";
 import * as svenskaTeatern from "../src/scrapers/adapters/svenska-teatern";
 import { upsertProduction } from "../src/scrapers/normalise";
 import type { RawProduction, RawProductionDetail } from "../src/scrapers/types";
@@ -44,6 +47,37 @@ function fixtureDetails(): Array<{ sourceId: string; detail: RawProductionDetail
         findRef(hkt.parseList(read("fixtures/hkt/list-esitykset.html")), "https://hkt.fi/esitykset/julia/"),
       ),
     },
+    {
+      sourceId: hkt.hktAdapter.id,
+      detail: hkt.parseDetail(
+        read("fixtures/hkt/production-de-obehoriga.html"),
+        null,
+        findRef(hkt.parseList(read("fixtures/hkt/list-esitykset.html")), "https://hkt.fi/esitykset/de-obehoriga/"),
+      ),
+    },
+    {
+      sourceId: ryhma.ryhmateatteriAdapter.id,
+      detail: ryhma.parseDetail(
+        read("fixtures/ryhmateatteri/production-aitisi-klytaimestra.html"),
+        ryhma.parseRestList(read("fixtures/ryhmateatteri/artist-page-1.json"))[0],
+      ),
+    },
+    {
+      sourceId: kom.komTeatteriAdapter.id,
+      detail: kom.parseDetail(
+        read("fixtures/kom-teatteri/production-mysteriobuffo.html"),
+        read("fixtures/kom-teatteri/kalenteri.html"),
+        findRef(kom.parseList(read("fixtures/kom-teatteri/ohjelmisto.html")), "https://kom-teatteri.fi/ohjelmisto/mysteriobuffo/"),
+      ),
+    },
+    ...["rakastavaisten-kuoro", "legend-of-harri-kala"].map((slug) => ({
+      sourceId: espoo.espoonTeatteriAdapter.id,
+      detail: espoo.parseDetail(
+        read(`fixtures/espoon-teatteri/production-${slug}.html`),
+        null,
+        findRef(espoo.parseList(read("fixtures/espoon-teatteri/ohjelmisto.html")), `https://espoonteatteri.fi/ohjelmisto/${slug}/`),
+      ),
+    })),
   ];
 }
 

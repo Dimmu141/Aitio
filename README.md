@@ -144,6 +144,52 @@ Sign in locally: `pnpm dev`, enter any address on `/kirjaudu`, copy the link fro
 - **An expired session cookie without JavaScript** on a personal page shows the sign-in redirect only with JS (the proxy sees a cookie and lets it through).
 - **e2e tests need the dev database** and delete their own `@example.fi` users afterwards; point `DATABASE_URL` at a disposable database if you'd rather not touch dev data.
 
-## Next: milestone 4
+## Status: milestone 4 (all six theatres, cron, monitoring, admin)
 
-Remaining adapters (HKT, Ryhmäteatteri, KOM, Espoo), Vercel Cron, ScrapeRun monitoring, admin page for type overrides and moderation. The cron route should POST to `/api/revalidate` after a run. See `BRIEF.md` section 8.
+### Adapters
+
+| Source | How | Quirks the fixtures taught us |
+|---|---|---|
+| Kansallisteatteri | HTML | per-performance subtitles still not parsed (empty in every capture) |
+| Svenska Teatern | REST list + HTML | old productions kept for diary entries |
+| HKT + Lilla Teatern | HTML + `/wp-json/hkt/ticket-list/<id>/` | performances only come from the JSON; its `timestamp` is Helsinki time posing as UTC, so we use `date` + `time` |
+| Ryhmäteatteri | REST `artist` + HTML | FI and EN posts per show (keep FI); subtitles only on some weekdays; one production on right now |
+| KOM-teatteri | repertoire page + production pages + calendar | hand-edited pages; page dates merged with the calendar's tickets and venues |
+| Espoon Teatteri | HTML + `admin-ajax.php` (POST) | only the next few performances are ever public; the year comes from the printed weekday; `page/2` repeats page 1 |
+
+Every adapter has fixtures and tests (`src/scrapers/adapters/*.test.ts`); `fixtures/SOURCES.md` says where each capture came from.
+
+### Scheduling and monitoring
+
+- **Vercel Cron**: one job per theatre (`vercel.json`), daily 03:00–03:50 UTC, calling `/api/cron/scrape/<source>` with `Authorization: Bearer $CRON_SECRET`, up to 300 s each. `/api/cron/scrape/next` runs whichever source is most overdue, for a plan with fewer cron jobs.
+- **Once a day** per source even if a cron retries; runs killed by the time limit are closed as failed; a successful run refreshes the cached catalogue.
+- **Alerts**: a failed or timed-out run, or one that lost over a quarter of its detail pages, emails `ADMIN_EMAILS`.
+- **`/yllapito`** (admins only, Finnish): health and history per source, a type-override list for productions the classifier was unsure about, and the moderation queue.
+
+### Data model changes
+
+- `Performance.subtitleLangs`: subtitles at that performance only (Ryhmäteatteri's Wednesdays and Fridays); `Production.subtitleLangs` now means every performance. The production page lists them per date.
+- Partial performance lists (`performancesPartial`): for Espoo, a stored performance after the last listed one stays current instead of looking cancelled.
+- Critic links carry their publication date where the theatre gives it.
+- Languages: Spanish, Arabic, Latvian, Estonian, French, German, and `zxx` for wordless shows.
+
+### Configuration (new)
+
+| Variable | What for |
+|---|---|
+| `CRON_SECRET` | Vercel sends it to the cron routes; set it in the project's environment variables |
+| `ADMIN_EMAILS` | comma-separated accounts that see `/yllapito` and get scrape alerts |
+
+### Known gaps
+
+- **Not one live scrape yet.** The new fixtures were captured through Firecrawl because this environment blocks the theatre sites, and Firecrawl returns pages after JavaScript ran. Before trusting the cron: `pnpm fixtures:refresh && pnpm test`, then `pnpm scrape --dry-run --limit 3` per source. HKT and Espoo depend on endpoints their own scripts call (`/wp-json/hkt/ticket-list/`, `admin-ajax.php`); those requests are verified only through the captured data.
+- **Vercel plan limits not confirmed**: I could not find the current cron-count and duration limits in Vercel's docs from here. If six cron jobs or 300 s are not allowed on your plan, switch `vercel.json` to one `/api/cron/scrape/next` job, run several times a day if possible.
+- **Espoo shows only its next few performances**, so its productions list only those, with the theatre's own ticket link for the rest.
+- **Kansallisteatteri subtitles** still unknown; the subtitle filter stays off, but the per-performance model it needs now exists.
+- **No production type for circus, puppetry or game performances**; they come out as OTHER or a guessed PLAY and wait in the admin's type list.
+- **Admins are an environment variable**, with no audit log of overrides or moderation decisions.
+- **The admin page answers non-admins with HTTP 200** and the not-found page (the status is sent before the page decides); none of its content is sent, which the e2e tests check.
+
+## Next: milestone 5
+
+Engagement: year-in-review page, badges, "closing soon" email digest. See `BRIEF.md` section 8.

@@ -112,7 +112,7 @@ async function TypeReview() {
                   {row.theatre} · arvaus {t.types[row.type]} ({Math.round(row.typeConfidence * 100)} %)
                 </span>
               </span>
-              <form action={setTypeOverrideAction} className="flex gap-2">
+              <form action={setTypeOverrideAction} className="flex w-full flex-wrap gap-2 sm:w-auto">
                 <input type="hidden" name="productionId" value={row.id} />
                 <label className="sr-only" htmlFor={`type-${row.id}`}>
                   Lajityyppi
@@ -121,7 +121,7 @@ async function TypeReview() {
                   id={`type-${row.id}`}
                   name="type"
                   defaultValue={row.typeOverride ?? ""}
-                  className="min-h-tap rounded border-2 border-rule bg-white px-2"
+                  className="min-h-tap min-w-0 flex-1 rounded border-2 border-rule bg-white px-2"
                 >
                   <option value="">Automaattinen ({t.types[row.type]})</option>
                   {Object.values(ProductionType).map((type) => (

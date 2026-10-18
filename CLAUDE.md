@@ -17,8 +17,9 @@ Read `BRIEF.md` before starting new work. It holds the product decisions, data s
 - **Milestone 3 is done** (users and diary, see README.md "Status: milestone 3" and its known gaps). Decisions agreed with Dimmu:
   - Better Auth instead of Auth.js (BRIEF.md section 2 updated), email magic links only, no passwords or social login.
   - Reviews are public by default with a visible opt-out checkbox; ratings and tags always count anonymously.
-- **Before launch:** a privacy policy page and a decision on the email provider (Resend is US-based).
-- **Next: milestone 4**, remaining adapters, cron, monitoring, admin page (BRIEF.md section 8). Propose first and wait for Dimmu's OK.
+- **Milestone 4 is done** (all six adapters, Vercel Cron, monitoring, `/yllapito`; see README.md "Status: milestone 4"). The new fixtures came from Firecrawl (post-JavaScript), so **the first session with network access must run `pnpm fixtures:refresh && pnpm test` and a dry-run per source** before the cron is trusted.
+- **Before launch:** a privacy policy page, a decision on the email provider (Resend is US-based), `CRON_SECRET` and `ADMIN_EMAILS` in Vercel, and confirming the plan allows six cron jobs of up to 300 s.
+- **Next: milestone 5**, engagement (BRIEF.md section 8). Propose first and wait for Dimmu's OK.
 
 ## Commands
 
@@ -43,7 +44,9 @@ pnpm moderation [hide|show <entryId>]  # reported reviews
 - **Auth**: Better Auth in `src/lib/auth.ts`; read the user with `getCurrentUser`/`requireUser` (`src/lib/session.ts`) only on dynamic pages and in actions. Never read the session on public pages: they are static. Personal sections are listed in `src/lib/auth-gate.ts` for the proxy redirect. Mutations are server actions in `src/lib/actions.ts`; after changing diary data call `updateTag(productionTag(slug))`.
 - **Forms work without JavaScript** (plain server-action forms, `<details>`, radio chips). Keep it that way; `pnpm test:e2e` runs a no-JS project.
 - **Current rows**: performances and credits whose `lastSeenAt` is older than the production's are stale; filter with `isCurrent` in `src/lib/catalogue/select.ts`.
-- **Never hard-delete** scraped data; use `lastSeenAt`.
+- **Never hard-delete** scraped data; use `lastSeenAt`. Sources that only list upcoming performances set `performancesPartial` so unlisted later dates are not treated as cancelled.
+- **Theatre-site endpoints**: HKT performances come from `/wp-json/hkt/ticket-list/<post id>/` (its `timestamp` is Helsinki wall-clock posing as UTC: use `date` + `time`); Espoo's from `POST admin-ajax.php`. Dates without a year: use the printed weekday (`yearFromWeekday`) or month headings, never "next occurrence" guesses.
+- **Ops**: cron logic is pure and tested in `src/lib/ops/schedule.ts`; admins are `ADMIN_EMAILS`. Admin UI strings are Finnish-only by design.
 - **Audience**: many users are 55–74. Light mode by default, body text 17–18px, high contrast, big tap targets, usable at 360px width.
 - **Languages**: UI in Finnish (default), Swedish and English. Content stays in its original language.
 - **Design**: printed theatre programme, not Netflix. Warm off-white, serif titles, sans UI, one accent colour. No masks, curtains or gradients.

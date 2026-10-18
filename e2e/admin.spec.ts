@@ -30,4 +30,5 @@ test("admins see scrape health, type review and moderation", async ({ page }) =>
   }
   await expect(page.getByRole("heading", { name: "Lajityypit" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Ilmoitukset" })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(0);
 });
