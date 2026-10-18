@@ -1,0 +1,287 @@
+import { cacheLife, cacheTag } from "next/cache";
+import type { CreditRole, ProductionType } from "@/generated/prisma/enums";
+import { db } from "@/lib/db";
+import {
+  effectiveType,
+  isCurrent,
+  lastYear,
+  runProgress,
+  schedule,
+  summariseRatings,
+  upcomingPerformances,
+  type RatingSummary,
+} from "./select";
+import type { CreditRow, PerformanceRow, ProductionCard, TheatreRef } from "./types";
+
+/**
+ * Everything here is cached for an hour and tagged "catalogue", so the scraper can
+ * invalidate it after a run. Time-dependent answers ("next 14 days") use `asOf`, the
+ * moment the cache entry was built, which is also returned so pages stay consistent.
+ */
+export const CATALOGUE_TAG = "catalogue";
+
+function cacheCatalogue(): void {
+  cacheLife("hours");
+  cacheTag(CATALOGUE_TAG);
+}
+
+const theatreSelect = { select: { slug: true, name: true, city: true } } as const;
+
+const cardSelect = {
+  slug: true,
+  title: true,
+  type: true,
+  typeOverride: true,
+  languages: true,
+  subtitleLangs: true,
+  lastSeenAt: true,
+  premiereDate: true,
+  runEnd: true,
+  theatre: theatreSelect,
+  stage: { select: { name: true } },
+  performances: { select: { startsAt: true, lastSeenAt: true }, orderBy: { startsAt: "asc" } },
+} as const;
+
+interface CardSource {
+  slug: string;
+  title: string;
+  type: ProductionType;
+  typeOverride: ProductionType | null;
+  languages: string[];
+  subtitleLangs: string[];
+  lastSeenAt: Date;
+  premiereDate: Date | null;
+  runEnd: Date | null;
+  theatre: TheatreRef;
+  stage: { name: string } | null;
+  performances: Array<{ startsAt: Date; lastSeenAt: Date }>;
+}
+
+export function toCard(source: CardSource, asOf: Date): ProductionCard {
+  const upcoming = upcomingPerformances(source.performances, source, asOf);
+  const timing = schedule(upcoming, asOf);
+  return {
+    slug: source.slug,
+    title: source.title,
+    theatre: source.theatre,
+    stage: source.stage?.name ?? null,
+    type: effectiveType(source),
+    languages: source.languages,
+    subtitleLangs: source.subtitleLangs,
+    ...timing,
+    year: timing.next ? null : lastYear([source.performances.at(-1)?.startsAt, source.runEnd, source.premiereDate]),
+  };
+}
+
+const byNext = (a: ProductionCard, b: ProductionCard) =>
+  (a.next?.getTime() ?? Infinity) - (b.next?.getTime() ?? Infinity) || a.title.localeCompare(b.title, "fi");
+
+const byYearDesc = (a: ProductionCard, b: ProductionCard) =>
+  (b.year ?? 0) - (a.year ?? 0) || a.title.localeCompare(b.title, "fi");
+
+/** Productions playing within the window, soonest first. */
+export async function getOnStage(): Promise<{ asOf: Date; cards: ProductionCard[] }> {
+  "use cache";
+  cacheCatalogue();
+  const asOf = new Date();
+  const rows = await db.production.findMany({
+    where: { performances: { some: { startsAt: { gte: asOf } } } },
+    select: cardSelect,
+  });
+  const cards = rows.map((row) => toCard(row, asOf)).filter((card) => card.onSoon);
+  return { asOf, cards: cards.sort(byNext) };
+}
+
+export interface ProductionPage {
+  asOf: Date;
+  slug: string;
+  title: string;
+  type: ProductionType;
+  theatre: TheatreRef & { website: string };
+  stage: string | null;
+  languages: string[];
+  subtitleLangs: string[];
+  durationText: string | null;
+  sourceUrl: string;
+  ticketUrl: string | null;
+  premiereDate: Date | null;
+  performances: PerformanceRow[];
+  next: Date | null;
+  last: Date | null;
+  progress: number | null;
+  year: number | null;
+  credits: CreditRow[];
+  critics: Array<{ outlet: string; url: string; publishedAt: Date | null }>;
+  ratings: RatingSummary;
+  tags: Array<{ slug: string; labels: { fi: string; sv: string; en: string }; count: number }>;
+  updatedAt: Date;
+}
+
+export async function getProduction(slug: string): Promise<ProductionPage | null> {
+  "use cache";
+  cacheCatalogue();
+  const asOf = new Date();
+  const row = await db.production.findUnique({
+    where: { slug },
+    include: {
+      theatre: { select: { slug: true, name: true, city: true, website: true } },
+      stage: { select: { name: true } },
+      performances: { include: { stage: { select: { name: true } } }, orderBy: { startsAt: "asc" } },
+      credits: { include: { person: { select: { slug: true, name: true } } }, orderBy: { sortOrder: "asc" } },
+      criticReviews: { orderBy: [{ publishedAt: "desc" }, { outlet: "asc" }] },
+      diaryEntries: { select: { rating: true, tags: { select: { slug: true, labelFi: true, labelSv: true, labelEn: true } } } },
+    },
+  });
+  if (!row) return null;
+
+  const upcoming = upcomingPerformances(row.performances, row, asOf);
+  const timing = schedule(upcoming, asOf);
+  const firstKnown = row.premiereDate ?? row.runStart ?? row.performances[0]?.startsAt ?? null;
+  const ratings = row.diaryEntries.flatMap((entry) => (entry.rating === null ? [] : [Number(entry.rating)]));
+
+  return {
+    asOf,
+    slug: row.slug,
+    title: row.title,
+    type: effectiveType(row),
+    theatre: row.theatre,
+    stage: row.stage?.name ?? null,
+    languages: row.languages,
+    subtitleLangs: row.subtitleLangs,
+    durationText: row.durationText,
+    sourceUrl: row.sourceUrl,
+    ticketUrl: upcoming.find((performance) => performance.ticketUrl)?.ticketUrl ?? row.ticketUrl,
+    premiereDate: row.premiereDate,
+    performances: upcoming.map((performance) => ({
+      startsAt: performance.startsAt,
+      stage: performance.stage?.name ?? null,
+      ticketUrl: performance.ticketUrl,
+    })),
+    next: timing.next,
+    last: timing.last,
+    progress: runProgress(firstKnown, timing.last ?? row.runEnd, asOf),
+    year: timing.next ? null : lastYear([row.performances.at(-1)?.startsAt, row.runEnd, row.premiereDate]),
+    credits: row.credits
+      .filter((credit) => isCurrent(credit, row))
+      .map((credit) => ({ role: credit.role, person: credit.person, characterName: credit.characterName })),
+    critics: row.criticReviews.map((review) => ({ outlet: review.outlet, url: review.url, publishedAt: review.publishedAt })),
+    ratings: summariseRatings(ratings),
+    tags: countTags(row.diaryEntries.flatMap((entry) => entry.tags)),
+    updatedAt: row.lastSeenAt,
+  };
+}
+
+function countTags(tags: Array<{ slug: string; labelFi: string; labelSv: string; labelEn: string }>) {
+  const counts = new Map<string, ProductionPage["tags"][number]>();
+  for (const tag of tags) {
+    const entry = counts.get(tag.slug) ?? {
+      slug: tag.slug,
+      labels: { fi: tag.labelFi, sv: tag.labelSv, en: tag.labelEn },
+      count: 0,
+    };
+    entry.count += 1;
+    counts.set(tag.slug, entry);
+  }
+  return [...counts.values()].sort((a, b) => b.count - a.count);
+}
+
+export interface TheatrePage {
+  asOf: Date;
+  theatre: TheatreRef & { website: string };
+  stages: string[];
+  current: ProductionCard[];
+  past: ProductionCard[];
+}
+
+export async function getTheatre(slug: string): Promise<TheatrePage | null> {
+  "use cache";
+  cacheCatalogue();
+  const asOf = new Date();
+  const row = await db.theatre.findUnique({
+    where: { slug },
+    select: {
+      slug: true,
+      name: true,
+      city: true,
+      website: true,
+      stages: { select: { name: true }, orderBy: { name: "asc" } },
+      productions: { select: cardSelect },
+    },
+  });
+  if (!row) return null;
+  const cards = row.productions.map((production) => toCard(production, asOf));
+  return {
+    asOf,
+    theatre: { slug: row.slug, name: row.name, city: row.city, website: row.website },
+    stages: row.stages.map((stage) => stage.name),
+    current: cards.filter((card) => card.next).sort(byNext),
+    past: cards.filter((card) => !card.next).sort(byYearDesc),
+  };
+}
+
+export interface PersonCredit {
+  card: ProductionCard;
+  roles: CreditRole[];
+  characterNames: string[];
+}
+
+export interface PersonPage {
+  asOf: Date;
+  slug: string;
+  name: string;
+  current: PersonCredit[];
+  past: PersonCredit[];
+}
+
+export async function getPerson(slug: string): Promise<PersonPage | null> {
+  "use cache";
+  cacheCatalogue();
+  const asOf = new Date();
+  const row = await db.person.findUnique({
+    where: { slug },
+    include: { credits: { include: { production: { select: cardSelect } } } },
+  });
+  if (!row) return null;
+
+  const byProduction = new Map<string, PersonCredit>();
+  for (const credit of row.credits) {
+    if (!isCurrent(credit, credit.production)) continue;
+    const entry = byProduction.get(credit.production.slug) ?? {
+      card: toCard(credit.production, asOf),
+      roles: [],
+      characterNames: [],
+    };
+    entry.roles.push(credit.role);
+    if (credit.characterName) entry.characterNames.push(credit.characterName);
+    byProduction.set(credit.production.slug, entry);
+  }
+  const all = [...byProduction.values()];
+  if (all.length === 0) return null;
+  return {
+    asOf,
+    slug: row.slug,
+    name: row.name,
+    current: all.filter((entry) => entry.card.next).sort((a, b) => byNext(a.card, b.card)),
+    past: all.filter((entry) => !entry.card.next).sort((a, b) => byYearDesc(a.card, b.card)),
+  };
+}
+
+/** Every public slug, for generateStaticParams and the sitemap. */
+export async function getAllSlugs(): Promise<{
+  productions: Array<{ slug: string; updatedAt: Date }>;
+  theatres: Array<{ slug: string; updatedAt: Date }>;
+  people: Array<{ slug: string }>;
+}> {
+  "use cache";
+  cacheCatalogue();
+  const [productions, theatres, people] = await Promise.all([
+    db.production.findMany({ select: { slug: true, lastSeenAt: true }, orderBy: { slug: "asc" } }),
+    db.theatre.findMany({ select: { slug: true, updatedAt: true }, orderBy: { slug: "asc" } }),
+    db.person.findMany({ where: { credits: { some: {} } }, select: { slug: true }, orderBy: { slug: "asc" } }),
+  ]);
+  return {
+    productions: productions.map((row) => ({ slug: row.slug, updatedAt: row.lastSeenAt })),
+    theatres: theatres.map((row) => ({ slug: row.slug, updatedAt: row.updatedAt })),
+    people,
+  };
+}
