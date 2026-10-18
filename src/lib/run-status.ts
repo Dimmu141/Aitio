@@ -1,3 +1,5 @@
+import { helsinkiToUtc } from "@/scrapers/text";
+
 const DAY_MS = 24 * 60 * 60 * 1000;
 export const CLOSING_SOON_DAYS = 14;
 
@@ -27,10 +29,20 @@ function bounds(input: RunInput): { opensAt: Date | null; endsAt: Date | null } 
   };
 }
 
+/**
+ * Midnight after the Helsinki calendar day of `date`. Sources store the run end
+ * either as a date at UTC midnight (Svenska Teatern) or as the final show's
+ * start time (Kansallisteatteri); both mean "the run lasts that whole day".
+ */
+function endOfHelsinkiDay(date: Date): Date {
+  const day = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Helsinki" }).format(date);
+  const next = new Date(new Date(`${day}T00:00:00Z`).getTime() + DAY_MS).toISOString().slice(0, 10);
+  return helsinkiToUtc(next, "00:00");
+}
+
 function phaseOf(opensAt: Date | null, endsAt: Date | null, remaining: number, now: Date): RunPhase {
   if (!endsAt) return remaining > 0 ? "running" : "unknown";
-  // runEnd is stored as the date at UTC midnight: the run lasts the whole day.
-  const endOfRun = endsAt.getTime() + DAY_MS;
+  const endOfRun = endOfHelsinkiDay(endsAt).getTime();
   if (endOfRun <= now.getTime() && remaining === 0) return "ended";
   if (opensAt && opensAt.getTime() > now.getTime()) return "upcoming";
   return endOfRun - now.getTime() <= CLOSING_SOON_DAYS * DAY_MS ? "closing" : "running";

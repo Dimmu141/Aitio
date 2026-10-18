@@ -41,4 +41,13 @@ describe("runStatus", () => {
     expect(status.opensAt).toEqual(nattland.performances[0]);
     expect(status.endsAt).toEqual(nattland.performances[1]);
   });
+
+  it("ends a run stored as the final show's start time at the end of that day", () => {
+    // Kansallisteatteri: runEnd is the last performance, la 19.12. klo 18.30.
+    const run = { premiereDate: null, runStart: null, runEnd: new Date("2026-12-19T16:30:00Z"), performances: [] };
+    expect(runStatus(run, new Date("2026-12-19T21:00:00Z")).phase).toBe("closing");
+    expect(runStatus(run, new Date("2026-12-19T22:30:00Z")).phase).toBe("ended");
+    expect(runStatus(run, new Date("2026-12-05T22:30:00Z")).phase).toBe("closing");
+    expect(runStatus(run, new Date("2026-12-05T21:30:00Z")).phase).toBe("running");
+  });
 });

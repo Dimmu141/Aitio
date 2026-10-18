@@ -1,6 +1,7 @@
 import { cacheLife, cacheTag } from "next/cache";
 import type { PrismaClient } from "@/generated/prisma/client";
 import type { CreditRole, ProductionType } from "@/generated/prisma/enums";
+import { currentPerformances } from "@/lib/freshness";
 import { runStatus, type RunStatus } from "@/lib/run-status";
 
 /**
@@ -54,13 +55,14 @@ type ProgrammeRow = {
   premiereDate: Date | null;
   runStart: Date | null;
   runEnd: Date | null;
+  lastSeenAt: Date;
   theatre: TheatreRef;
   stage: { name: string } | null;
-  performances: { startsAt: Date }[];
+  performances: { startsAt: Date; lastSeenAt: Date }[];
 };
 
 function toProgrammeItem(row: ProgrammeRow, now: Date): ProgrammeItem | null {
-  const dates = row.performances.map((performance) => performance.startsAt);
+  const dates = currentPerformances(row.performances, row.lastSeenAt).map((performance) => performance.startsAt);
   const nextPerformance = dates[0];
   if (!nextPerformance) return null;
   return {
@@ -87,9 +89,10 @@ const programmeSelect = (now: Date) =>
     premiereDate: true,
     runStart: true,
     runEnd: true,
+    lastSeenAt: true,
     theatre: theatreRef,
     stage: { select: { name: true } },
-    performances: { where: { startsAt: { gte: now } }, orderBy: { startsAt: "asc" }, select: { startsAt: true } },
+    performances: { where: { startsAt: { gte: now } }, orderBy: { startsAt: "asc" }, select: { startsAt: true, lastSeenAt: true } },
   }) as const;
 
 function sortByNext(items: (ProgrammeItem | null)[]): ProgrammeItem[] {
@@ -108,7 +111,8 @@ export async function getProgramme(): Promise<Loaded<ProgrammeItem[]>> {
       where: { performances: { some: { startsAt: { gte: now, lte: horizon } } } },
       select: programmeSelect(now),
     });
-    return sortByNext(rows.map((row) => toProgrammeItem(row, now)));
+    // The where clause can't see freshness, so re-check the 14-day window on current performances.
+    return sortByNext(rows.map((row) => toProgrammeItem(row, now))).filter((item) => item.nextPerformance <= horizon);
   });
   if (result.ok) cacheLife("hours");
   else cacheLife("seconds");
@@ -144,14 +148,15 @@ export async function getProduction(slug: string): Promise<Loaded<ProductionDeta
         performances: {
           where: { startsAt: { gte: now } },
           orderBy: { startsAt: "asc" },
-          select: { startsAt: true, ticketUrl: true, stage: { select: { name: true } } },
+          select: { startsAt: true, ticketUrl: true, lastSeenAt: true, stage: { select: { name: true } } },
         },
         credits: { orderBy: { sortOrder: "asc" }, include: { person: { select: { slug: true, name: true } } } },
         criticReviews: { orderBy: { publishedAt: "asc" }, select: { outlet: true, url: true, publishedAt: true } },
       },
     });
     if (!row) return null;
-    const dates = row.performances.map((performance) => performance.startsAt);
+    const performances = currentPerformances(row.performances, row.lastSeenAt);
+    const dates = performances.map((performance) => performance.startsAt);
     return {
       slug: row.slug,
       title: row.title,
@@ -164,7 +169,7 @@ export async function getProduction(slug: string): Promise<Loaded<ProductionDeta
       sourceUrl: row.sourceUrl,
       lastSeenAt: row.lastSeenAt,
       status: runStatus({ premiereDate: row.premiereDate, runStart: row.runStart, runEnd: row.runEnd, performances: dates }, now),
-      performances: row.performances.map((performance) => ({
+      performances: performances.map((performance) => ({
         startsAt: performance.startsAt,
         ticketUrl: performance.ticketUrl,
         stage: performance.stage?.name ?? null,
@@ -190,10 +195,17 @@ export async function getTheatres(): Promise<Loaded<TheatreSummary[]>> {
         slug: true,
         name: true,
         city: true,
-        productions: { where: { performances: { some: { startsAt: { gte: now } } } }, select: { id: true } },
+        productions: {
+          where: { performances: { some: { startsAt: { gte: now } } } },
+          select: { lastSeenAt: true, performances: { where: { startsAt: { gte: now } }, select: { lastSeenAt: true } } },
+        },
       },
     });
-    return rows.map(({ productions, ...theatre }) => ({ ...theatre, productionCount: productions.length }));
+    return rows.map(({ productions, ...theatre }) => ({
+      ...theatre,
+      productionCount: productions.filter((production) => currentPerformances(production.performances, production.lastSeenAt).length > 0)
+        .length,
+    }));
   });
   if (result.ok) cacheLife("hours");
   else cacheLife("seconds");
@@ -257,8 +269,9 @@ export async function getPerson(slug: string): Promise<Loaded<PersonDetail | nul
                 title: true,
                 premiereDate: true,
                 runStart: true,
+                lastSeenAt: true,
                 theatre: { select: { name: true } },
-                performances: { where: { startsAt: { gte: now } }, take: 1, select: { startsAt: true } },
+                performances: { where: { startsAt: { gte: now } }, select: { lastSeenAt: true } },
               },
             },
           },
@@ -281,8 +294,9 @@ type CreditRow = {
     title: string;
     premiereDate: Date | null;
     runStart: Date | null;
+    lastSeenAt: Date;
     theatre: { name: string };
-    performances: { startsAt: Date }[];
+    performances: { lastSeenAt: Date }[];
   };
 };
 
@@ -297,7 +311,7 @@ function groupCredits(rows: CreditRow[]): PersonCredit[] {
         title: production.title,
         year: production.premiereDate ?? production.runStart,
         theatre: production.theatre.name,
-        upcoming: production.performances.length > 0,
+        upcoming: currentPerformances(production.performances, production.lastSeenAt).length > 0,
       },
       roles: [],
     };
