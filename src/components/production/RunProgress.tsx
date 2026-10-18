@@ -4,12 +4,12 @@ import { formatPerformance, formatShortDate, isoDateTime } from "@/lib/format";
 
 /**
  * Where the run stands: how many performances are left, and a bar from the premiere to
- * the last date. Counting needs the theatre's whole schedule; without it we say what's next.
+ * the end. Counting needs the theatre's whole schedule; without it we say what's next.
  */
 export function RunProgress({
   progress,
   premiere,
-  last,
+  end,
   next,
   remaining,
   fullSchedule,
@@ -19,7 +19,8 @@ export function RunProgress({
 }: {
   progress: number | null;
   premiere: Date | null;
-  last: Date | null;
+  /** The known end of the run (`knownEnd`), not merely the last listed date. */
+  end: Date | null;
   next: Date | null;
   remaining: number;
   fullSchedule: boolean;
@@ -36,8 +37,8 @@ export function RunProgress({
       <p className="ai-run__status">
         {!next ? (
           t.production.noUpcoming
-        ) : fullSchedule && last ? (
-          t.production.remaining(remaining, short(last))
+        ) : fullSchedule && end ? (
+          t.production.remaining(remaining, short(end))
         ) : (
           <>
             {t.production.nextPerformance}:{" "}
@@ -59,9 +60,9 @@ export function RunProgress({
           </div>
           <p className="ai-run__line">
             <span>{premiere && `${t.production.premiere} ${short(premiere, false)}`}</span>
-            {last && fullSchedule && (
+            {end && (
               <span>
-                {t.production.ends} <time dateTime={isoDateTime(last)}>{short(last, false)}</time>
+                {t.production.ends} <time dateTime={isoDateTime(end)}>{short(end, false)}</time>
               </span>
             )}
           </p>

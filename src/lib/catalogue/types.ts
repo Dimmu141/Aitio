@@ -18,6 +18,8 @@ export interface ProductionCard {
   subtitleLangs: string[];
   next: Date | null;
   last: Date | null;
+  /** When the run ends as far as we know (`knownEnd`): `last`, or for partial sources the theatre's end date. */
+  end: Date | null;
   onSoon: boolean;
   closingSoon: boolean;
   /** For productions no longer playing: "Esitetty 2024". */

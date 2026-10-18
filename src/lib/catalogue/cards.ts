@@ -1,5 +1,6 @@
 import type { ProductionType } from "@/generated/prisma/enums";
-import { effectiveType, lastYear, schedule, upcomingPerformances, windowEnd } from "./select";
+import { hasFullSchedule } from "@/scrapers/theatres";
+import { effectiveType, isClosingSoon, knownEnd, lastYear, schedule, upcomingPerformances, windowEnd } from "./select";
 import type { ProductionCard, TheatreRef } from "./types";
 
 /** The select and mapping behind every production list; kept free of next/cache for scripts and tests. */
@@ -47,6 +48,7 @@ function subtitlesSoon(source: CardSource, upcoming: CardSource["performances"],
 export function toCard(source: CardSource, asOf: Date): ProductionCard {
   const upcoming = source.delistedAt ? [] : upcomingPerformances(source.performances, source, asOf);
   const timing = schedule(upcoming, asOf);
+  const fullSchedule = hasFullSchedule(source.theatre.slug);
   return {
     slug: source.slug,
     title: source.title,
@@ -56,6 +58,8 @@ export function toCard(source: CardSource, asOf: Date): ProductionCard {
     languages: source.languages,
     subtitleLangs: subtitlesSoon(source, upcoming, asOf),
     ...timing,
+    end: knownEnd(timing.last, source.runEnd, fullSchedule),
+    closingSoon: isClosingSoon(timing, source.runEnd, fullSchedule, asOf),
     year: timing.next ? null : lastYear([source.performances.at(-1)?.startsAt, source.runEnd, source.premiereDate]),
   };
 }

@@ -5,7 +5,9 @@ import { hasFullSchedule } from "@/scrapers/theatres";
 import { cardSelect, toCard } from "./cards";
 import {
   effectiveType,
+  isClosingSoon,
   isCurrent,
+  knownEnd,
   lastYear,
   runProgress,
   schedule,
@@ -65,6 +67,8 @@ export interface ProductionPage {
   next: Date | null;
   last: Date | null;
   progress: number | null;
+  /** When the run ends as far as we know (see `knownEnd`); null when we can't tell. */
+  end: Date | null;
   /** False when the source lists only the next few dates, so "N left" would be wrong. */
   fullSchedule: boolean;
   closingSoon: boolean;
@@ -130,6 +134,8 @@ export async function getProduction(slug: string): Promise<ProductionPage | null
   // A production the theatre no longer lists has no performances to sell, whatever is stored.
   const upcoming = row.delistedAt ? [] : upcomingPerformances(row.performances, row, asOf);
   const timing = schedule(upcoming, asOf);
+  const fullSchedule = hasFullSchedule(row.theatre.slug);
+  const end = knownEnd(timing.last, row.runEnd, fullSchedule);
   const ratings = row.diaryEntries.flatMap((entry) => (entry.rating === null ? [] : [entry.rating / 2]));
 
   return {
@@ -153,9 +159,10 @@ export async function getProduction(slug: string): Promise<ProductionPage | null
     })),
     next: timing.next,
     last: timing.last,
-    progress: runProgress(row.premiereDate, row.performances[0]?.startsAt ?? null, timing.last ?? row.runEnd, asOf),
-    fullSchedule: hasFullSchedule(row.theatre.slug),
-    closingSoon: timing.closingSoon,
+    progress: runProgress(row.premiereDate, row.performances[0]?.startsAt ?? null, end, asOf),
+    end,
+    fullSchedule,
+    closingSoon: isClosingSoon(timing, row.runEnd, fullSchedule, asOf),
     year: timing.next ? null : lastYear([row.performances.at(-1)?.startsAt, row.runEnd, row.premiereDate]),
     credits: row.credits
       .filter((credit) => isCurrent(credit, row))

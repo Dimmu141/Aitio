@@ -58,7 +58,7 @@ async function OnStage({
                 asOf={asOf}
                 locale={locale}
                 t={t}
-                note={card.last ? t.home.closes(formatDate(card.last, locale)) : undefined}
+                note={card.end ? t.home.closes(formatDate(card.end, locale)) : undefined}
               />
             ))}
           </ul>

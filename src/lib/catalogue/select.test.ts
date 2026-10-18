@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   effectiveType,
+  isClosingSoon,
   isCurrent,
+  knownEnd,
   lastYear,
   runProgress,
   schedule,
@@ -100,5 +102,30 @@ describe("summariseRatings", () => {
 
   it("shows a one-decimal average from ten ratings", () => {
     expect(summariseRatings([...Array(9).fill(4), 3]).average).toBe(3.9);
+  });
+});
+
+describe("known end and closing soon for partial schedules", () => {
+  // Espoo lists only its next few dates: five shows within a week say nothing about the end.
+  const listed = schedule([{ startsAt: day(1) }, { startsAt: day(3) }, { startsAt: day(6) }], asOf);
+
+  it("uses the last listed date when the schedule is complete", () => {
+    expect(knownEnd(day(6), day(60), true)).toEqual(day(6));
+    expect(isClosingSoon(listed, null, true, asOf)).toBe(true);
+  });
+
+  it("uses only the theatre's end date when the schedule is partial", () => {
+    expect(knownEnd(day(6), day(60), false)).toEqual(day(60));
+    expect(knownEnd(day(6), null, false)).toBeNull();
+    expect(isClosingSoon(listed, day(60), false, asOf)).toBe(false);
+    expect(isClosingSoon(listed, null, false, asOf)).toBe(false);
+  });
+
+  it("is closing soon when the printed end falls within the window", () => {
+    expect(isClosingSoon(listed, day(10), false, asOf)).toBe(true);
+  });
+
+  it("is not closing soon with nothing left to see", () => {
+    expect(isClosingSoon(schedule([], asOf), day(10), false, asOf)).toBe(false);
   });
 });

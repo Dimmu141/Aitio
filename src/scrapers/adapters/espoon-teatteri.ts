@@ -178,7 +178,8 @@ export function parseDetail(
     subtitle: genre || undefined,
     premiereDate: premiere,
     runStart: range.start ?? performances[0]?.startsAt,
-    runEnd: range.end ?? performances.at(-1)?.startsAt,
+    // Only the printed range: the listed shows are just the next few, not the last one.
+    runEnd: range.end,
     languages: spokenLanguages(facts.get("kieli")),
     subtitleLangs: subtitleLanguages(facts),
     credits: parseCredits($),

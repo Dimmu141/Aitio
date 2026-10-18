@@ -113,7 +113,7 @@ export default async function ProductionRoute({ params }: PageProps<"/[locale]/e
         <RunProgress
           progress={page.progress}
           premiere={page.premiereDate}
-          last={page.last}
+          end={page.end}
           next={page.next}
           remaining={page.performances.length}
           fullSchedule={page.fullSchedule}

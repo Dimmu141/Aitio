@@ -49,6 +49,21 @@ export function schedule(upcoming: Array<{ startsAt: Date }>, asOf: Date, days =
 }
 
 /**
+ * When the run ends, as far as we know. A source that lists only the next few dates
+ * (`hasFullSchedule` false) says nothing with its last listed date; then only the
+ * theatre's own end date counts.
+ */
+export function knownEnd(last: Date | null, runEnd: Date | null, fullSchedule: boolean): Date | null {
+  return fullSchedule ? (last ?? runEnd) : runEnd;
+}
+
+/** "Viimeiset esitykset": still playing, and the known end falls within the window. */
+export function isClosingSoon(timing: Schedule, runEnd: Date | null, fullSchedule: boolean, asOf: Date): boolean {
+  if (fullSchedule) return timing.closingSoon;
+  return timing.next !== null && runEnd !== null && runEnd < windowEnd(asOf);
+}
+
+/**
  * How far the run has progressed, 0–100, or null when the dates don't allow it.
  * Starts at the premiere when we know it, else at the earliest performance we have
  * ever seen. Without a premiere, a start in the future only means our history begins

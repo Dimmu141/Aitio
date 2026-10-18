@@ -13,6 +13,7 @@ function card(overrides: Partial<ProductionCard>): ProductionCard {
     subtitleLangs: [],
     next: null,
     last: null,
+    end: null,
     onSoon: true,
     closingSoon: false,
     year: null,
