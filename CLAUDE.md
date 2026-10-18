@@ -8,19 +8,19 @@ Read `BRIEF.md` before starting new work. It holds the product decisions, data s
 
 - **Milestone 1 is done** (data layer + two scrapers, 43 tests). See README.md for what exists.
 - **Milestone 1 first-run is done** except the live scrape: migration committed (`prisma/migrations`), seed and integration tests pass on PostgreSQL 16. `pnpm db:seed:fixtures` loads the two fixture productions for local page development.
-- **Still open:** `pnpm scrape --dry-run --limit 3` has never run against the live sites. Cloud sessions get a proxy 403 for the theatre domains unless they are allowed in the environment's network settings. Fix any parser problems before scraping fully.
+- **Live verification done (18 Oct 2026, LAUNCH.md step 0):** all six sources fetched, fixtures refreshed from the live servers, parsers fixed, full scrape into the dev database. See `fixtures/SOURCES.md` "What the live run changed". In a cloud session, scripts that fetch need `NODE_USE_ENV_PROXY=1` (Node's fetch ignores `HTTPS_PROXY`).
 - **Milestone 2 is done** (read-only site, see README.md "Status: milestone 2" and its known gaps). Decisions agreed with Dimmu and now built:
   - Finnish URLs at the root, `/sv/` and `/en/` with translated segments, via `src/proxy.ts` and `src/i18n/paths.ts` (not next-intl; see README for why).
   - "Merkitse nähdyksi" is hidden until auth exists (milestone 3); no dead buttons.
   - Past productions are indexed and in the sitemap with an "Esitetty <year>" label, but stay out of "Ohjelmassa".
-  - The subtitle filter stays off until Kansallisteatteri per-performance subtitles are parsed from a real fixture.
+  - The subtitle filter is on since 18 Oct 2026: Kansallisteatteri per-performance subtitles are parsed from a real fixture. A card matches when any performance in the next two weeks has the language.
 - **Milestone 3 is done** (users and diary, see README.md "Status: milestone 3" and its known gaps). Decisions agreed with Dimmu:
   - Better Auth instead of Auth.js (BRIEF.md section 2 updated), email magic links only, no passwords or social login.
   - Reviews are public by default with a visible opt-out checkbox; ratings and tags always count anonymously.
-- **Milestone 4 is done** (all six adapters, Vercel Cron, monitoring, `/yllapito`; see README.md "Status: milestone 4"). The new fixtures came from Firecrawl (post-JavaScript), so **the first session with network access must run `pnpm fixtures:refresh && pnpm test` and a dry-run per source** before the cron is trusted.
+- **Milestone 4 is done** (all six adapters, Vercel Cron, monitoring, `/yllapito`; see README.md "Status: milestone 4"). Its Firecrawl fixtures were replaced by live server HTML on 18 Oct 2026.
 - **Launch decisions made:** Brevo (EU) for email, Neon in Frankfurt with Vercel functions in `fra1`, and the Hobby plan, which is enough (100 cron jobs, once a day, 300 s). The privacy policy lives in `src/lib/privacy.ts` and quotes the retention constants; when you change retention, data collected, or a provider, update it and `POLICY_DATE`.
 - **Milestone 5 is done** (year in review, badges, "closing soon" email; see README.md "Status: milestone 5"). Badges are computed on every view, never stored. The digest is opt-in, and its unsubscribe link is signed, needs no sign-in and never acts on GET.
-- **All milestones in BRIEF.md are built, and launch readiness is done in code** (see README.md "Status: launch readiness"). What's left is in `LAUNCH.md`, and most of it is Dimmu's (accounts, DNS, env vars, legal review). The live scrape (step 0) is still blocking. Ask Dimmu before starting anything new.
+- **All milestones in BRIEF.md are built, and launch readiness is done in code** (see README.md "Status: launch readiness"). What's left is in `LAUNCH.md`, and most of it is Dimmu's (accounts, DNS, env vars, legal review). Step 0 (live scrape) is done. Ask Dimmu before starting anything new.
 
 ## Commands
 
@@ -47,7 +47,7 @@ pnpm launch:check <env file>  # validate a production environment (see LAUNCH.md
 - **Forms work without JavaScript** (plain server-action forms, `<details>`, radio chips). Keep it that way; `pnpm test:e2e` runs a no-JS project.
 - **Current rows**: performances and credits whose `lastSeenAt` is older than the production's are stale; filter with `isCurrent` in `src/lib/catalogue/select.ts`.
 - **Never hard-delete** scraped data; use `lastSeenAt`. Sources that only list upcoming performances set `performancesPartial` so unlisted later dates are not treated as cancelled.
-- **Theatre-site endpoints**: HKT performances come from `/wp-json/hkt/ticket-list/<post id>/` (its `timestamp` is Helsinki wall-clock posing as UTC: use `date` + `time`); Espoo's from `POST admin-ajax.php`. Dates without a year: use the printed weekday (`yearFromWeekday`) or month headings, never "next occurrence" guesses.
+- **Theatre-site endpoints**: HKT performances come from `/wp-json/hkt/ticket-list/<post id>/` (its `timestamp` is Helsinki wall-clock posing as UTC: use `date` + `time`); Espoo's repertoire and performances both from `POST admin-ajax.php` (`get_dynamic_content`, `get_event_shows`). A listed page answering 404 is logged as missing, not failed. Free-text credit cells go through `personName` (drops "/ Company" and phrases). Dates without a year: use the printed weekday (`yearFromWeekday`) or month headings, never "next occurrence" guesses.
 - **Engagement** (`src/lib/engagement/`): pure `yearInReview` and `badges` over `getEntryFacts`; badge texts live in the dictionaries under `badges.items`. A new badge needs an id in `BADGE_IDS`, a rule, and strings in all three languages.
 - **Ops**: cron logic is pure and tested in `src/lib/ops/schedule.ts`; admins are `ADMIN_EMAILS`. Admin UI strings are Finnish-only by design.
 - **Audience**: many users are 55–74. Light mode by default, body text 17–18px, high contrast, big tap targets, usable at 360px width.

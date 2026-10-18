@@ -5,25 +5,43 @@ them with our own polite fetcher; do that whenever a site changes, then run `pnp
 
 | Fixtures | Captured | How |
 |---|---|---|
-| `kansallisteatteri/`, `svenska-teatern/` | 18 Oct 2026 | own fetcher (milestone 1) |
-| `hkt/`, `ryhmateatteri/`, `kom-teatteri/`, `espoon-teatteri/` | 18 Oct 2026 | **Firecrawl**, because this environment's network policy blocks the theatre sites |
+| all six theatres | 18 Oct 2026 | own fetcher (`politeFetch`), server HTML before JavaScript |
 
-**Firecrawl captures are rendered after JavaScript.** Our fetcher gets the server HTML,
-which can differ (on hkt.fi, for example, the performance list and calendar are filled
-in by script). The parsers only rely on markup and endpoints the server sends itself,
-but the first run with network access must be `pnpm fixtures:refresh && pnpm test`
-before trusting a scrape. JSON endpoints were unwrapped from Firecrawl's `<html><body>`.
+The milestone 4 fixtures came from Firecrawl (after JavaScript) because cloud sessions were
+blocked from the theatre sites. They were replaced on 18 Oct 2026 by the first live run;
+see "What the live run changed" below.
+
+In a cloud session, Node's built-in fetch ignores `HTTPS_PROXY`; run the scripts with
+`NODE_USE_ENV_PROXY=1` (Node 22.21 or later).
 
 Things these captures taught us, which a refresh must keep true:
 
+- **kansallisteatteri.fi** marks subtitles per performance (`.subtitle-indicator`) and names
+  the languages in the production's info text ("Tekstitys saatavilla englanniksi ja
+  suomeksi … valituissa näytännöissä"). `production-lady-t.html` has them on 9 of 10 dates.
 - **hkt.fi** loads performances from `/wp-json/hkt/ticket-list/<post id>/`. Its `timestamp`
-  field is Helsinki wall-clock time encoded as UTC; use `date` and `time`.
-- **espoonteatteri.fi** loads performances with `POST /wp-admin/admin-ajax.php`
-  (`action=get_event_shows`) and shows only the next few; the full list is only in its
-  Lippu.fi shop, which we don't fetch. `/ohjelmisto/page/2/` repeats page 1.
-  The calendar page (`kalenteri.html`) was captured for reference but is not used: it is
-  as incomplete as the production pages.
+  field is Helsinki wall-clock time encoded as UTC; use `date` and `time`. Credits include
+  rights agencies ("Oikeuksien valvoja"), which are skipped.
+- **espoonteatteri.fi**: both the repertoire and each production's performances come from
+  `POST /wp-admin/admin-ajax.php` (`action=get_dynamic_content` with no filters, and
+  `action=get_event_shows&event_id=<eventShowsId>`); the pages themselves are empty shells.
+  Productions show only their next few performances ("Yht. 22 näytöstä", 5 listed); the
+  full list is only in its Lippu.fi shop, which we don't fetch. Team cells are free text
+  with company names after a slash. `kalenteri.html` is unused, kept for reference.
 - **kom-teatteri.fi**'s REST child-page list mixes productions with workshops and
-  announcements; the adapter uses the curated repertoire page and the calendar.
-- **ryhmateatteri.fi** has one production on (checked against its own repertoire page,
-  `ohjelmisto-liput.html`).
+  announcements; the adapter uses the curated repertoire page and the calendar. The
+  production's ticket link is the "OSTA LIPUT" link on its page. The repertoire can link to
+  pages that don't exist (Trio Kaipuu, 404 on 18 Oct 2026); runs log those as missing.
+- **ryhmateatteri.fi** has one production on (checked against its own programme page on
+  18 Oct 2026; `ohjelmisto-liput.html` is kept for reference, not used by the tests).
+
+## What the live run changed (18 Oct 2026)
+
+| Source | Firecrawl fixtures said | Live server HTML | Fix |
+|---|---|---|---|
+| Espoo list | repertoire in the page, paginated | empty shell, filled by `get_dynamic_content` | adapter posts to admin-ajax.php |
+| Espoo performances | in the page | only via `get_event_shows` | fixtures `shows-*.html` |
+| Espoo credits | clean names | "Name / Company", descriptive phrases | `personName` |
+| Kansallisteatteri | no subtitle data | per-performance indicators | parsed, `production-lady-t.html` |
+| HKT credits | – | rights agencies, "Kirjailija" | skipped / WRITER |
+| KOM | – | ticket link only on the page; one dead link | production ticket link; 404 = missing |

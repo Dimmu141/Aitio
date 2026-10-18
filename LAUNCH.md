@@ -3,10 +3,12 @@
 Do the steps in order. Each one ends with a check, so you know it worked before moving on.
 Everything here is decided except the items marked **you decide**.
 
-## 0. Verify the scrapers against the live sites (blocking)
+## 0. Verify the scrapers against the live sites ✓ done 18 Oct 2026
 
-No scraper has fetched a live page yet. Cloud sessions are blocked from the theatre
-sites by the environment's network policy. In the environment settings, under
+Done in a cloud session; results and fixes are in `fixtures/SOURCES.md`. Repeat it whenever
+a source starts failing in `/yllapito`. Cloud sessions are blocked from the theatre sites
+unless the environment allows them, and Node's fetch needs `NODE_USE_ENV_PROXY=1` there.
+In the environment settings, under
 Network access, add these six hosts to the allowed domains (keep "Allow package
 managers" ticked; see https://code.claude.com/docs/en/cloud-environments#network-access):
 
