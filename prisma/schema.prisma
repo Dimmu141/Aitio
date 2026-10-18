@@ -126,6 +126,7 @@ model Credit {
   sortOrder     Int        @default(0)
 
   @@unique([personId, productionId, role])
+  @@index([productionId])
 }
 
 model CriticReview {
@@ -135,6 +136,8 @@ model CriticReview {
   outlet        String
   url           String     @unique
   publishedAt   DateTime?
+
+  @@index([productionId])
 }
 
 model User {
