@@ -64,15 +64,20 @@ describe("schedule", () => {
 });
 
 describe("runProgress", () => {
-  it("is a clamped percentage", () => {
-    expect(runProgress(day(-10), day(10), asOf)).toBe(50);
-    expect(runProgress(day(5), day(10), asOf)).toBe(0);
-    expect(runProgress(day(-20), day(-10), asOf)).toBe(100);
+  it("is a clamped percentage from the premiere", () => {
+    expect(runProgress(day(-10), null, day(10), asOf)).toBe(50);
+    expect(runProgress(day(5), null, day(10), asOf)).toBe(0);
+    expect(runProgress(day(-20), null, day(-10), asOf)).toBe(100);
+  });
+
+  it("falls back to the earliest performance seen, but only if it has happened", () => {
+    expect(runProgress(null, day(-10), day(10), asOf)).toBe(50);
+    expect(runProgress(null, day(5), day(10), asOf)).toBeNull();
   });
 
   it("is null without a usable range", () => {
-    expect(runProgress(null, day(10), asOf)).toBeNull();
-    expect(runProgress(day(10), day(10), asOf)).toBeNull();
+    expect(runProgress(null, null, day(10), asOf)).toBeNull();
+    expect(runProgress(day(10), null, day(10), asOf)).toBeNull();
   });
 });
 

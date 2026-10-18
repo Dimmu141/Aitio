@@ -136,7 +136,6 @@ export async function getProduction(slug: string): Promise<ProductionPage | null
 
   const upcoming = upcomingPerformances(row.performances, row, asOf);
   const timing = schedule(upcoming, asOf);
-  const firstKnown = row.premiereDate ?? row.runStart ?? row.performances[0]?.startsAt ?? null;
   const ratings = row.diaryEntries.flatMap((entry) => (entry.rating === null ? [] : [Number(entry.rating)]));
 
   return {
@@ -159,7 +158,7 @@ export async function getProduction(slug: string): Promise<ProductionPage | null
     })),
     next: timing.next,
     last: timing.last,
-    progress: runProgress(firstKnown, timing.last ?? row.runEnd, asOf),
+    progress: runProgress(row.premiereDate, row.performances[0]?.startsAt ?? null, timing.last ?? row.runEnd, asOf),
     year: timing.next ? null : lastYear([row.performances.at(-1)?.startsAt, row.runEnd, row.premiereDate]),
     credits: row.credits
       .filter((credit) => isCurrent(credit, row))

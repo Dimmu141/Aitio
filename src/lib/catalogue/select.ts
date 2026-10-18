@@ -50,9 +50,17 @@ export function schedule(upcoming: Array<{ startsAt: Date }>, asOf: Date, days =
 
 /**
  * How far the run has progressed, 0–100, or null when the dates don't allow it.
- * Starts at the premiere when we know it, else the first date we have.
+ * Starts at the premiere when we know it, else at the earliest performance we have
+ * ever seen. Without a premiere, a start in the future only means our history begins
+ * there, so we show nothing rather than a misleading 0 %.
  */
-export function runProgress(start: Date | null, end: Date | null, asOf: Date): number | null {
+export function runProgress(
+  premiere: Date | null,
+  earliestSeen: Date | null,
+  end: Date | null,
+  asOf: Date,
+): number | null {
+  const start = premiere ?? (earliestSeen && earliestSeen <= asOf ? earliestSeen : null);
   if (!start || !end || end <= start) return null;
   const ratio = (asOf.getTime() - start.getTime()) / (end.getTime() - start.getTime());
   return Math.round(Math.min(1, Math.max(0, ratio)) * 100);
