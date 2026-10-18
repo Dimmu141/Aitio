@@ -53,7 +53,14 @@ What follows is how it was done, for a rebuild:
   deleted data is gone from backups within `BACKUP_DAYS` (7) days; change `src/lib/privacy.ts`
   if your plan keeps it longer.
 
-## 2. Email: Brevo
+## 2. Email: Brevo ✓ domain authenticated 18 Oct 2026
+
+Domain `omaaitio.fi` is authenticated in Brevo (brevo-code TXT, DKIM `brevo1`/`brevo2`
+CNAMEs, one merged SPF `v=spf1 mx include:_spf.nordweb.fi include:spf.brevo.com ~all`,
+DMARC `p=none` reporting to Brevo). Sender `kirjaudu@omaaitio.fi` is active, and the
+webhook posts to `https://omaaitio.fi/api/email/events`. DNS is at Nordweb (the
+registrar); keep its MX record, and never add a second SPF or DMARC record: edit the
+existing one. Still to do: the Gmail "Show original" check in item 5 below.
 
 Why Brevo: an EU company (France), data hosted in France and Germany, 300 emails a day
 free, and it allows both sign-in emails and the opt-in weekly digest. Scaleway TEM keeps
@@ -74,16 +81,20 @@ digest is a newsletter. Resend works as a fallback and is still supported (`RESE
    `List-Unsubscribe` may be replaced by Brevo's own. If it is missing, the link in the text
    still works; tell Claude and we'll look at Brevo's unsubscribe setting.
 
-## 3. Vercel project ✓ done 18 Oct 2026 (except the custom domain)
+## 3. Vercel project ✓ done 18 Oct 2026
 
 Project **aitio** (`prj_9bVcICSGk9YAz1TVEVPue1aEDaKg`), linked to `dimmu141/aitio`, functions
 in `fra1`, Node 22, Vercel Authentication on preview deployments only. Live at
 **https://aitio-eight.vercel.app** (`aitio.vercel.app` belongs to someone else). Production
 env vars set: `DATABASE_URL` (Neon, pooled), `BETTER_AUTH_SECRET`, `CRON_SECRET`,
 `REVALIDATE_SECRET`, `EMAIL_WEBHOOK_SECRET` (all sensitive), `SITE_URL`, `ADMIN_EMAILS`,
-`SCRAPER_USER_AGENT`. Still missing: `BREVO_API_KEY`, `EMAIL_FROM`, `PRIVACY_CONTROLLER`,
-`PRIVACY_EMAIL`, so sign-in emails and the privacy contact don't work yet. Previews have no
-database on purpose (they would write to production), so preview builds fail.
+`SCRAPER_USER_AGENT`, `BREVO_API_KEY`, `EMAIL_FROM`. Still missing: `PRIVACY_CONTROLLER`,
+`PRIVACY_EMAIL`, so the privacy and about pages have no contact address. Previews have no
+database on purpose (they would write to production), so preview builds are skipped.
+
+**Custom domain:** `omaaitio.fi` (A `76.76.21.21`) and `www` (CNAME `cname.vercel-dns.com`,
+308 to the apex) since 18 Oct 2026; `SITE_URL=https://omaaitio.fi`. Sign-in only works on
+that origin. `PRIVACY_CONTROLLER` and `PRIVACY_EMAIL` are still missing.
 
 The first production deployment was made from the PR branch; once PR #1 is merged, pushes
 to `main` deploy production.
