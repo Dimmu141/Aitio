@@ -9,10 +9,12 @@ export function SiteFooter({ locale, t }: { locale: Locale; t: Dictionary }) {
   const { email } = privacyConfig();
   return (
     <footer className="mt-12 border-t-2 border-ink bg-paper-sunk">
-      <div className="mx-auto max-w-measure space-y-4 px-4 pt-6 pb-8">
-        <p className="ai-wordmark min-h-0">{t.site.name}</p>
-        <p className="text-meta text-ink-muted">{t.footer.facts}</p>
-        <ul className="grid gap-x-6 sm:grid-cols-2">
+      <div className="mx-auto max-w-measure space-y-4 px-4 pt-6 pb-8 md:grid md:max-w-wide md:grid-cols-[3fr_2fr] md:gap-x-12 md:space-y-0">
+        <div className="space-y-4">
+          <p className="ai-wordmark min-h-0">{t.site.name}</p>
+          <p className="text-meta text-ink-muted">{t.footer.facts}</p>
+        </div>
+        <ul className="grid gap-x-6 sm:grid-cols-2 md:grid-cols-1 md:content-start">
           <li>
             <Link href={href(locale, "tietoa")} className="inline-flex min-h-tap items-center font-bold">
               {t.footer.about}
@@ -24,7 +26,7 @@ export function SiteFooter({ locale, t }: { locale: Locale; t: Dictionary }) {
             </Link>
           </li>
           {email && (
-            <li className="sm:col-span-2">
+            <li className="sm:col-span-2 md:col-span-1">
               <span className="block text-meta text-ink-muted">{t.footer.contact}</span>
               <a href={`mailto:${email}`} className="inline-flex min-h-tap items-center font-bold">
                 {email}

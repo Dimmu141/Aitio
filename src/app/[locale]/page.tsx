@@ -76,7 +76,7 @@ async function OnStage({
                   <span className="font-normal text-ink-muted"> · {formatShortDate(day.sample, locale, asOf)}</span>
                 )}
               </h3>
-              <ul>
+              <ul className="md:grid md:grid-cols-2 md:gap-x-10">
                 {day.cards.map((card) => (
                   <ProductionCard key={card.slug} card={card} asOf={asOf} locale={locale} t={t} when="time" heading="h4" />
                 ))}
@@ -92,8 +92,8 @@ async function OnStage({
 export default async function HomePage({ searchParams }: PageProps<"/[locale]">) {
   const { locale, t } = await getDictionary();
   return (
-    <div className="space-y-6">
-      <header>
+    <div className="ai-wide space-y-6">
+      <header className="max-w-measure">
         <h1 className="text-display">{t.home.title}</h1>
         <p className="mt-1 text-ink-muted">{t.home.intro}</p>
       </header>

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Atkinson_Hyperlegible, Newsreader } from "next/font/google";
+import localFont from "next/font/local";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { TabBar } from "@/components/TabBar";
@@ -25,6 +26,19 @@ const sans = Atkinson_Hyperlegible({
   display: "swap",
 });
 
+// Atkinson slashes its zero ("19.ØØ" in every time); Hanken Grotesk supplies plain
+// digits only. No fallback face: anything but 0–9 must fall through to Atkinson.
+const digits = localFont({
+  src: [
+    { path: "../fonts/hanken-grotesk-digits-400.woff2", weight: "400" },
+    { path: "../fonts/hanken-grotesk-digits-700.woff2", weight: "700" },
+  ],
+  variable: "--font-digits",
+  display: "swap",
+  adjustFontFallback: false,
+  declarations: [{ prop: "unicode-range", value: "U+0030-0039" }],
+});
+
 export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }));
 }
@@ -46,7 +60,7 @@ export const viewport: Viewport = { themeColor: TOKENS.paper, colorScheme: "ligh
 export default async function RootLayout({ children }: LayoutProps<"/[locale]">) {
   const { locale, t } = await getDictionary();
   return (
-    <html lang={locale} className={`${serif.variable} ${sans.variable}`}>
+    <html lang={locale} className={`${serif.variable} ${sans.variable} ${digits.variable}`}>
       <body className="flex min-h-dvh flex-col">
         <a
           href="#main"
@@ -55,11 +69,11 @@ export default async function RootLayout({ children }: LayoutProps<"/[locale]">)
           {t.site.skipToContent}
         </a>
         <SiteHeader locale={locale} t={t} />
-        <main id="main" className="mx-auto w-full max-w-measure flex-1 px-4 pt-4 pb-8">
+        <main id="main" className="mx-auto w-full max-w-measure flex-1 px-4 pt-4 pb-8 md:pt-8 md:has-[.ai-wide]:max-w-wide">
           {children}
         </main>
         <SiteFooter locale={locale} t={t} />
-        <TabBar locale={locale} t={t} />
+        <TabBar locale={locale} t={t} variant="bar" />
       </body>
     </html>
   );

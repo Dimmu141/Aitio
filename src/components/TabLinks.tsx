@@ -42,13 +42,22 @@ export function tabItems(locale: Locale, t: Dictionary): TabItem[] {
   return TABS.map((tab) => ({ tab, label: labels[tab], href: targets[tab] }));
 }
 
-/** Plain strings only: the client version gets these props across the server boundary. */
-export function TabLinks({ items, active }: { items: TabItem[]; active: Tab | null }) {
+export type TabVariant = "bar" | "top";
+
+/**
+ * Plain strings only: the client version gets these props across the server boundary.
+ * "bar" is the phone's bottom tab bar, "top" the same links in the desktop top bar.
+ */
+export function TabLinks({ items, active, variant }: { items: TabItem[]; active: Tab | null; variant: TabVariant }) {
   return (
-    <ul className="ai-tabbar__list">
+    <ul className={variant === "bar" ? "ai-tabbar__list" : "ai-topnav__list"}>
       {items.map((item) => (
         <li key={item.tab} className="grid">
-          <Link href={item.href} className="ai-tab" aria-current={item.tab === active ? "page" : undefined}>
+          <Link
+            href={item.href}
+            className={variant === "bar" ? "ai-tab" : "ai-topnav__link"}
+            aria-current={item.tab === active ? "page" : undefined}
+          >
             <svg viewBox="0 0 24 24" aria-hidden="true">
               {ICONS[item.tab]}
             </svg>
