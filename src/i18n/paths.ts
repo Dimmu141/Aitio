@@ -59,10 +59,25 @@ export function alternates(section?: Section, slug?: string): Record<Locale, str
   };
 }
 
+/**
+ * The internal /[locale]/<finnish segment>/... path for a public or internal pathname.
+ * Prerendered pages report the internal path from usePathname(), e.g. /fi/esitys/x,
+ * which resolvePublicPath treats as a redirect, so follow that first.
+ */
+function internalPath(pathname: string): string {
+  let current = pathname;
+  for (let hops = 0; hops < 3; hops += 1) {
+    const resolution = resolvePublicPath(current);
+    if (resolution.kind === "pass") return current;
+    if (resolution.kind === "rewrite") return resolution.pathname;
+    current = resolution.pathname;
+  }
+  return current;
+}
+
 /** The same page in another locale, from a public pathname: `/sv/forestallning/x` → `/show/x` for en. */
 export function switchLocalePath(pathname: string, target: Locale): string {
-  const resolution = resolvePublicPath(pathname);
-  const internal = resolution.kind === "pass" ? pathname : resolution.pathname;
+  const internal = internalPath(pathname);
   const [, segment, slug] = internal.split("/").filter(Boolean);
   const section = SECTIONS.find((candidate) => candidate === segment);
   return section ? href(target, section, slug === undefined ? undefined : decodeURIComponent(slug)) : href(target);

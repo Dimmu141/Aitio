@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { FilterBar } from "@/components/FilterBar";
 import { ProductionCard } from "@/components/ProductionCard";
 import { getDictionary } from "@/i18n";
@@ -8,6 +7,13 @@ import { applyFilters, filterOptions, parseFilters } from "@/lib/catalogue/filte
 import { getOnStage } from "@/lib/catalogue/queries";
 import { formatDate } from "@/lib/format";
 import { pageMetadata } from "@/lib/metadata";
+
+/**
+ * Rendered per request on purpose: the list depends on the query string, and inside
+ * <Suspense> it would stream as a hidden template that never appears without JavaScript.
+ * The data itself comes from the hour-long catalogue cache, so this stays cheap.
+ */
+export const instant = false;
 
 export async function generateMetadata() {
   const { locale, t } = await getDictionary();
@@ -80,9 +86,7 @@ export default async function HomePage({ searchParams }: PageProps<"/[locale]">)
         <h1 className="text-4xl font-semibold">{t.home.title}</h1>
         <p className="mt-1 text-lg text-ink-muted">{t.home.intro}</p>
       </header>
-      <Suspense fallback={<p className="py-6 text-ink-muted">{t.home.loading}</p>}>
-        <OnStage searchParams={searchParams} locale={locale} t={t} />
-      </Suspense>
+      <OnStage searchParams={searchParams} locale={locale} t={t} />
     </div>
   );
 }

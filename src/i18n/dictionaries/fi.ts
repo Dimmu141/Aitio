@@ -29,7 +29,6 @@ export const fi = {
     empty: "Näillä valinnoilla ei löytynyt esityksiä. Kokeile väljempiä valintoja.",
     count: (n: number) => (n === 1 ? "1 esitys ohjelmassa" : `${n} esitystä ohjelmassa`),
     closes: (date: string) => `Viimeinen esitys ${date}`,
-    loading: "Haetaan esityksiä…",
   },
   filters: {
     legend: "Rajaa esityksiä",

@@ -50,6 +50,11 @@ describe("switchLocalePath", () => {
     ["/sv/forestallning/x", "fi", "/esitys/x"],
     ["/en/theatre/kansallisteatteri", "sv", "/sv/teater/kansallisteatteri"],
     ["/sv/okand", "en", "/en"],
+    // Internal paths, as usePathname() reports them on prerendered pages.
+    ["/fi/esitys/x", "en", "/en/show/x"],
+    ["/fi", "sv", "/sv"],
+    ["/sv/esitys/x", "fi", "/esitys/x"],
+    ["/en/teatteri/y", "sv", "/sv/teater/y"],
   ] as const)("%s → %s", (pathname, target, expected) => {
     expect(switchLocalePath(pathname, target)).toBe(expected);
   });
