@@ -11,7 +11,9 @@ export function mapRoleText(roleText: string): CreditRoleName[] {
     return [];
   }
   const roles = new Set<CreditRoleName>();
-  if (/ohjaa|ohjaus|\bregi\b|regiss/.test(text)) roles.add("DIRECTOR");
+  // "Ohjaajan assistentti", "Apulaisohjaaja", "Regiassistent" are not directors.
+  const isAssistant = /assist|apulais/.test(text);
+  if (!isAssistant && /ohjaa|ohjaus|\bregi\b|regiss/.test(text)) roles.add("DIRECTOR");
   if (/käsikirjoit|dramatisoin|\bteksti\b|kirjoittaja|\bav\b|^text\b|manus|dramatis|librett|alkuperäisteos/.test(text)) {
     roles.add("WRITER");
   }

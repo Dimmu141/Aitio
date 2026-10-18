@@ -6,6 +6,9 @@ describe("mapRoleText", () => {
   it.each([
     ["Ohjaus ja käsikirjoitus", ["DIRECTOR", "WRITER"]],
     ["Regi", ["DIRECTOR"]],
+    ["Ohjaajan assistentti", ["OTHER"]],
+    ["Apulaisohjaaja", ["OTHER"]],
+    ["Regiassistent", ["OTHER"]],
     ["Av", ["WRITER"]],
     ["Lavastussuunnittelu", ["DESIGNER"]],
     ["Svensk översättning och dramaturg", ["TRANSLATOR"]],
