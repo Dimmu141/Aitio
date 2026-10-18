@@ -86,3 +86,25 @@ export function languageCodes(text: string): string[] {
 export function stripGuestMarker(name: string): string {
   return cleanText(name.replace(/\((?:vier|gäst|guest)\.?\)/gi, ""));
 }
+
+const WEEKDAY_ADVERBS: Array<[RegExp, number]> = [
+  [/sunnuntaisin|söndagar/, 0],
+  [/maanantaisin|måndagar/, 1],
+  [/tiistaisin|tisdagar/, 2],
+  [/keskiviikkoisin|onsdagar/, 3],
+  [/torstaisin|torsdagar/, 4],
+  [/perjantaisin|fredagar/, 5],
+  [/lauantaisin|lördagar/, 6],
+];
+
+/** "keskiviikkoisin ja perjantaisin" → [3, 5] (0 = Sunday), in Finnish or Swedish. */
+export function weekdaysIn(text: string): number[] {
+  const lower = text.toLowerCase();
+  return WEEKDAY_ADVERBS.filter(([pattern]) => pattern.test(lower)).map(([, day]) => day);
+}
+
+/** The weekday of an instant in Helsinki (0 = Sunday). */
+export function helsinkiWeekday(instant: Date): number {
+  const name = new Intl.DateTimeFormat("en-US", { timeZone: HELSINKI, weekday: "short" }).format(instant);
+  return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(name);
+}

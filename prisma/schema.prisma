@@ -93,15 +93,17 @@ model Production {
 }
 
 model Performance {
-  id           String       @id @default(cuid())
-  productionId String
-  production   Production   @relation(fields: [productionId], references: [id])
-  startsAt     DateTime
-  stageId      String?
-  stage        Stage?       @relation(fields: [stageId], references: [id])
-  ticketUrl    String?
-  lastSeenAt   DateTime
-  diaryEntries DiaryEntry[]
+  id            String       @id @default(cuid())
+  productionId  String
+  production    Production   @relation(fields: [productionId], references: [id])
+  startsAt      DateTime
+  stageId       String?
+  stage         Stage?       @relation(fields: [stageId], references: [id])
+  ticketUrl     String?
+  /// Subtitles at this performance (e.g. only on Wednesdays); Production.subtitleLangs means every performance.
+  subtitleLangs String[]     @default([])
+  lastSeenAt    DateTime
+  diaryEntries  DiaryEntry[]
 
   @@unique([productionId, startsAt])
   @@index([startsAt])

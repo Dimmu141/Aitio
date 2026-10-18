@@ -48,6 +48,8 @@ export const rawPerformanceSchema = z.object({
   startsAt: z.date(),
   stage: z.string().optional(),
   ticketUrl: z.url().optional(),
+  /** Subtitles at this performance only; leave out when they apply to every performance. */
+  subtitleLangs: z.array(z.string()).optional(),
 });
 export type RawPerformance = z.infer<typeof rawPerformanceSchema>;
 

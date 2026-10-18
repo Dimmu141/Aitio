@@ -101,11 +101,13 @@ export async function upsertProduction(
         startsAt: performance.startsAt,
         stageId: performanceStage?.id ?? null,
         ticketUrl: performance.ticketUrl ?? null,
+        subtitleLangs: performance.subtitleLangs ?? [],
         lastSeenAt: seenAt,
       },
       update: {
         stageId: performanceStage?.id ?? null,
         ticketUrl: performance.ticketUrl ?? null,
+        subtitleLangs: performance.subtitleLangs ?? [],
         lastSeenAt: seenAt,
       },
     });

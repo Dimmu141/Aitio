@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { cleanText, helsinkiToUtc, languageCodes, parseFinnishDate, slugify, stripGuestMarker } from "./text";
+import {
+  cleanText,
+  helsinkiToUtc,
+  helsinkiWeekday,
+  languageCodes,
+  parseFinnishDate,
+  slugify,
+  stripGuestMarker,
+  weekdaysIn,
+} from "./text";
 
 describe("helsinkiToUtc", () => {
   it("uses UTC+3 in summer time", () => {
@@ -51,5 +60,18 @@ describe("stripGuestMarker", () => {
     expect(stripGuestMarker("Mawlawi Rahem (vier.)")).toBe("Mawlawi Rahem");
     expect(stripGuestMarker("Anna Gäst (gäst)")).toBe("Anna Gäst");
     expect(stripGuestMarker("Pia Runnakko")).toBe("Pia Runnakko");
+  });
+});
+
+describe("weekdays", () => {
+  it("reads Finnish and Swedish weekday adverbs", () => {
+    expect(weekdaysIn("Tekstitys keskiviikkoisin ja perjantaisin.")).toEqual([3, 5]);
+    expect(weekdaysIn("textning på lördagar")).toEqual([6]);
+    expect(weekdaysIn("joka ilta")).toEqual([]);
+  });
+
+  it("uses the Helsinki weekday, not the UTC one", () => {
+    // 23:30 UTC on Tuesday is already Wednesday in Helsinki.
+    expect(helsinkiWeekday(new Date("2026-10-20T23:30:00Z"))).toBe(3);
   });
 });
