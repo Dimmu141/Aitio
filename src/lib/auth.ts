@@ -5,6 +5,7 @@ import { magicLink } from "better-auth/plugins/magic-link";
 import { DEFAULT_LOCALE, isLocale } from "@/i18n/config";
 import { dictionaryFor } from "@/i18n/dictionaries";
 import { href } from "@/i18n/paths";
+import { AUTH_COOKIE_PREFIX, CLIENT_IP_HEADERS } from "@/lib/auth-config";
 import { db } from "@/lib/db";
 import { sendEmail } from "@/lib/email";
 import { absoluteUrl, SITE_URL } from "@/lib/site";
@@ -42,7 +43,11 @@ export const auth = betterAuth({
   user: {
     additionalFields: { locale: { type: "string", required: false, defaultValue: DEFAULT_LOCALE, input: false } },
   },
-  advanced: { cookiePrefix: "aitio" },
+  advanced: {
+    cookiePrefix: AUTH_COOKIE_PREFIX,
+    // Without a trusted client IP, Better Auth rate limits everyone in one shared bucket.
+    ipAddress: { ipAddressHeaders: CLIENT_IP_HEADERS },
+  },
   plugins: [
     magicLink({
       expiresIn: MAGIC_LINK_MINUTES * 60,

@@ -15,6 +15,9 @@ export function SiteHeader({ locale, t }: { locale: Locale; t: Dictionary }) {
         </Link>
         {/* On prerendered pages the pathname only arrives with JavaScript; until then, and
             without it, the links point to each language's front page. */}
+        <Link href={href(locale, "paivakirja")} className="order-last inline-flex min-h-tap items-center font-semibold sm:order-none">
+          {t.nav.diary}
+        </Link>
         <Suspense fallback={<LocaleLinks current={locale} label={t.site.language} hrefs={alternates()} />}>
           <LocaleSwitcher current={locale} label={t.site.language} />
         </Suspense>
