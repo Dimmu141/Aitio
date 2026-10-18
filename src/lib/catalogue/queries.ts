@@ -12,6 +12,7 @@ import {
   upcomingPerformances,
   type RatingSummary,
 } from "./select";
+import { reviewKind } from "./review-kind";
 import { productionTag } from "./tags";
 import type { CreditRow, PerformanceRow, ProductionCard, TheatreRef } from "./types";
 
@@ -65,11 +66,19 @@ export interface ProductionPage {
   progress: number | null;
   year: number | null;
   credits: CreditRow[];
-  critics: Array<{ outlet: string; url: string; publishedAt: Date | null }>;
+  /** Press reviews; blog posts the theatre lists go to `blogs` (see review-kind.ts). */
+  critics: ReviewLink[];
+  blogs: ReviewLink[];
   ratings: RatingSummary;
   tags: Array<{ slug: string; labels: { fi: string; sv: string; en: string }; count: number }>;
   reviews: PublicReview[];
   updatedAt: Date;
+}
+
+export interface ReviewLink {
+  outlet: string;
+  url: string;
+  publishedAt: Date | null;
 }
 
 export interface PublicReview {
@@ -144,7 +153,7 @@ export async function getProduction(slug: string): Promise<ProductionPage | null
     credits: row.credits
       .filter((credit) => isCurrent(credit, row))
       .map((credit) => ({ role: credit.role, person: credit.person, characterName: credit.characterName })),
-    critics: row.criticReviews.map((review) => ({ outlet: review.outlet, url: review.url, publishedAt: review.publishedAt })),
+    ...splitReviews(row.criticReviews),
     ratings: summariseRatings(ratings),
     tags: countTags(row.diaryEntries.flatMap((entry) => entry.tags)),
     reviews: row.diaryEntries
@@ -158,6 +167,14 @@ export async function getProduction(slug: string): Promise<ProductionPage | null
         text: entry.review ?? "",
       })),
     updatedAt: row.lastSeenAt,
+  };
+}
+
+function splitReviews(rows: ReviewLink[]): { critics: ReviewLink[]; blogs: ReviewLink[] } {
+  const links = rows.map(({ outlet, url, publishedAt }) => ({ outlet, url, publishedAt }));
+  return {
+    critics: links.filter((link) => reviewKind(link.outlet, link.url) === "press"),
+    blogs: links.filter((link) => reviewKind(link.outlet, link.url) === "blog"),
   };
 }
 

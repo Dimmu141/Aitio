@@ -29,6 +29,7 @@ const page: ProductionPage = {
     { role: "CAST", person: { slug: "b", name: "Bo" }, characterName: "X" },
   ],
   critics: [],
+  blogs: [],
   ratings: summariseRatings([]),
   tags: [],
   reviews: [],

@@ -56,13 +56,17 @@ test("the language switcher keeps the page, or falls back to the front page with
 });
 
 test("filters work as a plain form", async ({ page }) => {
+  // Works on fixture data and on a real scrape alike: Swedish narrows the list, never to zero.
+  const count = async () => Number((await page.getByRole("heading", { level: 2, name: /ohjelmassa$/ }).textContent())?.match(/\d+/)?.[0]);
   await page.goto("/");
+  const all = await count();
   await page.getByText("Rajaa esityksiä").click();
   await page.getByRole("group", { name: "Esityskieli" }).getByText("ruotsi").click();
   await page.getByRole("button", { name: "Näytä esitykset" }).click();
   await expect(page).toHaveURL(/lang=sv/);
-  await expect(page.getByRole("heading", { level: 2, name: "1 esitys ohjelmassa" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Nattland" })).toBeVisible();
+  const swedish = await count();
+  expect(swedish).toBeGreaterThan(0);
+  expect(swedish).toBeLessThan(all);
 });
 
 test("the production page has event JSON-LD and outbound ticket links", async ({ page }) => {

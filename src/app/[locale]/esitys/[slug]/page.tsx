@@ -110,7 +110,7 @@ export default async function ProductionRoute({ params }: PageProps<"/[locale]/e
 
       <PerformanceList rows={page.performances} asOf={page.asOf} locale={locale} t={t} />
       <AudienceSection ratings={page.ratings} tags={page.tags} reviews={page.reviews} locale={locale} t={t} />
-      <CriticLinks critics={page.critics} locale={locale} t={t} />
+      <CriticLinks critics={page.critics} blogs={page.blogs} locale={locale} t={t} />
       <CreditList credits={page.credits} locale={locale} t={t} />
 
       <p className="text-base text-ink-muted">
