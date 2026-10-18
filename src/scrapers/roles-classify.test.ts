@@ -26,6 +26,51 @@ describe("mapRoleText", () => {
   });
 });
 
+describe("mapRoleText for dance and crew", () => {
+  it("counts dancers and performers as cast", () => {
+    expect(mapRoleText("Tanssijat")).toEqual(["CAST"]);
+    expect(mapRoleText("Esiintyjät")).toEqual(["CAST"]);
+    expect(mapRoleText("Dansare")).toEqual(["CAST"]);
+  });
+
+  it("does not credit assistants as choreographers", () => {
+    expect(mapRoleText("Koreografinen assistentti")).toEqual(["OTHER"]);
+    expect(mapRoleText("Koreografia")).toEqual(["CHOREOGRAPHER"]);
+  });
+
+  it("reads Swedish labels without false writers", () => {
+    expect(mapRoleText("Av")).toEqual(["WRITER"]);
+    expect(mapRoleText("Design av rekvisita")).toEqual(["DESIGNER"]);
+    expect(mapRoleText("Manuskriptets översättning")).toEqual(["TRANSLATOR"]);
+    expect(mapRoleText("På scen")).toEqual(["CAST"]);
+    expect(mapRoleText("Bygge av scenografi")).toEqual([]);
+    expect(mapRoleText("Intimitetskoreograf")).toEqual([]);
+  });
+
+  it("reads Takomo-style Finnish and English labels", () => {
+    expect(mapRoleText("Näytelmä")).toEqual(["WRITER"]);
+    expect(mapRoleText("Näyttelijät")).toEqual(["CAST"]);
+    expect(mapRoleText("Directing")).toEqual(["DIRECTOR"]);
+    expect(mapRoleText("Writer")).toEqual(["WRITER"]);
+    expect(mapRoleText("Tuotanto")).toEqual([]);
+    expect(mapRoleText("Teksti, ohjaus, sävellys, tuotanto ja esiintyminen")).toEqual(["DIRECTOR", "WRITER", "COMPOSER", "CAST"]);
+  });
+
+  it("does not credit a conductor as the composer", () => {
+    expect(mapRoleText("Musiikinjohto")).toEqual(["OTHER"]);
+    expect(mapRoleText("Kapellimestari")).toEqual(["OTHER"]);
+    expect(mapRoleText("Musiikki")).toEqual(["COMPOSER"]);
+  });
+
+  it("skips photographers, technicians and mentors", () => {
+    expect(mapRoleText("Esitysvalokuvat")).toEqual([]);
+    expect(mapRoleText("Live-videokuvaajat")).toEqual([]);
+    expect(mapRoleText("Ääniteknikko")).toEqual([]);
+    expect(mapRoleText("Esiintyjäntyön mentori")).toEqual([]);
+    expect(mapRoleText("Valosuunnittelu")).toEqual(["DESIGNER"]);
+  });
+});
+
 describe("classifyProduction", () => {
   const base = { hasDirector: false, castCount: 0 };
 

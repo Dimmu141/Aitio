@@ -147,6 +147,8 @@ export function personName(raw: string): string | null {
   const name = cleanText(raw.split(/\s+\/\s+/)[0]);
   const words = name.split(" ").filter(Boolean);
   if (words.length === 0) return null;
+  // Collective labels, not people.
+  if (/^(työryhmä|arbetsgruppen?|ensemble|team)$/i.test(name)) return null;
   const prose = words.length > 1 && words.some((word) => /^\p{Ll}/u.test(word) && !NAME_PARTICLES.has(word));
   return prose ? null : name;
 }

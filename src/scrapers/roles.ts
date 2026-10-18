@@ -1,33 +1,41 @@
 import type { CreditRoleName } from "./types";
 
+const SKIP_WORDS =
+  /\S*(?:uppföranderätt|esitysoikeu|oikeuksien|rättigheter|tuottaja|tuotanto|producent|production|valokuv|kuvaaja|fotograf|photograph|teknikko|tekniker|intimitet)\S*|bygge av \S+|\S*bygge\S*|\S*rakenta\S*|(?:\S+\s+)?mentor\S*/;
+
 /**
  * Map a free-text role label (Finnish or Swedish) to credit roles.
  * Returns an empty array for roles we deliberately skip (rights holders, producers).
  * One label can map to several roles: "Ohjaus ja käsikirjoitus" → DIRECTOR + WRITER.
  */
 export function mapRoleText(roleText: string): CreditRoleName[] {
-  const text = roleText.toLowerCase();
-  // Rights agencies ("Oikeuksien valvoja: Agency North") are companies, not people.
-  if (/uppföranderätt|esitysoikeu|oikeuksien|rättigheter|tuottaja|producent/.test(text)) {
-    return [];
-  }
+  const lower = roleText.toLowerCase();
+  // Rights agencies, producers, photographers, technicians, builders and mentors are not
+  // the creative team. Their words are cut out, so "Teksti, ohjaus, … tuotanto ja
+  // esiintyminen" keeps its other roles, and "Esitysvalokuvat" is not lighting design.
+  const skipped = SKIP_WORDS.test(lower);
+  const text = lower.replace(new RegExp(SKIP_WORDS.source, "g"), " ");
   const roles = new Set<CreditRoleName>();
-  // "Ohjaajan assistentti", "Apulaisohjaaja", "Regiassistent" are not directors.
+  // "Ohjaajan assistentti", "Apulaisohjaaja", "Koreografinen assistentti" are not the lead.
   const isAssistant = /assist|apulais/.test(text);
-  if (!isAssistant && /ohjaa|ohjaus|\bregi\b|regiss/.test(text)) roles.add("DIRECTOR");
+  if (!isAssistant && /ohjaa|ohjaus|\bregi\b|regiss|\bdirect/.test(text)) roles.add("DIRECTOR");
   if (
-    /käsikirjoit|dramatisoin|\bteksti\b|kirjoittaja|kirjailija|\bav\b|^text\b|manus|dramatis|librett|alkuperäisteos|författ|bearbetning/.test(text)
+    /käsikirjoit|dramatisoin|\bteksti\b|kirjoittaja|kirjailija|^näytelmä(?:$|[\s:,])|\bwriter|^av\b|^text\b|\bmanus\b|dramatis|librett|alkuperäis|författ|bearbetning/.test(text)
   ) {
     roles.add("WRITER");
   }
-  if (/sävel|musiikki|kompo|\bmusik\b/.test(text)) roles.add("COMPOSER");
+  // A conductor ("Musiikinjohto", "Kapellimestari") leads the music but did not write it.
+  const conducts = /musiikinjoht|kapellimest|dirigent|conduct/.test(text);
+  if (!conducts && /sävel|musiikki|kompo|\bmusik\b/.test(text)) roles.add("COMPOSER");
   if (/suomennos|käännös|översättning/.test(text)) roles.add("TRANSLATOR");
-  if (/koreograf/.test(text)) roles.add("CHOREOGRAPHER");
+  if (!isAssistant && /koreograf/.test(text)) roles.add("CHOREOGRAPHER");
   if (/suunnittel|design|lavastu|scenografi|kostym|puku|valo|ljus|ääni|ljud|naamio|mask|video/.test(text)) {
     roles.add("DESIGNER");
   }
-  if (/rooleissa|näyttämöllä|medverkande|ensemble|skådespel/.test(text)) {
+  // Dance credits name dancers and performers instead of roles.
+  if (/rooleissa|näyttämöllä|medverkande|ensemble|skådespel|tanssij|esiinty|näyttelij|^performance$|^cast$|dansare|dansar\b|performer|på scen/.test(text)) {
     roles.add("CAST");
   }
-  return roles.size > 0 ? [...roles] : ["OTHER"];
+  if (roles.size === 0) return skipped ? [] : ["OTHER"];
+  return [...roles];
 }
