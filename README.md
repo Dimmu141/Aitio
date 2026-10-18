@@ -56,6 +56,20 @@ We store facts only: titles, dates, stages, credits, ticket links and links to r
 - **Classifier** is keyword based; check `typeConfidence` below 0.6 manually until the admin override page exists.
 - **The live fetch path has not run end-to-end** from the build environment (its network was restricted). Parsers are tested against real pages, but do one `pnpm scrape --dry-run --limit 3` first.
 
-## Next: milestone 2
+## Milestone 2 (in progress): the read-only site
 
-Read-only site: "Ohjelmassa" front page, production, theatre and person pages, i18n (fi/sv/en), PWA manifest, sitemap. See `BRIEF.md` section 7.
+The look follows the Aitio design system (https://claude.ai/artifact/P8RU9CHVFfvPRLkiQax68J): its tokens live in `src/app/globals.css` as Tailwind theme values (`bg-paper`, `text-ink-muted`, `text-display`, `min-h-tap`…). Tailwind's default palette is switched off on purpose.
+
+| Route | What |
+|---|---|
+| `/` | "Ohjelmassa": productions with performances in the next 14 days, "Viimeiset esitykset", filters as URL parameters (`?kaupunki=&tyyppi=&kieli=&tekstitys=`) |
+| `/esitys/[slug]` | production page: poster, badges, run status, dates with ticket links, critic links, credits, `TheaterEvent` JSON-LD |
+| `/teatterit`, `/teatteri/[slug]` | theatres and what is on at each |
+| `/henkilo/[slug]` | everything a person has done, newest first |
+| `sitemap.xml`, `robots.txt`, `manifest.webmanifest`, `/icon` | SEO and PWA basics |
+
+Data is read through `src/lib/queries.ts`, cached for hours (`use cache`, tag `productions`). Without `DATABASE_URL`, or if the database is down, pages show a short notice instead of failing, so a Vercel build never needs the database. Set `NEXT_PUBLIC_SITE_URL` in production for canonical URLs.
+
+Still to do in milestone 2: Swedish and English UI (strings are already in `src/i18n/fi.ts`), purge the cache after a scrape (`revalidateTag("productions")`), share images per production.
+
+Known gap: `Credit` stores only the role enum, so "Lavastus", "Puvut" and "Valot" all show as "Suunnittelu". Adding `Credit.roleText` fixes it; best done before the first migration.
