@@ -5,13 +5,12 @@ import { magicLink } from "better-auth/plugins/magic-link";
 import { DEFAULT_LOCALE, isLocale } from "@/i18n/config";
 import { dictionaryFor } from "@/i18n/dictionaries";
 import { href } from "@/i18n/paths";
-import { AUTH_COOKIE_PREFIX, CLIENT_IP_HEADERS } from "@/lib/auth-config";
+import { AUTH_COOKIE_PREFIX, CLIENT_IP_HEADERS, MAGIC_LINK_MINUTES, SESSION_DAYS } from "@/lib/auth-config";
 import { db } from "@/lib/db";
 import { sendEmail } from "@/lib/email";
 import { absoluteUrl, SITE_URL } from "@/lib/site";
 
-/** Long enough for someone who checks their email slowly; the token still works only once. */
-export const MAGIC_LINK_MINUTES = 20;
+export { MAGIC_LINK_MINUTES };
 
 /**
  * The email links to our own confirmation page, which has a "Kirjaudu sisään" button,
@@ -34,9 +33,8 @@ export const auth = betterAuth({
   database: prismaAdapter(db, { provider: "postgresql" }),
   telemetry: { enabled: false },
   rateLimit: { enabled: true, storage: "database" },
-  // Older users shouldn't have to sign in every week.
   session: {
-    expiresIn: 60 * 60 * 24 * 90,
+    expiresIn: 60 * 60 * 24 * SESSION_DAYS,
     updateAge: 60 * 60 * 24,
     cookieCache: { enabled: true, maxAge: 5 * 60 },
   },
