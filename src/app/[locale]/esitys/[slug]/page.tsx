@@ -89,9 +89,7 @@ export default async function ProductionRoute({ params }: PageProps<"/[locale]/e
         </p>
         <BadgeRow>
           {page.closingSoon && (
-            <Badge variant="urgent">
-              <span aria-hidden="true">⏳</span> {t.home.closingSoon}
-            </Badge>
+            <Badge variant="urgent">{t.home.closingSoon}</Badge>
           )}
           {typeLabel(page.type, t) && <Badge>{typeLabel(page.type, t)}</Badge>}
           {page.year && <Badge variant="quiet">{t.production.performedIn(page.year)}</Badge>}

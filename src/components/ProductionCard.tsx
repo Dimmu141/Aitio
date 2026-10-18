@@ -61,7 +61,7 @@ export function ProductionCard({
         </p>
         {card.closingSoon && card.end && (
           <p className="ai-badge ai-badge--urgent">
-            <span aria-hidden="true">⏳</span> {t.production.ends} {formatShortDate(card.end, locale, asOf, false)}
+            {t.production.ends} {formatShortDate(card.end, locale, asOf, false)}
           </p>
         )}
         {note && <p className="text-meta font-bold">{note}</p>}

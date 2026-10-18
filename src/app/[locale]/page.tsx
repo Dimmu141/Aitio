@@ -58,7 +58,6 @@ async function OnStage({
         </div>
         {closing > 0 && (
           <p className="text-meta">
-            <span aria-hidden="true">⏳ </span>
             {t.home.closingCount(closing)}{" "}
             <Link href={`${href(locale, "asetukset")}#kooste`} className="inline-flex min-h-tap items-center">
               {t.digest.homeLink}
