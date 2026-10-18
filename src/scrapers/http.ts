@@ -2,7 +2,7 @@ import robotsParser from "robots-parser";
 
 export const USER_AGENT =
   process.env.SCRAPER_USER_AGENT ??
-  "VaeliaikaBot/0.1 (+https://github.com/; theatre diary project)";
+  "AitioBot/0.1 (+https://github.com/; theatre diary project)";
 
 const MIN_INTERVAL_MS = Number(process.env.SCRAPER_MIN_INTERVAL_MS ?? 1000);
 

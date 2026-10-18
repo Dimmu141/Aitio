@@ -1,4 +1,4 @@
-# Project brief: Finnish theatre diary and review site (working name "Väliaika")
+# Aitio: project brief for a Finnish theatre diary and review site
 
 You are my coding partner on a new project. Read this whole brief before writing any code. When something here is ambiguous, ask me instead of guessing. When you finish a milestone, stop, summarise what you built, list what is still rough, and wait for me.
 
@@ -73,7 +73,7 @@ Not in scope now: Lippu.fi sitemaps or event pages. I will ask Eventim about the
 ## 5. Scraping rules (non-negotiable)
 
 - Respect each site's robots.txt (checked: none of the paths above are disallowed for generic bots, but check in code too).
-- Identify ourselves: `User-Agent: VaeliaikaBot/0.1 (+https://<our-domain>/bot; contact email)`.
+- Identify ourselves: `User-Agent: AitioBot/0.1 (+https://<our-domain>/bot; contact email)`.
 - At most 1 request per second per host, run at most once a day, cache responses.
 - Store FACTS only: titles, dates, venues, credits, ticket URLs, source URLs. Never copy marketing descriptions or press photos into our database or pages. We write our own one-line summaries later, or link out.
 - Save raw HTML/JSON fixtures of every source in `fixtures/` and write parser tests against them, so a site redesign breaks a test instead of silently returning nothing.

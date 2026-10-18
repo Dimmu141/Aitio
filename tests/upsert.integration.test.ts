@@ -6,7 +6,7 @@ import { upsertProduction } from "@/scrapers/normalise";
 
 /**
  * Runs only when TEST_DATABASE_URL points at a disposable, migrated database.
- * Example: TEST_DATABASE_URL=postgresql://postgres@localhost:5432/valiaika_test pnpm test
+ * Example: TEST_DATABASE_URL=postgresql://postgres@localhost:5432/aitio_test pnpm test
  */
 const url = process.env.TEST_DATABASE_URL;
 

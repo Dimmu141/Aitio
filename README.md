@@ -1,4 +1,4 @@
-# Väliaika (working name)
+# Aitio
 
 A mobile-first website for logging, rating and discovering theatre in Finland: Letterboxd mechanics, Untappd-style check-ins, Show-Score-style tags. See [`BRIEF.md`](BRIEF.md) for the full project brief and roadmap.
 
