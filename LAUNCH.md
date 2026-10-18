@@ -95,7 +95,14 @@ to `main` deploy production.
   https://vercel.com/docs/cron-jobs/usage-and-pricing and https://vercel.com/docs/functions/limitations
   (both read 2026-10-18). Hobby is for non-commercial use; if Aitio ever earns money
   (ads, affiliate ticket links), move to Pro.
-- Domain `aitio.fi` (and `www` → apex redirect).
+- Domain: **`aitio.fi` is taken** (registered since 2010 to Kiinteistö Oy Aitio Business Park
+  Vivaldi, paid until 21 Oct 2027; checked in the .fi registry's RDAP on 18 Oct 2026).
+  `teatteriaitio.fi` and `aitio-teatteri.fi` were unregistered then. Vercel doesn't sell
+  `.fi`; buy it from a Finnish reseller and point it at Vercel, then change `SITE_URL`,
+  `EMAIL_FROM` and the Brevo sender domain to match. Every `aitio.fi` in this runbook is a
+  placeholder until then.
+- Preview builds are skipped (Ignored Build Step: only `VERCEL_ENV=production` builds), since
+  previews have no database.
 - Environment variables (Production), see `.env.example`:
 
 | Variable | Value |
