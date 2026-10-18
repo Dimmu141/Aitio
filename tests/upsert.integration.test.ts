@@ -17,6 +17,9 @@ describe.skipIf(!url)("upsertProduction (integration)", () => {
   beforeAll(async () => {
     process.env.DATABASE_URL = url;
     db = (await import("@/lib/db")).db;
+    await db.report.deleteMany();
+    await db.diaryEntry.deleteMany();
+    await db.user.deleteMany();
     await db.credit.deleteMany();
     await db.criticReview.deleteMany();
     await db.performance.deleteMany();

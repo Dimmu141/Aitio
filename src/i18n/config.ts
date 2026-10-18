@@ -17,6 +17,11 @@ export const SEGMENTS = {
   esitys: { fi: "esitys", sv: "forestallning", en: "show" },
   teatteri: { fi: "teatteri", sv: "teater", en: "theatre" },
   henkilo: { fi: "henkilo", sv: "person", en: "person" },
+  kirjaudu: { fi: "kirjaudu", sv: "logga-in", en: "sign-in" },
+  merkitse: { fi: "merkitse", sv: "markera", en: "log" },
+  paivakirja: { fi: "paivakirja", sv: "dagbok", en: "diary" },
+  asetukset: { fi: "asetukset", sv: "installningar", en: "settings" },
+  ilmoita: { fi: "ilmoita", sv: "anmal", en: "report" },
 } as const satisfies Record<string, Record<Locale, string>>;
 
 export type Section = keyof typeof SEGMENTS;

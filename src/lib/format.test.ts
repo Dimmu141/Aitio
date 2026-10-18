@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatDate, formatPerformance } from "./format";
+import { formatCalendarDate, formatDate, formatPerformance, helsinkiDate } from "./format";
 
 const asOf = new Date("2026-10-18T09:00:00Z");
 
@@ -32,5 +32,18 @@ describe("formatDate", () => {
   it("formats a long date", () => {
     expect(formatDate(new Date("2026-09-10T00:00:00Z"), "fi")).toBe("10. syyskuuta 2026");
     expect(formatDate(new Date("2026-09-10T00:00:00Z"), "sv")).toBe("10 september 2026");
+  });
+});
+
+describe("helsinkiDate", () => {
+  it("uses the Helsinki day, not the UTC one", () => {
+    expect(helsinkiDate(new Date("2026-10-23T22:30:00Z"))).toBe("2026-10-24");
+    expect(helsinkiDate(new Date("2026-10-23T15:30:00Z"))).toBe("2026-10-23");
+  });
+});
+
+describe("formatCalendarDate", () => {
+  it("does not shift a stored date", () => {
+    expect(formatCalendarDate(new Date("2026-10-24T00:00:00Z"), "fi")).toBe("24. lokakuuta 2026");
   });
 });

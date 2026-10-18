@@ -136,7 +136,7 @@ export async function getProduction(slug: string): Promise<ProductionPage | null
 
   const upcoming = upcomingPerformances(row.performances, row, asOf);
   const timing = schedule(upcoming, asOf);
-  const ratings = row.diaryEntries.flatMap((entry) => (entry.rating === null ? [] : [Number(entry.rating)]));
+  const ratings = row.diaryEntries.flatMap((entry) => (entry.rating === null ? [] : [entry.rating / 2]));
 
   return {
     asOf,

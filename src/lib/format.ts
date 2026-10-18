@@ -34,3 +34,20 @@ export function formatDate(date: Date, locale: Locale): string {
 export function isoDateTime(date: Date): string {
   return date.toISOString();
 }
+
+/** The Helsinki calendar day of a moment, as YYYY-MM-DD. */
+export function helsinkiDate(date: Date): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: TIME_ZONE, year: "numeric", month: "2-digit", day: "2-digit" }).format(
+    date,
+  );
+}
+
+/** A calendar date stored as UTC midnight (Postgres DATE), e.g. DiaryEntry.seenOn. */
+export function formatCalendarDate(date: Date, locale: Locale): string {
+  return new Intl.DateTimeFormat(INTL_LOCALE[locale], {
+    timeZone: "UTC",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(date);
+}
