@@ -16,17 +16,19 @@ A mobile-first website for logging, rating and discovering theatre in Finland: L
 | Normaliser that upserts everything idempotently and never deletes | `src/scrapers/normalise.ts` |
 | Safety check: a run aborts if a source returns 0 productions or under half of the last good run | `src/scrapers/run.ts` |
 | Scrape CLI with `--dry-run` and `--limit` | `scripts/scrape.ts` |
-| 41 tests against real pages captured on 18 Oct 2026, plus a database integration test | `pnpm test` |
+| 43 tests: parsers against real pages captured on 18 Oct 2026, pipeline, and 2 database integration tests | `pnpm test` |
+| Initial migration | `prisma/migrations` |
 
 ## Getting started
 
 Requirements: Node 22+, pnpm, a PostgreSQL database (local, or a free Neon project).
 
 ```bash
-pnpm install                       # also generates the Prisma client
+pnpm install                       # also generates the Prisma client (no .env needed yet)
 cp .env.example .env               # then set DATABASE_URL
-pnpm db:migrate --name init        # creates prisma/migrations and the tables
+pnpm prisma migrate deploy         # creates the tables from prisma/migrations
 pnpm db:seed                       # inserts the six theatres
+pnpm db:seed:fixtures              # optional, dev only: loads the two saved fixture productions
 pnpm scrape --dry-run --limit 3    # see what would be saved, nothing is written
 pnpm scrape                        # scrape both sources into the database
 pnpm test                          # parser and pipeline tests
@@ -34,8 +36,12 @@ pnpm test                          # parser and pipeline tests
 
 Run one source: `pnpm scrape kansallisteatteri` or `pnpm scrape svenska-teatern`.
 
-Database integration test: create an empty database, migrate it, then run
-`TEST_DATABASE_URL=postgresql://... pnpm test`. It wipes that database, so never point it at real data.
+Database integration test: create an empty database, migrate it (`DATABASE_URL=<test url> pnpm prisma migrate deploy`), then run
+`TEST_DATABASE_URL=postgresql://... pnpm test` (or put `TEST_DATABASE_URL` in `.env`). It wipes that database, so never point it at real data.
+
+Schema changes: edit `prisma/schema.prisma`, run `pnpm db:migrate --name <change>`, commit the new migration folder.
+
+Behind an HTTP proxy, Node's built-in `fetch` ignores `HTTPS_PROXY` unless you set `NODE_USE_ENV_PROXY=1`.
 
 ## When a theatre redesigns its website
 
@@ -49,12 +55,11 @@ We store facts only: titles, dates, stages, credits, ticket links and links to r
 
 ## Known gaps and decisions for you
 
-- **No migration committed.** The Prisma engine couldn't be downloaded in the sandbox this was built in. Run `pnpm db:migrate --name init` once on your machine and commit the generated `prisma/migrations` folder.
 - **Person matching is by name.** Two different actors with the same name would merge. Fine for now; revisit with theatre person-page URLs as stable IDs.
 - **Svenska Teatern's REST list includes about 85 shows back to 2022.** All are stored, because old productions are useful for diary entries ("I saw this in 2023"). Pages without performances just get no dates.
 - **Kansallisteatteri subtitles** are shown per performance on their site; not parsed yet, so `subtitleLangs` is empty there.
 - **Classifier** is keyword based; check `typeConfidence` below 0.6 manually until the admin override page exists.
-- **The live fetch path has not run end-to-end** from the build environment (its network was restricted). Parsers are tested against real pages, but do one `pnpm scrape --dry-run --limit 3` first.
+- **The live fetch path has still not run end-to-end.** The cloud environment's network policy blocks the theatre sites (proxy 403), so do one `pnpm scrape --dry-run --limit 3` locally first. Migration, seed and integration tests have now run against real PostgreSQL 16.
 
 ## Next: milestone 2
 

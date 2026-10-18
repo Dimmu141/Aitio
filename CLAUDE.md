@@ -6,21 +6,23 @@ Read `BRIEF.md` before starting new work. It holds the product decisions, data s
 
 ## Current status
 
-- **Milestone 1 is done** (data layer + two scrapers, 41 tests). See README.md for what exists.
-- **Milestone 1 was built in a sandbox without internet access to the theatre sites or Prisma's engine downloads.** So on first run here:
-  1. `pnpm install`
-  2. `cp .env.example .env` and set `DATABASE_URL`
-  3. `pnpm db:migrate --name init` (no migration was committed yet; commit the generated `prisma/migrations` folder)
-  4. `pnpm db:seed`
-  5. `pnpm scrape --dry-run --limit 3`: the first ever run against the live sites. Fix any parser problems before scraping fully.
-- **Next: milestone 2**, the read-only site (BRIEF.md section 7). Start by proposing the route structure and component list, and wait for Dimmu's OK.
+- **Milestone 1 is done** (data layer + two scrapers, 43 tests). See README.md for what exists.
+- **Milestone 1 first-run is done** except the live scrape: migration committed (`prisma/migrations`), seed and integration tests pass on PostgreSQL 16. `pnpm db:seed:fixtures` loads the two fixture productions for local page development.
+- **Still open:** `pnpm scrape --dry-run --limit 3` has never run against the live sites. Cloud sessions get a proxy 403 for the theatre domains unless they are allowed in the environment's network settings. Fix any parser problems before scraping fully.
+- **Next: milestone 2**, the read-only site (BRIEF.md section 7). Decisions already agreed with Dimmu:
+  - Finnish URLs at the root, `/sv/` and `/en/` prefixed with translated path segments (next-intl `pathnames`); fall back to Finnish segments everywhere if next-intl misbehaves on Next 16.
+  - Hide "Merkitse nähdyksi" until auth exists (milestone 3); no dead buttons.
+  - Index past productions and list them in the sitemap with a "Esitetty <year>" label, but keep them out of "Ohjelmassa".
+  - Parse Kansallisteatteri per-performance subtitles (with a fixture) before shipping the subtitle filter.
+  - Format all times with an explicit `timeZone: "Europe/Helsinki"` (Vercel renders in UTC).
 
 ## Commands
 
 ```bash
 pnpm dev                     # Next.js dev server
 pnpm test                    # Vitest, parser tests run against fixtures/
-pnpm typecheck && pnpm lint
+pnpm typecheck && pnpm lint  # typecheck runs next typegen first (LayoutProps etc.)
+pnpm db:seed:fixtures        # dev only: fixture productions into the database
 pnpm scrape [sourceId] [--dry-run] [--limit N]
 pnpm fixtures:refresh        # re-download the pages the parser tests use
 ```
