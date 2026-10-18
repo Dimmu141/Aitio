@@ -106,17 +106,38 @@ export async function saveEntry(
     tags: { set: [], connect: input.tagSlugs.map((slug) => ({ slug })) },
   };
   if (entryId) {
-    const owned = await db.diaryEntry.findFirst({ where: { id: entryId, userId, productionId }, select: { id: true } });
+    const owned = await db.diaryEntry.findFirst({
+      where: { id: entryId, userId, productionId },
+      select: { id: true, review: true, hiddenAt: true, _count: { select: { reports: { where: { resolvedAt: null } } } } },
+    });
     if (!owned) return null;
-    // An edited review is a new text: earlier reports were about the old one.
-    await db.report.updateMany({ where: { entryId, resolvedAt: null }, data: { resolvedAt: new Date() } });
-    return db.diaryEntry.update({ where: { id: entryId }, data: { ...data, hiddenAt: null }, select: { id: true } });
+    return db.diaryEntry.update({
+      where: { id: entryId },
+      data: { ...data, ...(await afterReviewEdit(owned, input.review)) },
+      select: { id: true },
+    });
   }
   const { tags, ...rest } = data;
   return db.diaryEntry.create({
     data: { ...rest, userId, productionId, tags: { connect: tags.connect } },
     select: { id: true },
   });
+}
+
+/**
+ * Moderation state after the author saves. Only a changed text is a new review: earlier
+ * reports were about the old one, so they close, and an automatic hide (open reports)
+ * lifts. A moderator's hide (reports already resolved) stays, so a trivial edit can't
+ * undo it; changing only the rating, tags or date changes nothing here.
+ */
+async function afterReviewEdit(
+  entry: { id: string; review: string | null; hiddenAt: Date | null; _count: { reports: number } },
+  review: string | null,
+): Promise<{ hiddenAt?: null }> {
+  if ((entry.review ?? "") === (review ?? "")) return {};
+  await db.report.updateMany({ where: { entryId: entry.id, resolvedAt: null }, data: { resolvedAt: new Date() } });
+  const autoHidden = entry.hiddenAt !== null && entry._count.reports > 0;
+  return autoHidden ? { hiddenAt: null } : {};
 }
 
 /** Delete the user's own entry; returns the production slug for cache invalidation. */
@@ -182,14 +203,21 @@ export async function reportEntry(
 ): Promise<{ outcome: ReportOutcome; slug?: string; hidden?: boolean }> {
   const entry = await db.diaryEntry.findUnique({
     where: { id: entryId },
-    select: { userId: true, review: true, isPublic: true, production: { select: { slug: true } } },
+    select: { userId: true, review: true, isPublic: true, updatedAt: true, production: { select: { slug: true } } },
   });
   if (!entry || !entry.review || !entry.isPublic) return { outcome: "missing" };
   if (entry.userId === reporterId) return { outcome: "own" };
 
+  // One report per person per review text: a report resolved before the entry was last
+  // edited was about older text, so it can be raised again.
   const existing = await db.report.findUnique({ where: { entryId_reporterId: { entryId, reporterId } } });
-  if (existing) return { outcome: "already", slug: entry.production.slug };
-  await db.report.create({ data: { entryId, reporterId, reason } });
+  const reopenable = existing?.resolvedAt && existing.resolvedAt < entry.updatedAt;
+  if (existing && !reopenable) return { outcome: "already", slug: entry.production.slug };
+  if (existing) {
+    await db.report.update({ where: { id: existing.id }, data: { reason, resolvedAt: null, createdAt: new Date() } });
+  } else {
+    await db.report.create({ data: { entryId, reporterId, reason } });
+  }
 
   const open = await db.report.count({ where: { entryId, resolvedAt: null } });
   const hidden = open >= AUTO_HIDE_REPORTS;
@@ -224,6 +252,12 @@ export async function exportData(userId: string) {
     where: { reporterId: userId },
     select: { entryId: true, reason: true, createdAt: true },
   });
+  // Everything stored about the sign-ins except the token itself, which is a credential.
+  const sessions = await db.session.findMany({
+    where: { userId },
+    select: { createdAt: true, expiresAt: true, ipAddress: true, userAgent: true },
+    orderBy: { createdAt: "desc" },
+  });
   return {
     exportedAt: new Date().toISOString(),
     user,
@@ -238,6 +272,7 @@ export async function exportData(userId: string) {
       tags: entry.tags.map((tag) => tag.slug),
     })),
     reports,
+    sessions,
   };
 }
 

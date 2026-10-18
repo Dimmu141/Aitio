@@ -88,11 +88,26 @@ describe.skipIf(!url)("diary service (integration)", () => {
     expect((await service.getDiary(users.anna))[0].hidden).toBe(true);
   });
 
+  it("keeps a hidden review hidden when the author changes only the rating", async () => {
+    const [entry] = await service.getDiary(users.anna);
+    const current = await service.getOwnEntry(users.anna, productionId, entry.id);
+    await service.saveEntry(users.anna, productionId, entry.id, { ...input, review: current?.review ?? null, rating: 2 });
+    expect((await service.getDiary(users.anna))[0].hidden).toBe(true);
+    expect(await db.report.count({ where: { entryId: entry.id, resolvedAt: null } })).toBe(3);
+  });
+
   it("unhides an edited review and closes the old reports", async () => {
     const [entry] = await service.getDiary(users.anna);
     await service.saveEntry(users.anna, productionId, entry.id, { ...input, review: "Omskriven." });
     expect((await service.getDiary(users.anna))[0].hidden).toBe(false);
     expect(await db.report.count({ where: { entryId: entry.id, resolvedAt: null } })).toBe(0);
+  });
+
+  it("lets an earlier reporter report the edited text again", async () => {
+    const [entry] = await service.getDiary(users.anna);
+    expect(await service.reportEntry(users.bo, entry.id, "OFFENSIVE")).toMatchObject({ outcome: "reported" });
+    expect((await service.reportEntry(users.bo, entry.id, "SPAM")).outcome).toBe("already");
+    await db.report.updateMany({ where: { entryId: entry.id }, data: { resolvedAt: new Date() } });
   });
 
   it("lists reported reviews for moderation and applies the decision", async () => {
@@ -105,6 +120,14 @@ describe.skipIf(!url)("diary service (integration)", () => {
     expect(await service.moderationQueue()).toEqual([]);
     await service.moderate(entry.id, false);
     expect((await service.getDiary(users.anna))[0].hidden).toBe(false);
+  });
+
+  it("keeps a moderator's hide even when the author rewrites the text", async () => {
+    const [entry] = await service.getDiary(users.anna);
+    await service.moderate(entry.id, true);
+    await service.saveEntry(users.anna, productionId, entry.id, { ...input, review: "Samma sak, ny stavning." });
+    expect((await service.getDiary(users.anna))[0].hidden).toBe(true);
+    await service.moderate(entry.id, false);
   });
 
   it("deletes the account with its diary and reports", async () => {
@@ -120,6 +143,11 @@ describe.skipIf(!url)("diary service (integration)", () => {
   it("exports the user's data", async () => {
     const data = await service.exportData(users.anna);
     expect(data.user.email).toBe("anna@example.fi");
-    expect(data.diary[0]).toMatchObject({ production: "Nattland", rating: 4, seenOn: "2026-10-17" });
+    expect(data.diary[0]).toMatchObject({ production: "Nattland", seenOn: "2026-10-17" });
+    // Sign-in metadata is part of "everything", the session token is not.
+    await db.session.create({ data: { token: "secret-token", userId: users.anna, expiresAt: new Date(Date.now() + 1e9), ipAddress: "10.0.0.9" } });
+    const withSession = await service.exportData(users.anna);
+    expect(withSession.sessions).toEqual([expect.objectContaining({ ipAddress: "10.0.0.9" })]);
+    expect(JSON.stringify(withSession)).not.toContain("secret-token");
   });
 });
