@@ -59,4 +59,19 @@ describe.skipIf(!url)("upsertProduction (integration)", () => {
     expect(await db.production.count()).toBe(1);
     expect(await db.performance.count()).toBe(7);
   });
+
+  it("keeps dropped performances and credits but leaves their lastSeenAt behind", async () => {
+    const later = new Date(Date.now() + 60_000);
+    const trimmed = { ...detail, performances: detail.performances.slice(1), credits: detail.credits.slice(1) };
+    await upsertProduction(db, theatre, trimmed, later);
+
+    const saved = await db.production.findUniqueOrThrow({
+      where: { slug: "nattland-svenska-teatern" },
+      include: { performances: true, credits: true },
+    });
+    expect(saved.performances).toHaveLength(7);
+    expect(saved.performances.filter((row) => row.lastSeenAt < saved.lastSeenAt)).toHaveLength(1);
+    const staleCredits = saved.credits.filter((row) => row.lastSeenAt < saved.lastSeenAt);
+    expect(staleCredits.length).toBe(detail.credits[0].roles.length);
+  });
 });

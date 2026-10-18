@@ -53,7 +53,8 @@ async function upsertPerson(db: PrismaClient, name: string) {
 
 /**
  * Upsert one scraped production with its performances, credits and critic links.
- * Never deletes: performances that disappeared simply keep their old lastSeenAt.
+ * Never deletes: performances and credits that disappeared simply keep their old
+ * lastSeenAt, so readers can tell current rows from stale ones (see src/lib/current.ts).
  */
 export async function upsertProduction(
   db: PrismaClient,
@@ -122,8 +123,9 @@ export async function upsertProduction(
           role,
           characterName: credit.characterName ?? null,
           sortOrder: index,
+          lastSeenAt: seenAt,
         },
-        update: { characterName: credit.characterName ?? null, sortOrder: index },
+        update: { characterName: credit.characterName ?? null, sortOrder: index, lastSeenAt: seenAt },
       });
       creditCount += 1;
     }

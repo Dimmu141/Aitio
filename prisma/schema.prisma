@@ -124,6 +124,8 @@ model Credit {
   role          CreditRole
   characterName String?
   sortOrder     Int        @default(0)
+  /// Same value as Production.lastSeenAt when the credit is still on the theatre's page.
+  lastSeenAt    DateTime   @default(now())
 
   @@unique([personId, productionId, role])
   @@index([productionId])
