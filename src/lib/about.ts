@@ -27,7 +27,7 @@ const ABOUT: Record<Locale, About> = {
   fi: {
     title: "Tietoa Aitiosta",
     intro:
-      "Aitio kokoaa pääkaupunkiseudun teattereiden ohjelmiston yhteen paikkaan. Samalla se on teatteripäiväkirja, johon voit merkitä näkemäsi esitykset, antaa niille tähtiä ja muistaa ne vielä vuosien päästä.",
+      "Aitio kokoaa pääkaupunkiseudun teattereiden, tanssitalojen ja oopperan ohjelmiston yhteen paikkaan. Samalla se on teatteripäiväkirja, johon voit merkitä näkemäsi esitykset, antaa niille tähtiä ja muistaa ne vielä vuosien päästä.",
     sections: [
       {
         heading: "Mistä tiedot tulevat",
@@ -72,7 +72,7 @@ const ABOUT: Record<Locale, About> = {
   sv: {
     title: "Om Aitio",
     intro:
-      "Aitio samlar repertoaren på huvudstadsregionens teatrar på ett ställe. Det är också en teaterdagbok där du kan markera föreställningar du sett, ge dem stjärnor och minnas dem många år senare.",
+      "Aitio samlar repertoaren på huvudstadsregionens teatrar, danshus och opera på ett ställe. Det är också en teaterdagbok där du kan markera föreställningar du sett, ge dem stjärnor och minnas dem många år senare.",
     sections: [
       {
         heading: "Varifrån uppgifterna kommer",
@@ -117,7 +117,7 @@ const ABOUT: Record<Locale, About> = {
   en: {
     title: "About Aitio",
     intro:
-      "Aitio brings the programmes of the Helsinki region's theatres together in one place. It is also a theatre diary: log the shows you've seen, rate them, and still remember them years later.",
+      "Aitio brings the programmes of the Helsinki region's theatres, dance houses and opera together in one place. It is also a theatre diary: log the shows you've seen, rate them, and still remember them years later.",
     sections: [
       {
         heading: "Where the listings come from",

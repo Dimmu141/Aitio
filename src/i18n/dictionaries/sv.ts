@@ -3,9 +3,9 @@ import type { Dictionary } from "./fi";
 export const sv: Dictionary = {
   site: {
     name: "Aitio",
-    tagline: "Huvudstadsregionens teatrar på ett ställe",
+    tagline: "Teater, dans och opera i huvudstadsregionen på ett ställe",
     description:
-      "Vad som spelas på teatrarna just nu: föreställningar, speldatum, upphovspersoner och länkar till recensioner från teatrar i huvudstadsregionen.",
+      "Vad som spelas på huvudstadsregionens teatrar, danshus och opera just nu: föreställningar, speldatum, upphovspersoner och länkar till recensioner.",
     skipToContent: "Hoppa till innehållet",
     language: "Språk",
     home: "Startsidan",

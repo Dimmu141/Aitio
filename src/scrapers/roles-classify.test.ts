@@ -47,6 +47,23 @@ describe("classifyProduction", () => {
     expect(result).toEqual({ type: "PLAY", confidence: 0.7 });
   });
 
+  it("treats a choreographed piece without a director as dance", () => {
+    expect(classifyProduction({ title: "no-no", hasDirector: false, hasChoreographer: true, castCount: 9 })).toEqual({
+      type: "DANCE",
+      confidence: 0.7,
+    });
+    expect(classifyProduction({ ...base, title: "Helsinki Dance Company: Kvarnström" }).type).toBe("DANCE");
+  });
+
+  it("keeps a directed musical with a choreographer a play-or-musical, not dance", () => {
+    expect(classifyProduction({ title: "Kotijoukot", hasDirector: true, hasChoreographer: true, castCount: 6 }).type).toBe("PLAY");
+  });
+
+  it("takes the source's own category over the keyword rules", () => {
+    expect(classifyProduction({ ...base, title: "Hamlet", typeHint: "DANCE" })).toEqual({ type: "DANCE", confidence: 0.9 });
+    expect(classifyProduction({ title: "Nattland", hasDirector: true, castCount: 8, typeHint: "OTHER" }).type).toBe("PLAY");
+  });
+
   it("falls back to OTHER with low confidence", () => {
     expect(classifyProduction({ ...base, title: "Konstens natt 2026" })).toEqual({ type: "OTHER", confidence: 0.2 });
   });

@@ -14,9 +14,9 @@ const types: Record<ProductionType, string> = {
 export const fi = {
   site: {
     name: "Aitio",
-    tagline: "Helsingin seudun teatterit yhdessä paikassa",
+    tagline: "Helsingin seudun teatteri, tanssi ja ooppera yhdessä paikassa",
     description:
-      "Mitä teattereissa on nyt ohjelmassa: esitykset, esityspäivät, tekijät ja linkit arvosteluihin Helsingin seudun teattereista.",
+      "Mitä Helsingin seudun teattereissa, tanssitaloissa ja oopperassa on nyt ohjelmassa: esitykset, esityspäivät, tekijät ja linkit arvosteluihin.",
     skipToContent: "Siirry sisältöön",
     language: "Kieli",
     home: "Etusivu",

@@ -68,6 +68,11 @@ export const rawProductionDetailSchema = z.object({
   url: z.url(),
   stage: z.string().optional(),
   subtitle: z.string().optional(),
+  /**
+   * The source's own category, when it states one (the Opera's "Baletti", a dance house
+   * whose programme is dance). Wins over the keyword rules; OTHER means "not stated".
+   */
+  typeHint: z.enum(PRODUCTION_TYPES).optional(),
   durationText: z.string().optional(),
   /** The production's own ticket link, for sources whose performance rows have none (KOM). */
   ticketUrl: z.url().optional(),

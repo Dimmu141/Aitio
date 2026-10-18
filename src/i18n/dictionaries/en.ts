@@ -3,9 +3,9 @@ import type { Dictionary } from "./fi";
 export const en: Dictionary = {
   site: {
     name: "Aitio",
-    tagline: "Helsinki-area theatre in one place",
+    tagline: "Helsinki-area theatre, dance and opera in one place",
     description:
-      "What's on in Helsinki-area theatres: productions, performance dates, creative teams and links to reviews.",
+      "What's on in Helsinki-area theatres, dance houses and opera: productions, performance dates, creative teams and links to reviews.",
     skipToContent: "Skip to content",
     language: "Language",
     home: "Home",

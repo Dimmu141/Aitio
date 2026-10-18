@@ -18,7 +18,9 @@ export function planProduction(detail: RawProductionDetail) {
     title: detail.title,
     stage: detail.stage,
     subtitle: detail.subtitle,
+    typeHint: detail.typeHint,
     hasDirector: detail.credits.some((credit) => credit.roles.includes("DIRECTOR")),
+    hasChoreographer: detail.credits.some((credit) => credit.roles.includes("CHOREOGRAPHER")),
     castCount: detail.credits.filter((credit) => credit.roles.includes("CAST")).length,
   });
   return { detail, classification };
