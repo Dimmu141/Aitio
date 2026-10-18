@@ -95,6 +95,18 @@ describe.skipIf(!url)("diary service (integration)", () => {
     expect(await db.report.count({ where: { entryId: entry.id, resolvedAt: null } })).toBe(0);
   });
 
+  it("lists reported reviews for moderation and applies the decision", async () => {
+    const [entry] = await service.getDiary(users.anna);
+    await service.reportEntry(users.eva, entry.id, "OFFENSIVE");
+    const queue = await service.moderationQueue();
+    expect(queue).toEqual([expect.objectContaining({ entryId: entry.id, reasons: { OFFENSIVE: 1 }, hidden: false })]);
+    expect(await service.moderate(entry.id, true)).toBe("nattland-svenska-teatern");
+    expect((await service.getDiary(users.anna))[0].hidden).toBe(true);
+    expect(await service.moderationQueue()).toEqual([]);
+    await service.moderate(entry.id, false);
+    expect((await service.getDiary(users.anna))[0].hidden).toBe(false);
+  });
+
   it("deletes the account with its diary and reports", async () => {
     await service.saveEntry(users.eva, productionId, null, input);
     const [entry] = await service.getDiary(users.eva);

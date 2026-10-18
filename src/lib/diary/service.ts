@@ -240,3 +240,50 @@ export async function exportData(userId: string) {
     reports,
   };
 }
+
+export interface ModerationItem {
+  entryId: string;
+  production: string;
+  slug: string;
+  author: string;
+  review: string;
+  hidden: boolean;
+  reasons: Record<string, number>;
+}
+
+/** Entries with open reports, most reported first. */
+export async function moderationQueue(): Promise<ModerationItem[]> {
+  const entries = await db.diaryEntry.findMany({
+    where: { reports: { some: { resolvedAt: null } } },
+    include: {
+      reports: { where: { resolvedAt: null }, select: { reason: true } },
+      user: { select: { email: true } },
+      production: { select: { title: true, slug: true } },
+    },
+  });
+  return entries
+    .map((entry) => ({
+      entryId: entry.id,
+      production: entry.production.title,
+      slug: entry.production.slug,
+      author: entry.user.email,
+      review: entry.review ?? "",
+      hidden: entry.hiddenAt !== null,
+      reasons: entry.reports.reduce<Record<string, number>>((counts, report) => {
+        counts[report.reason] = (counts[report.reason] ?? 0) + 1;
+        return counts;
+      }, {}),
+    }))
+    .sort((a, b) => sum(b.reasons) - sum(a.reasons));
+}
+
+const sum = (counts: Record<string, number>) => Object.values(counts).reduce((total, n) => total + n, 0);
+
+/** A moderator's decision: hide or show the review, and close its open reports. */
+export async function moderate(entryId: string, hide: boolean): Promise<string | null> {
+  const entry = await db.diaryEntry.findUnique({ where: { id: entryId }, select: { production: { select: { slug: true } } } });
+  if (!entry) return null;
+  await db.diaryEntry.update({ where: { id: entryId }, data: { hiddenAt: hide ? new Date() : null } });
+  await db.report.updateMany({ where: { entryId, resolvedAt: null }, data: { resolvedAt: new Date() } });
+  return entry.production.slug;
+}
