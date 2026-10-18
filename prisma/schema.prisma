@@ -1,0 +1,190 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ProductionType {
+  PLAY
+  MUSICAL
+  OPERA
+  DANCE
+  CONCERT
+  STANDUP
+  TALK
+  OTHER
+}
+
+enum CreditRole {
+  DIRECTOR
+  WRITER
+  COMPOSER
+  TRANSLATOR
+  CHOREOGRAPHER
+  DESIGNER
+  CAST
+  OTHER
+}
+
+enum ScrapeStatus {
+  RUNNING
+  SUCCESS
+  FAILED
+}
+
+model Theatre {
+  id                String       @id @default(cuid())
+  slug              String       @unique
+  name              String
+  city              String
+  website           String
+  ticketingProvider String?
+  sourceId          String?      @unique
+  stages            Stage[]
+  productions       Production[]
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+}
+
+model Stage {
+  id           String        @id @default(cuid())
+  theatreId    String
+  theatre      Theatre       @relation(fields: [theatreId], references: [id])
+  name         String
+  productions  Production[]
+  performances Performance[]
+
+  @@unique([theatreId, name])
+}
+
+model Production {
+  id              String         @id @default(cuid())
+  slug            String         @unique
+  title           String
+  theatreId       String
+  theatre         Theatre        @relation(fields: [theatreId], references: [id])
+  stageId         String?
+  stage           Stage?         @relation(fields: [stageId], references: [id])
+  externalId      String
+  sourceUrl       String
+  type            ProductionType @default(OTHER)
+  typeConfidence  Float          @default(0)
+  typeOverride    ProductionType?
+  languages       String[]
+  subtitleLangs   String[]
+  premiereDate    DateTime?
+  runStart        DateTime?
+  runEnd          DateTime?
+  durationText    String?
+  ticketUrl       String?
+  lastSeenAt      DateTime
+  performances    Performance[]
+  credits         Credit[]
+  criticReviews   CriticReview[]
+  diaryEntries    DiaryEntry[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@unique([theatreId, externalId])
+  @@index([runEnd])
+}
+
+model Performance {
+  id           String       @id @default(cuid())
+  productionId String
+  production   Production   @relation(fields: [productionId], references: [id])
+  startsAt     DateTime
+  stageId      String?
+  stage        Stage?       @relation(fields: [stageId], references: [id])
+  ticketUrl    String?
+  lastSeenAt   DateTime
+  diaryEntries DiaryEntry[]
+
+  @@unique([productionId, startsAt])
+  @@index([startsAt])
+}
+
+model Person {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  credits   Credit[]
+  createdAt DateTime @default(now())
+}
+
+model Credit {
+  id            String     @id @default(cuid())
+  personId      String
+  person        Person     @relation(fields: [personId], references: [id])
+  productionId  String
+  production    Production @relation(fields: [productionId], references: [id])
+  role          CreditRole
+  characterName String?
+  sortOrder     Int        @default(0)
+
+  @@unique([personId, productionId, role])
+}
+
+model CriticReview {
+  id            String     @id @default(cuid())
+  productionId  String
+  production    Production @relation(fields: [productionId], references: [id])
+  outlet        String
+  url           String     @unique
+  publishedAt   DateTime?
+}
+
+model User {
+  id           String       @id @default(cuid())
+  email        String       @unique
+  displayName  String?
+  handle       String?      @unique
+  locale       String       @default("fi")
+  diaryEntries DiaryEntry[]
+  createdAt    DateTime     @default(now())
+}
+
+model DiaryEntry {
+  id            String       @id @default(cuid())
+  userId        String
+  user          User         @relation(fields: [userId], references: [id])
+  productionId  String
+  production    Production   @relation(fields: [productionId], references: [id])
+  performanceId String?
+  performance   Performance? @relation(fields: [performanceId], references: [id])
+  seenOn        DateTime
+  rating        Decimal?     @db.Decimal(2, 1)
+  review        String?
+  isRewatch     Boolean      @default(false)
+  tags          Tag[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@index([productionId])
+  @@index([userId, seenOn])
+}
+
+model Tag {
+  id      String       @id @default(cuid())
+  slug    String       @unique
+  labelFi String
+  labelSv String
+  labelEn String
+  entries DiaryEntry[]
+}
+
+model ScrapeRun {
+  id           String       @id @default(cuid())
+  sourceId     String
+  status       ScrapeStatus @default(RUNNING)
+  startedAt    DateTime     @default(now())
+  finishedAt   DateTime?
+  itemsFound   Int          @default(0)
+  itemsChanged Int          @default(0)
+  errors       Json?
+
+  @@index([sourceId, startedAt])
+}
