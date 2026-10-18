@@ -60,7 +60,7 @@ export const fi = {
     language: "Kieli",
     subtitles: "Tekstitys",
     audience: "Yleisö",
-    noRatings: "Ei vielä katsojien arvioita. Arviointi avautuu pian.",
+    noRatings: "Ei vielä katsojien arvioita. Ole ensimmäinen: merkitse esitys nähdyksi.",
     ratingsCount: (n: number) => (n === 1 ? "1 arvio" : `${n} arviota`),
     averageHidden: (needed: number) => `Keskiarvo näytetään, kun arvioita on ${needed}.`,
     critics: "Kriitikot",

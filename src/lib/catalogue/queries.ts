@@ -11,6 +11,7 @@ import {
   upcomingPerformances,
   type RatingSummary,
 } from "./select";
+import { productionTag } from "./tags";
 import type { CreditRow, PerformanceRow, ProductionCard, TheatreRef } from "./types";
 
 /**
@@ -114,12 +115,25 @@ export interface ProductionPage {
   critics: Array<{ outlet: string; url: string; publishedAt: Date | null }>;
   ratings: RatingSummary;
   tags: Array<{ slug: string; labels: { fi: string; sv: string; en: string }; count: number }>;
+  reviews: PublicReview[];
   updatedAt: Date;
 }
+
+export interface PublicReview {
+  id: string;
+  /** Empty when the user hasn't set a name; the page shows a neutral label. */
+  name: string;
+  rating: number | null;
+  seenOn: Date;
+  text: string;
+}
+
+const MAX_REVIEWS = 20;
 
 export async function getProduction(slug: string): Promise<ProductionPage | null> {
   "use cache";
   cacheCatalogue();
+  cacheTag(productionTag(slug));
   const asOf = new Date();
   const row = await db.production.findUnique({
     where: { slug },
@@ -129,7 +143,20 @@ export async function getProduction(slug: string): Promise<ProductionPage | null
       performances: { include: { stage: { select: { name: true } } }, orderBy: { startsAt: "asc" } },
       credits: { include: { person: { select: { slug: true, name: true } } }, orderBy: { sortOrder: "asc" } },
       criticReviews: { orderBy: [{ publishedAt: "desc" }, { outlet: "asc" }] },
-      diaryEntries: { select: { rating: true, tags: { select: { slug: true, labelFi: true, labelSv: true, labelEn: true } } } },
+      diaryEntries: {
+        select: {
+          id: true,
+          rating: true,
+          review: true,
+          isPublic: true,
+          hiddenAt: true,
+          seenOn: true,
+          createdAt: true,
+          user: { select: { name: true } },
+          tags: { select: { slug: true, labelFi: true, labelSv: true, labelEn: true } },
+        },
+        orderBy: { createdAt: "desc" },
+      },
     },
   });
   if (!row) return null;
@@ -166,6 +193,16 @@ export async function getProduction(slug: string): Promise<ProductionPage | null
     critics: row.criticReviews.map((review) => ({ outlet: review.outlet, url: review.url, publishedAt: review.publishedAt })),
     ratings: summariseRatings(ratings),
     tags: countTags(row.diaryEntries.flatMap((entry) => entry.tags)),
+    reviews: row.diaryEntries
+      .filter((entry) => entry.isPublic && entry.hiddenAt === null && entry.review)
+      .slice(0, MAX_REVIEWS)
+      .map((entry) => ({
+        id: entry.id,
+        name: entry.user.name,
+        rating: entry.rating,
+        seenOn: entry.seenOn,
+        text: entry.review ?? "",
+      })),
     updatedAt: row.lastSeenAt,
   };
 }

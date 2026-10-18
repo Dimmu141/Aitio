@@ -2,16 +2,19 @@ import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/fi";
 import type { ProductionPage } from "@/lib/catalogue/queries";
 import { MIN_RATINGS_FOR_AVERAGE } from "@/lib/catalogue/select";
+import { ReviewList } from "./ReviewList";
 
 /** Rating histogram and tag counts. The average stays hidden until it means something. */
 export function AudienceSection({
   ratings,
   tags,
+  reviews,
   locale,
   t,
 }: {
   ratings: ProductionPage["ratings"];
   tags: ProductionPage["tags"];
+  reviews: ProductionPage["reviews"];
   locale: Locale;
   t: Dictionary;
 }) {
@@ -56,6 +59,7 @@ export function AudienceSection({
           ))}
         </ul>
       )}
+      <ReviewList reviews={reviews} locale={locale} t={t} />
     </section>
   );
 }

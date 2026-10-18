@@ -49,7 +49,7 @@ export const sv: Dictionary = {
     language: "Språk",
     subtitles: "Textning",
     audience: "Publiken",
-    noRatings: "Inga publikbetyg ännu. Betygsättningen öppnar snart.",
+    noRatings: "Inga publikbetyg ännu. Bli först: markera föreställningen som sedd.",
     ratingsCount: (n: number) => (n === 1 ? "1 betyg" : `${n} betyg`),
     averageHidden: (needed: number) => `Medelvärdet visas när det finns ${needed} betyg.`,
     critics: "Kritiker",

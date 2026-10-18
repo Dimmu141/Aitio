@@ -49,7 +49,7 @@ export const en: Dictionary = {
     language: "Language",
     subtitles: "Subtitles",
     audience: "Audience",
-    noRatings: "No audience ratings yet. Rating opens soon.",
+    noRatings: "No audience ratings yet. Be the first: mark it as seen.",
     ratingsCount: (n: number) => (n === 1 ? "1 rating" : `${n} ratings`),
     averageHidden: (needed: number) => `The average appears once there are ${needed} ratings.`,
     critics: "Critics",

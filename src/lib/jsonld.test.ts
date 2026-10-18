@@ -31,6 +31,7 @@ const page: ProductionPage = {
   critics: [],
   ratings: summariseRatings([]),
   tags: [],
+  reviews: [],
   updatedAt: new Date(),
 };
 

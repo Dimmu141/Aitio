@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { Badge, BadgeRow } from "@/components/Badge";
+import { buttonPrimary, buttonSecondary } from "@/components/ui";
 import { ExternalLink } from "@/components/ExternalLink";
 import { AudienceSection } from "@/components/production/AudienceSection";
 import { CreditList } from "@/components/production/CreditList";
@@ -96,18 +97,19 @@ export default async function ProductionRoute({ params }: PageProps<"/[locale]/e
         t={t}
       />
 
-      {page.next && page.ticketUrl && (
-        <ExternalLink
-          href={page.ticketUrl}
-          hint={t.production.externalLink}
-          className="flex min-h-tap w-full items-center justify-center rounded border-2 border-accent px-6 text-lg font-semibold text-accent no-underline sm:w-auto sm:inline-flex"
-        >
-          {t.production.buyTickets}
-        </ExternalLink>
-      )}
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <Link href={href(locale, "merkitse", page.slug)} className={buttonPrimary}>
+          {t.log.button}
+        </Link>
+        {page.next && page.ticketUrl && (
+          <ExternalLink href={page.ticketUrl} hint={t.production.externalLink} className={buttonSecondary}>
+            {t.production.buyTickets}
+          </ExternalLink>
+        )}
+      </div>
 
       <PerformanceList rows={page.performances} asOf={page.asOf} locale={locale} t={t} />
-      <AudienceSection ratings={page.ratings} tags={page.tags} locale={locale} t={t} />
+      <AudienceSection ratings={page.ratings} tags={page.tags} reviews={page.reviews} locale={locale} t={t} />
       <CriticLinks critics={page.critics} locale={locale} t={t} />
       <CreditList credits={page.credits} locale={locale} t={t} />
 
