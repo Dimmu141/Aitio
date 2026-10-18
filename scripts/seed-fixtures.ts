@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { readFileSync } from "node:fs";
+import * as hkt from "../src/scrapers/adapters/hkt";
 import * as kansallisteatteri from "../src/scrapers/adapters/kansallisteatteri";
 import * as svenskaTeatern from "../src/scrapers/adapters/svenska-teatern";
 import { upsertProduction } from "../src/scrapers/normalise";
@@ -34,6 +35,14 @@ function fixtureDetails(): Array<{ sourceId: string; detail: RawProductionDetail
     {
       sourceId: svenskaTeatern.svenskaTeaternAdapter.id,
       detail: svenskaTeatern.parseDetail(read("fixtures/svenska-teatern/production-nattland.html"), stRef),
+    },
+    {
+      sourceId: hkt.hktAdapter.id,
+      detail: hkt.parseDetail(
+        read("fixtures/hkt/production-julia.html"),
+        read("fixtures/hkt/ticket-list-47167.json"),
+        findRef(hkt.parseList(read("fixtures/hkt/list-esitykset.html")), "https://hkt.fi/esitykset/julia/"),
+      ),
     },
   ];
 }

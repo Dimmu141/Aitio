@@ -14,7 +14,9 @@ export function mapRoleText(roleText: string): CreditRoleName[] {
   // "Ohjaajan assistentti", "Apulaisohjaaja", "Regiassistent" are not directors.
   const isAssistant = /assist|apulais/.test(text);
   if (!isAssistant && /ohjaa|ohjaus|\bregi\b|regiss/.test(text)) roles.add("DIRECTOR");
-  if (/käsikirjoit|dramatisoin|\bteksti\b|kirjoittaja|\bav\b|^text\b|manus|dramatis|librett|alkuperäisteos/.test(text)) {
+  if (
+    /käsikirjoit|dramatisoin|\bteksti\b|kirjoittaja|\bav\b|^text\b|manus|dramatis|librett|alkuperäisteos|författ|bearbetning/.test(text)
+  ) {
     roles.add("WRITER");
   }
   if (/sävel|musiikki|kompo|\bmusik\b/.test(text)) roles.add("COMPOSER");

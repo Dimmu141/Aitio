@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cleanText, helsinkiToUtc, languageCodes, parseFinnishDate, slugify } from "./text";
+import { cleanText, helsinkiToUtc, languageCodes, parseFinnishDate, slugify, stripGuestMarker } from "./text";
 
 describe("helsinkiToUtc", () => {
   it("uses UTC+3 in summer time", () => {
@@ -43,5 +43,13 @@ describe("languageCodes", () => {
   it("maps Swedish and Finnish language names", () => {
     expect(languageCodes("Finska, engelska, svenska. Textningskod NATT").sort()).toEqual(["en", "fi", "sv"]);
     expect(languageCodes("suomeksi ja ruotsiksi").sort()).toEqual(["fi", "sv"]);
+  });
+});
+
+describe("stripGuestMarker", () => {
+  it("removes guest markers", () => {
+    expect(stripGuestMarker("Mawlawi Rahem (vier.)")).toBe("Mawlawi Rahem");
+    expect(stripGuestMarker("Anna Gäst (gäst)")).toBe("Anna Gäst");
+    expect(stripGuestMarker("Pia Runnakko")).toBe("Pia Runnakko");
   });
 });

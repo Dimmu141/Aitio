@@ -55,6 +55,7 @@ export const rawCriticReviewSchema = z.object({
   outlet: z.string().min(1),
   critic: z.string().optional(),
   url: z.url(),
+  publishedAt: z.date().optional(),
 });
 export type RawCriticReview = z.infer<typeof rawCriticReviewSchema>;
 

@@ -81,3 +81,8 @@ export function languageCodes(text: string): string[] {
   }
   return [...found];
 }
+
+/** "Mawlawi Rahem (vier.)" → "Mawlawi Rahem": guest markers aren't part of the name. */
+export function stripGuestMarker(name: string): string {
+  return cleanText(name.replace(/\((?:vier|gäst|guest)\.?\)/gi, ""));
+}

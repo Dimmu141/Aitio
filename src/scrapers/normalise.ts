@@ -134,8 +134,8 @@ export async function upsertProduction(
   for (const review of detail.criticReviews) {
     await db.criticReview.upsert({
       where: { url: review.url },
-      create: { productionId: production.id, outlet: review.outlet, url: review.url },
-      update: { outlet: review.outlet },
+      create: { productionId: production.id, outlet: review.outlet, url: review.url, publishedAt: review.publishedAt ?? null },
+      update: { outlet: review.outlet, ...(review.publishedAt ? { publishedAt: review.publishedAt } : {}) },
     });
   }
 

@@ -1,6 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { LIST_URL as KT_LIST_URL } from "../src/scrapers/adapters/kansallisteatteri";
+import { LIST_URL as HKT_LIST_URL } from "../src/scrapers/adapters/hkt";
 import { showsUrl } from "../src/scrapers/adapters/svenska-teatern";
 import { politeFetch } from "../src/scrapers/http";
 
@@ -17,6 +18,11 @@ const FIXTURES: Array<{ url: string; file: string }> = [
   },
   { url: showsUrl(1), file: "fixtures/svenska-teatern/shows-page-1.json" },
   { url: "https://svenskateatern.fi/repertoar/nattland/", file: "fixtures/svenska-teatern/production-nattland.html" },
+  { url: HKT_LIST_URL, file: "fixtures/hkt/list-esitykset.html" },
+  { url: `${HKT_LIST_URL}page/2/`, file: "fixtures/hkt/list-esitykset-page-2.html" },
+  { url: "https://hkt.fi/esitykset/julia/", file: "fixtures/hkt/production-julia.html" },
+  { url: "https://hkt.fi/esitykset/de-obehoriga/", file: "fixtures/hkt/production-de-obehoriga.html" },
+  { url: "https://hkt.fi/wp-json/hkt/ticket-list/47167/", file: "fixtures/hkt/ticket-list-47167.json" },
 ];
 
 async function main(): Promise<void> {
