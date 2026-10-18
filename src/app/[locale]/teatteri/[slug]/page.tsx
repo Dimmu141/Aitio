@@ -4,6 +4,7 @@ import { ProductionCard } from "@/components/ProductionCard";
 import { getDictionary } from "@/i18n";
 import { getAllSlugs, getTheatre } from "@/lib/catalogue/queries";
 import { pageMetadata } from "@/lib/metadata";
+import { theatreTone } from "@/lib/poster";
 import { withPlaceholder } from "@/lib/static-params";
 
 /** Fully static, so an unknown slug is a real 404 (see the production page). */
@@ -38,6 +39,7 @@ export default async function TheatreRoute({ params }: PageProps<"/[locale]/teat
   return (
     <div className="space-y-10">
       <header className="space-y-2 border-b-4 border-double border-ink pb-4">
+        <span aria-hidden="true" className={`ai-poster--${theatreTone(page.theatre.slug).name} block h-2 w-16 rounded-sm`} />
         <p className="text-label font-bold uppercase tracking-[0.06em] text-ink-muted">{page.theatre.city}</p>
         <h1 className="text-display">{page.theatre.name}</h1>
         <p>

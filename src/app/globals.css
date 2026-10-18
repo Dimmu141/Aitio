@@ -32,6 +32,7 @@
   --color-poster-teal: #2f6b67;
   --color-poster-plum: #5b3a5e;
   --color-poster-sage: #a9b79a;
+  --color-poster-blue: #2b4c7e; /* not in the design system: the sixth theatre needed a colour */
 
   --font-serif: var(--font-newsreader), Georgia, "Times New Roman", serif;
   /* Digits first: a 0–9-only face, so Atkinson's slashed zero never shows (see src/app/fonts). */
@@ -163,6 +164,7 @@
   .ai-poster--teal { background: var(--color-poster-teal); color: var(--color-paper-fixed); }
   .ai-poster--plum { background: var(--color-poster-plum); color: var(--color-paper-fixed); }
   .ai-poster--sage { background: var(--color-poster-sage); color: var(--color-ink-fixed); }
+  .ai-poster--blue { background: var(--color-poster-blue); color: var(--color-paper-fixed); }
 
   /* Badge */
   .ai-badges {

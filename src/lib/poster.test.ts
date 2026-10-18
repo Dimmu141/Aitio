@@ -1,16 +1,21 @@
 import { describe, expect, it } from "vitest";
 import { contrastRatio } from "./contrast";
-import { POSTER_TONES, posterTone } from "./poster";
+import { POSTER_TONES, THEATRE_TONES, theatreTone } from "./poster";
+import { THEATRES } from "@/scrapers/theatres";
 import { TOKENS } from "./tokens";
 
-describe("posterTone", () => {
-  it("is stable for a slug", () => {
-    expect(posterTone("nattland-svenska-teatern")).toBe(posterTone("nattland-svenska-teatern"));
+describe("theatreTone", () => {
+  it("gives every theatre its own colour", () => {
+    const tones = THEATRES.map((theatre) => theatreTone(theatre.slug).name);
+    expect(new Set(tones).size).toBe(THEATRES.length);
   });
 
-  it("spreads slugs over all five grounds", () => {
-    const used = new Set(Array.from({ length: 40 }, (_, index) => posterTone(`show-${index}`)));
-    expect(used.size).toBe(POSTER_TONES.length);
+  it("has an entry for every theatre, so none falls back to the hash", () => {
+    expect(THEATRES.map((theatre) => theatre.slug).filter((slug) => !(slug in THEATRE_TONES))).toEqual([]);
+  });
+
+  it("is stable for a theatre it doesn't know yet", () => {
+    expect(theatreTone("uusi-teatteri")).toBe(theatreTone("uusi-teatteri"));
   });
 
   // The poster title is large text, but its foot line is 16px, so every ground meets AA for body text.

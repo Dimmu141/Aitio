@@ -1,18 +1,18 @@
-import { isLongTitle, posterTone } from "@/lib/poster";
+import { isLongTitle, theatreTone } from "@/lib/poster";
 
 /** Typographic poster: no press photos, just the title set like a printed programme cover. */
 export function PosterBlock({
-  slug,
+  theatreSlug,
   title,
   kicker,
   foot,
 }: {
-  slug: string;
+  theatreSlug: string;
   title: string;
   kicker: string;
   foot: string | null;
 }) {
-  const tone = posterTone(slug);
+  const tone = theatreTone(theatreSlug);
   return (
     <div className={`ai-poster ai-poster--${tone.name}`}>
       <p className="ai-poster__kicker">{kicker}</p>

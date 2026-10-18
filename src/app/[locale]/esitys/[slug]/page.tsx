@@ -82,7 +82,7 @@ export default async function ProductionRoute({ params }: PageProps<"/[locale]/e
   return (
     <article>
       <header>
-        <PosterBlock slug={page.slug} title={page.title} kicker={page.theatre.name} foot={posterFoot(page, t)} />
+        <PosterBlock theatreSlug={page.theatre.slug} title={page.title} kicker={page.theatre.name} foot={posterFoot(page, t)} />
         <p className="ai-facts">
           <Link href={href(locale, "teatteri", page.theatre.slug)}>{page.theatre.name}</Link>
           {[page.stage, page.durationText].filter(Boolean).map((fact) => ` · ${fact}`)}

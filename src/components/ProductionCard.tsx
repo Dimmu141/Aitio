@@ -5,10 +5,10 @@ import { href } from "@/i18n/paths";
 import { typeLabel } from "@/lib/catalogue/type-label";
 import type { ProductionCard as Card } from "@/lib/catalogue/types";
 import { formatPerformance, formatShortDate, formatTime, isoDateTime } from "@/lib/format";
-import { posterTone } from "@/lib/poster";
+import { theatreTone } from "@/lib/poster";
 
 /**
- * One programme row: colour edge from the poster ground, serif title, where and when.
+ * One programme row: colour edge of its theatre, serif title, where and when.
  * Under a day heading (`when="time"`) the date is already said, so only the time shows.
  */
 export function ProductionCard({
@@ -30,7 +30,7 @@ export function ProductionCard({
   heading?: "h3" | "h4";
   note?: string;
 }) {
-  const tone = posterTone(card.slug);
+  const tone = theatreTone(card.theatre.slug);
   const Title = heading;
   // KOM's only stage is called "KOM-teatteri": don't print the name twice.
   const stage = card.stage === card.theatre.name ? null : card.stage;
