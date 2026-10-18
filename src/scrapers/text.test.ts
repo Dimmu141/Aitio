@@ -5,6 +5,7 @@ import {
   helsinkiWeekday,
   languageCodes,
   parseFinnishDate,
+  personName,
   slugify,
   stripGuestMarker,
   weekdaysIn,
@@ -98,5 +99,18 @@ describe("yearFromWeekday", () => {
     // 14.11. is a Friday in 2025, Saturday in 2026 and Sunday in 2027: never a Monday.
     expect(yearFromWeekday(14, 11, "ma", near)).toBeNull();
     expect(yearFromWeekday(14, 11, "xx", near)).toBeNull();
+  });
+});
+
+describe("personName", () => {
+  it.each([
+    ["Anacarsis Ramos / Pornotráfico", "Anacarsis Ramos"],
+    ["Ludwig van Beethoven", "Ludwig van Beethoven"],
+    ["Karla Sánchez Kiwi", "Karla Sánchez Kiwi"],
+    ["magu", "magu"],
+    ["Anacarsis Ramos Josefina Orlainetan arkistojen pohjalta", null],
+    ["  ", null],
+  ])("%s", (raw, expected) => {
+    expect(personName(raw)).toBe(expected);
   });
 });

@@ -1,366 +1,59 @@
-<!DOCTYPE html><html lang="fi" class="lenis lenis-smooth" data-scroll-orientation="vertical"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><style rel="stylesheet" type="text/css">@charset "utf-8";
 
-img:is([sizes="auto" i], [sizes^="auto," i]) { contain-intrinsic-size: 3000px 1500px; }</style><style rel="stylesheet" type="text/css">@charset "utf-8";
+<!doctype html>
+<html lang="fi">
 
-:root { --wp--preset--aspect-ratio--square: 1; --wp--preset--aspect-ratio--4-3: 4/3; --wp--preset--aspect-ratio--3-4: 3/4; --wp--preset--aspect-ratio--3-2: 3/2; --wp--preset--aspect-ratio--2-3: 2/3; --wp--preset--aspect-ratio--16-9: 16/9; --wp--preset--aspect-ratio--9-16: 9/16; --wp--preset--color--black: #000000; --wp--preset--color--cyan-bluish-gray: #abb8c3; --wp--preset--color--white: #ffffff; --wp--preset--color--pale-pink: #f78da7; --wp--preset--color--vivid-red: #cf2e2e; --wp--preset--color--luminous-vivid-orange: #ff6900; --wp--preset--color--luminous-vivid-amber: #fcb900; --wp--preset--color--light-green-cyan: #7bdcb5; --wp--preset--color--vivid-green-cyan: #00d084; --wp--preset--color--pale-cyan-blue: #8ed1fc; --wp--preset--color--vivid-cyan-blue: #0693e3; --wp--preset--color--vivid-purple: #9b51e0; --wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgb(6,147,227) 0%,rgb(155,81,224) 100%); --wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%); --wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgb(252,185,0) 0%,rgb(255,105,0) 100%); --wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgb(255,105,0) 0%,rgb(207,46,46) 100%); --wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%); --wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%); --wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%); --wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%); --wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%); --wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%); --wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%); --wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%); --wp--preset--font-size--small: 13px; --wp--preset--font-size--medium: 20px; --wp--preset--font-size--large: 36px; --wp--preset--font-size--x-large: 42px; --wp--preset--spacing--20: 0.44rem; --wp--preset--spacing--30: 0.67rem; --wp--preset--spacing--40: 1rem; --wp--preset--spacing--50: 1.5rem; --wp--preset--spacing--60: 2.25rem; --wp--preset--spacing--70: 3.38rem; --wp--preset--spacing--80: 5.06rem; --wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2); --wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4); --wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2); --wp--preset--shadow--outlined: 6px 6px 0px -3px rgb(255, 255, 255), 6px 6px rgb(0, 0, 0); --wp--preset--shadow--crisp: 6px 6px 0px rgb(0, 0, 0); }
-
-.wp-block-button { --wp--preset--dimension--25: 25%; --wp--preset--dimension--50: 50%; --wp--preset--dimension--75: 75%; --wp--preset--dimension--100: 100%; }
-
-:where(body) { margin: 0px; }
-
-:where(.is-layout-flex) { gap: 0.5em; }
-
-:where(.is-layout-grid) { gap: 0.5em; }
-
-body .is-layout-flex { display: flex; }
-
-.is-layout-flex { flex-wrap: wrap; align-items: center; }
-
-.is-layout-flex > :is(*, div) { margin: 0px; }
-
-body .is-layout-grid { display: grid; }
-
-.is-layout-grid > :is(*, div) { margin: 0px; }
-
-body { padding: 0px; }
-
-:root :where(.wp-element-button, .wp-block-button__link) { background-color: rgb(50, 55, 60); border-width: 0px; color: rgb(255, 255, 255); font-family: inherit; font-size: inherit; font-style: inherit; font-weight: inherit; letter-spacing: inherit; line-height: inherit; padding: calc(0.667em + 2px) calc(1.333em + 2px); text-decoration: none; text-transform: inherit; }
-
-.has-black-color { color: var(--wp--preset--color--black) !important; }
-
-.has-cyan-bluish-gray-color { color: var(--wp--preset--color--cyan-bluish-gray) !important; }
-
-.has-white-color { color: var(--wp--preset--color--white) !important; }
-
-.has-pale-pink-color { color: var(--wp--preset--color--pale-pink) !important; }
-
-.has-vivid-red-color { color: var(--wp--preset--color--vivid-red) !important; }
-
-.has-luminous-vivid-orange-color { color: var(--wp--preset--color--luminous-vivid-orange) !important; }
-
-.has-luminous-vivid-amber-color { color: var(--wp--preset--color--luminous-vivid-amber) !important; }
-
-.has-light-green-cyan-color { color: var(--wp--preset--color--light-green-cyan) !important; }
-
-.has-vivid-green-cyan-color { color: var(--wp--preset--color--vivid-green-cyan) !important; }
-
-.has-pale-cyan-blue-color { color: var(--wp--preset--color--pale-cyan-blue) !important; }
-
-.has-vivid-cyan-blue-color { color: var(--wp--preset--color--vivid-cyan-blue) !important; }
-
-.has-vivid-purple-color { color: var(--wp--preset--color--vivid-purple) !important; }
-
-.has-black-background-color { background-color: var(--wp--preset--color--black) !important; }
-
-.has-cyan-bluish-gray-background-color { background-color: var(--wp--preset--color--cyan-bluish-gray) !important; }
-
-.has-white-background-color { background-color: var(--wp--preset--color--white) !important; }
-
-.has-pale-pink-background-color { background-color: var(--wp--preset--color--pale-pink) !important; }
-
-.has-vivid-red-background-color { background-color: var(--wp--preset--color--vivid-red) !important; }
-
-.has-luminous-vivid-orange-background-color { background-color: var(--wp--preset--color--luminous-vivid-orange) !important; }
-
-.has-luminous-vivid-amber-background-color { background-color: var(--wp--preset--color--luminous-vivid-amber) !important; }
-
-.has-light-green-cyan-background-color { background-color: var(--wp--preset--color--light-green-cyan) !important; }
-
-.has-vivid-green-cyan-background-color { background-color: var(--wp--preset--color--vivid-green-cyan) !important; }
-
-.has-pale-cyan-blue-background-color { background-color: var(--wp--preset--color--pale-cyan-blue) !important; }
-
-.has-vivid-cyan-blue-background-color { background-color: var(--wp--preset--color--vivid-cyan-blue) !important; }
-
-.has-vivid-purple-background-color { background-color: var(--wp--preset--color--vivid-purple) !important; }
-
-.has-black-border-color { border-color: var(--wp--preset--color--black) !important; }
-
-.has-cyan-bluish-gray-border-color { border-color: var(--wp--preset--color--cyan-bluish-gray) !important; }
-
-.has-white-border-color { border-color: var(--wp--preset--color--white) !important; }
-
-.has-pale-pink-border-color { border-color: var(--wp--preset--color--pale-pink) !important; }
-
-.has-vivid-red-border-color { border-color: var(--wp--preset--color--vivid-red) !important; }
-
-.has-luminous-vivid-orange-border-color { border-color: var(--wp--preset--color--luminous-vivid-orange) !important; }
-
-.has-luminous-vivid-amber-border-color { border-color: var(--wp--preset--color--luminous-vivid-amber) !important; }
-
-.has-light-green-cyan-border-color { border-color: var(--wp--preset--color--light-green-cyan) !important; }
-
-.has-vivid-green-cyan-border-color { border-color: var(--wp--preset--color--vivid-green-cyan) !important; }
-
-.has-pale-cyan-blue-border-color { border-color: var(--wp--preset--color--pale-cyan-blue) !important; }
-
-.has-vivid-cyan-blue-border-color { border-color: var(--wp--preset--color--vivid-cyan-blue) !important; }
-
-.has-vivid-purple-border-color { border-color: var(--wp--preset--color--vivid-purple) !important; }
-
-.has-vivid-cyan-blue-to-vivid-purple-gradient-background { background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important; }
-
-.has-light-green-cyan-to-vivid-green-cyan-gradient-background { background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important; }
-
-.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background { background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important; }
-
-.has-luminous-vivid-orange-to-vivid-red-gradient-background { background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important; }
-
-.has-very-light-gray-to-cyan-bluish-gray-gradient-background { background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important; }
-
-.has-cool-to-warm-spectrum-gradient-background { background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important; }
-
-.has-blush-light-purple-gradient-background { background: var(--wp--preset--gradient--blush-light-purple) !important; }
-
-.has-blush-bordeaux-gradient-background { background: var(--wp--preset--gradient--blush-bordeaux) !important; }
-
-.has-luminous-dusk-gradient-background { background: var(--wp--preset--gradient--luminous-dusk) !important; }
-
-.has-pale-ocean-gradient-background { background: var(--wp--preset--gradient--pale-ocean) !important; }
-
-.has-electric-grass-gradient-background { background: var(--wp--preset--gradient--electric-grass) !important; }
-
-.has-midnight-gradient-background { background: var(--wp--preset--gradient--midnight) !important; }
-
-.has-small-font-size { font-size: var(--wp--preset--font-size--small) !important; }
-
-.has-medium-font-size { font-size: var(--wp--preset--font-size--medium) !important; }
-
-.has-large-font-size { font-size: var(--wp--preset--font-size--large) !important; }
-
-.has-x-large-font-size { font-size: var(--wp--preset--font-size--x-large) !important; }</style><style rel="stylesheet" type="text/css">@charset "utf-8";
-
-.cli-modal-content, .cli-tab-content { background-color: rgb(255, 255, 255); }
-
-.cli-privacy-content-text, .cli-modal .cli-modal-dialog, .cli-tab-container p, a.cli-privacy-readmore { color: rgb(0, 0, 0); }
-
-.cli-tab-header { background-color: rgb(242, 242, 242); }
-
-.cli-tab-header, .cli-tab-header a.cli-nav-link, span.cli-necessary-caption, .cli-switch .cli-slider::after { color: rgb(0, 0, 0); }
-
-.cli-switch .cli-slider::before { background-color: rgb(255, 255, 255); }
-
-.cli-switch input:checked + .cli-slider::before { background-color: rgb(255, 255, 255); }
-
-.cli-switch .cli-slider { background-color: rgb(227, 225, 232); }
-
-.cli-switch input:checked + .cli-slider { background-color: rgb(40, 167, 69); }
-
-.cli-modal-close svg { fill: rgb(0, 0, 0); }
-
-.cli-tab-footer .wt-cli-privacy-accept-all-btn { background-color: rgb(0, 172, 173); color: rgb(255, 255, 255); }
-
-.cli-tab-footer .wt-cli-privacy-accept-btn { background-color: rgb(0, 172, 173); color: rgb(255, 255, 255); }
-
-.cli-tab-header a::before { border-right: 1px solid rgb(0, 0, 0); border-bottom: 1px solid rgb(0, 0, 0); }</style><style rel="stylesheet" type="text/css">@charset "utf-8";
-
-:root { --black: $black; --white: $white; }
-
-body.osx .ticket-cta a.buy.button { padding: 0.9rem 0.5rem 0.5rem; }
-
-.ticket-cta { position: relative; text-transform: uppercase; text-align: left; }
-
-.ticket-cta a.buy { overflow: hidden; position: relative; color: rgb(0, 0, 0); white-space: nowrap; font-weight: 800; display: inline-block; -webkit-box-align: center; align-items: center; line-height: 1; text-decoration: none !important; }
-
-.ticket-cta a.buy .wrapper { display: inline-block; max-width: 20rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-.ticket-cta a.buy.button { border: 2px solid rgb(0, 0, 0); padding: 0.9rem 0.5rem 0.3rem; font-size: 1.5rem; font-weight: 500; }
-
-@media screen and (max-width: 834px) {
-  @supports (-webkit-touch-callout:none) {
-  .ticket-cta a.buy.button { padding: 0.9rem 0.5rem; }
-}
-}
-
-.ticket-cta a.buy.button.external span.arrow { background-repeat: no-repeat; background-position: right center; background-size: 1.1rem auto; width: 1.1rem; height: 1.1rem; padding: 0px 1rem 0px 0.75rem; background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEUAAABFCAYAAAAcjSspAAAACXBIWXMAACxLAAAsSwGlPZapAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAHwSURBVHgB7dzNjdRAFEXhAyIAQrihDJFBKDcDQuhQmEzAV2IxEsO0f8p21bOP9Fb91Gp/tlre2HB3d7eyT08+F9fodcnyY5rfF5jv3CjbYB5w+o89HOYLd2/7MWfpwVhnusl85u6fbpR3enaf8vXvjJym+cn4x9EsTfOL5f8rZRPrQMqiiPUgJVHENpByKGIeSHYeXABFzAfJrimOIpaBJFMYRSwHSaYoilgHkkxBFLEeJJliKGIbSDKFUMR2kGSKoIg2IMkUQBHtQJIZHEW0BUlmYBTRHiSZQVHEPiDJDIgi9gNJZjAUsS9IMgOhiP1BkhkERRwDkswAKOI4kGQ6RxHHgiTTMYo4HiSZTlHEOSDJdIgizgNJpjMUcS5IMh2hiPNBkukERfQBkkwHKKIfkGRORhF9gSRzIoroDySZk1BEnyDJnIAi+gVJ5mAU0TdIMgeiiP5BkjkIRYwBkswBKGIckGR2RhFjgSSzI4oYDySZnVDEmCDJ7IAixgVJpjGKGBskmYYoYnyQZBqhiBogyTRAEXVAktmIImqBJLMBRdQDSWYliqgJkswKFFEXJJmFKKI2SDILUER9kGRmoohrgCQzA0VcBySZ/xzj20dwH9O8PPmi12m+sfDVGp32woyTm4WPrpQqV8jixPswlwL5A13AeIzlnlRMAAAAAElFTkSuQmCC") !important; }
-
-.ticket-cta a.buy.external span.arrow { background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC0AAAAsCAYAAADxRjE/AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDkuMS1jMDAxIDc5LmE4ZDQ3NTM0OSwgMjAyMy8wMy8yMy0xMzowNTo0NSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIDI0LjcgKFdpbmRvd3MpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjU5Mjc0MjQxM0MwMDExRUVBRkU0RjMyNTdDRDdGMzZFIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjU5Mjc0MjQyM0MwMDExRUVBRkU0RjMyNTdDRDdGMzZFIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6NTkyNzQyM0YzQzAwMTFFRUFGRTRGMzI1N0NEN0YzNkUiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6NTkyNzQyNDAzQzAwMTFFRUFGRTRGMzI1N0NEN0YzNkUiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz5ZMmR6AAABJklEQVR42uzY6w2CMBAA4JYwgBvICA7gD92AEdzAFbqJruAO7oGb4JVAQgzUPu5FwiXXQq6ELw0tSW3f92ZrUfvGWrtUO0HelTi95QUT7Ia7wExffFlZPry32tiXcfNNZTYYO3pHB8L61biy5R0gW+L3HyFdygPgtUbw59JAdqnb3uAVQmeBJdHZYCl0LLjTgk4BNxrQqWAjjc4Bi6JzwWLoErAIuhTMjsYAs6KxwGxoTDALGhtMjqYAk6KpwGRoSjAJmhqMjuYAo6K5wGhoTjAKmhtcjJYAF6GlwNloSXAWWhqcjNYATkJrAUejNYGj0NrAQXQ9DmgjMB/I69hzxHN2fR7793TeOxWckhkOnU2bpYXotIJD6F+4GvA/9ARXBZ6jvwIMAP0P/3GuekLQAAAAAElFTkSuQmCC"); background-repeat: no-repeat; background-position: right center; background-size: 0.75rem auto; width: 0.75rem; height: 0.75rem; padding: 0px 0px 0px 1.25rem; display: inline-block; }
-
-.ticket-cta .only-few-left { font-weight: 600; font-style: italic; display: block; text-transform: none; position: absolute; margin-top: 0.5rem; }
-
-.ticket-cta .sold-out { font-weight: 600; font-style: italic; display: block; text-transform: none; color: rgb(0, 0, 0); }
-
-.small-media-component { overflow: hidden; margin-top: var(--component-top-margin); padding: 0 var(--padding-relative); display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; grid-template-areas: "a a b b"; }
-
-.small-media-component .content { margin-top: 4rem; grid-area: a; }
-
-.small-media-component .content h2, .small-media-component .content h3, .small-media-component .content h4 { font-size: 2rem; line-height: 120%; margin: 0px; padding: 0px; text-decoration: none; text-transform: none; }
-
-.small-media-component .content .text { margin-top: 2rem; text-align: left; width: 90%; }
-
-.small-media-component .content .text p { margin: 0px 0px 2rem; }
-
-.small-media-component .content .text a:not(.tertiary) { text-decoration: underline; }
-
-.small-media-component .content .text a:hover { text-decoration: none; }
-
-.small-media-component .image { grid-area: b; margin-top: 8.5rem; text-align: right; }
-
-@media screen and (max-width: 834px) {
-  .small-media-component .image { text-align: left; }
-}
-
-.small-media-component .image picture { width: 50%; aspect-ratio: 1 / 1; overflow: hidden; grid-area: b; }
-
-@media screen and (max-width: 1024px) {
-  .small-media-component .image picture { width: 85%; }
-}
-
-@media screen and (max-width: 834px) {
-  .small-media-component .image picture { width: 75%; }
-}
-
-.small-media-component .image picture img { object-fit: cover; width: 100%; height: 100%; }
-
-.small-media-component.right-align { grid-template-areas: "a a c c"; }
-
-.small-media-component.right-align .image { grid-area: a; text-align: left; }
-
-.small-media-component.right-align .content { grid-area: c; }
-
-@media screen and (max-width: 834px) {
-  .small-media-component { margin-top: 4rem; display: flex; -webkit-box-orient: vertical; -webkit-box-direction: reverse; flex-direction: column-reverse; }
-  .small-media-component .content { display: flex; -webkit-box-orient: vertical; -webkit-box-direction: normal; flex-direction: column; }
-  .small-media-component .content .text { margin: 1rem 0px 0px 2rem; }
-}
-
-.small-media-component .tertiary:hover { text-decoration: none; }</style><style rel="stylesheet" type="text/css">@charset "utf-8";
-
-body { background-color: rgb(213, 154, 100); }
-
-footer.site-footer a { color: rgb(213, 154, 100) !important; }
-
-footer.site-footer .primary-nav li a { border-color: rgb(213, 154, 100) !important; }
-
-footer.site-footer .social-links ul li a:hover { border-left: 1px solid rgb(213, 154, 100) !important; }</style><style rel="stylesheet" type="text/css">@charset "utf-8";
-
-:root { --black: $black; --white: $white; }
-
-footer.site-footer { background: rgb(0, 0, 0); padding: var(--padding,2rem); margin-top: 14rem; min-height: 30rem; display: flex; -webkit-box-pack: justify; justify-content: space-between; position: relative; overflow-x: hidden; width: 100vw; z-index: 9999999; --padding: 4rem var(--padding-relative) 6rem; }
-
-@media screen and (max-width: 599px) {
-  footer.site-footer { --padding: 1rem var(--padding-relative); }
-}
-
-footer.site-footer .et-font { font-weight: 500; }
-
-footer.site-footer a { color: rgb(247, 238, 237); }
-
-footer.site-footer a:focus-visible { outline-color: rgb(247, 238, 237) !important; }
-
-footer.site-footer .footer-wrapper { display: grid; grid-template-columns: 2.5fr 3.75fr 1fr 1fr; grid-template-areas: "a b c d"; gap: 2rem; }
-
-@media screen and (max-width: 1024px) {
-  footer.site-footer .footer-wrapper { grid-template-columns: 2.5fr 3.75fr 1fr; grid-template-areas: "a b c"; }
-}
-
-@media screen and (max-width: 599px) {
-  footer.site-footer .footer-wrapper { display: flex; -webkit-box-orient: vertical; -webkit-box-direction: normal; flex-direction: column; }
-}
-
-footer.site-footer .footer-wrapper .et-logo-footer-wrapper { width: 210px; height: 210px; margin-left: -1.5rem; }
-
-@media screen and (max-width: 599px) {
-  footer.site-footer .footer-wrapper .et-logo-footer-wrapper { width: 138px; height: 138px; margin-left: -0.9rem; }
-}
-
-footer.site-footer .footer-wrapper .footer-et { grid-area: a; z-index: 99999; width: 210px; height: 210px; }
-
-@media screen and (max-width: 599px) {
-  footer.site-footer .footer-wrapper .footer-et { width: 138px; height: 138px; }
-}
-
-footer.site-footer .footer-wrapper nav.primary-nav { grid-area: b; font-size: 2.8rem; }
-
-@media screen and (max-width: 599px) {
-  footer.site-footer .footer-wrapper nav.primary-nav { margin-top: 0rem; }
-}
-
-footer.site-footer .footer-wrapper nav.primary-nav li a { text-decoration: underline; white-space: nowrap; }
-
-footer.site-footer .footer-wrapper nav.primary-nav li a:hover { border-bottom: 2px solid white; }
-
-@media screen and (max-width: 599px) {
-  footer.site-footer .footer-wrapper nav.primary-nav { font-size: 2.5rem; }
-}
-
-footer.site-footer .footer-wrapper nav.secondary-nav { grid-area: c; }
-
-@media screen and (max-width: 1024px) {
-  footer.site-footer .footer-wrapper nav.secondary-nav { grid-area: 2 / b; margin-top: 2rem; }
-  @media screen and (max-width: 1024px) {
-  footer.site-footer .footer-wrapper .footer-et { }
-  footer.site-footer .footer-wrapper nav.primary-nav { }
-  footer.site-footer .footer-wrapper nav.secondary-nav { }
-  footer.site-footer .footer-wrapper nav.secondary-nav { }
-}
-}
-
-footer.site-footer .footer-wrapper nav.secondary-nav li a { white-space: nowrap; }
-
-footer.site-footer .footer-wrapper nav.secondary-nav li a:hover { text-decoration: underline; }
-
-footer.site-footer .footer-wrapper nav ul { list-style: none; margin: 0px; padding: 0px; line-height: 1; }
-
-footer.site-footer .footer-wrapper nav ul li { margin-bottom: 1.5rem; }
-
-footer.site-footer .social-links { -webkit-box-ordinal-group: 3; order: 2; float: right; bottom: 0px; padding: 0px; margin-right: 0px; position: absolute; right: var(--padding-relative); }
-
-@media screen and (max-width: 599px) {
-  @supports (-webkit-touch-callout:none) {
-  footer.site-footer .social-links { right: 2rem; }
-}
-}
-
-footer.site-footer .social-links ul { position: relative; white-space: nowrap; padding: 0px; margin: 0px; display: flex; -webkit-box-orient: horizontal; -webkit-box-direction: normal; flex-direction: row; transform: scale(-1); -webkit-writing-mode: vertical-lr; writing-mode: vertical-lr; }
-
-footer.site-footer .social-links ul li { display: flex; margin-right: 0px; margin-top: 2rem; }
-
-footer.site-footer .social-links ul li a { border-left: 1px solid transparent !important; }
-
-body.osx .social-links { right: 2.5rem !important; }</style><style rel="stylesheet" type="text/css">@charset "utf-8";
-
-.menu-toggle span::after { border-bottom-color: rgb(213, 154, 100) !important; }</style>
-    
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="profile" href="https://gmpg.org/xfn/11">
 
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
-<link rel="alternate" href="https://espoonteatteri.fi/ohjelmisto/legend-of-harri-kala/" hreflang="fi">
-<link rel="alternate" href="https://espoonteatteri.fi/en/programme/legend-of-harri-kala/" hreflang="en">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' />
+<link rel="alternate" href="https://espoonteatteri.fi/ohjelmisto/legend-of-harri-kala/" hreflang="fi" />
+<link rel="alternate" href="https://espoonteatteri.fi/en/programme/legend-of-harri-kala/" hreflang="en" />
 
 	<!-- This site is optimized with the Yoast SEO plugin v28.7 - https://yoast.com/product/yoast-seo-wordpress/ -->
 	<title>Legend of Harri Kala | Espoonteatteri</title>
-	<meta name="description" content="Muinainen kalalegenda herää henkiin – Legend of Harri Kala yhdistää teatterin, pelaamisen ja suullisen tarinankerronnan. &amp;Louhi 9.10.–22.10.2026">
-	<link rel="canonical" href="https://espoonteatteri.fi/ohjelmisto/legend-of-harri-kala/">
-	<meta property="og:locale" content="fi_FI">
-	<meta property="og:locale:alternate" content="en_US">
-	<meta property="og:type" content="article">
-	<meta property="og:title" content="Legend of Harri Kala | Espoonteatteri">
-	<meta property="og:description" content="Muinainen kalalegenda herää henkiin – Legend of Harri Kala yhdistää teatterin, pelaamisen ja suullisen tarinankerronnan. &amp;Louhi 9.10.–22.10.2026">
-	<meta property="og:url" content="https://espoonteatteri.fi/ohjelmisto/legend-of-harri-kala/">
-	<meta property="og:site_name" content="Espoonteatteri">
-	<meta property="article:publisher" content="https://www.facebook.com/espoonteatteri/">
-	<meta property="article:modified_time" content="2026-10-15T09:43:12+00:00">
-	<meta name="twitter:card" content="summary_large_image">
-	<meta name="twitter:site" content="@espoonteatteri">
+	<meta name="description" content="Muinainen kalalegenda herää henkiin – Legend of Harri Kala yhdistää teatterin, pelaamisen ja suullisen tarinankerronnan. &amp;Louhi 9.10.–22.10.2026" />
+	<link rel="canonical" href="https://espoonteatteri.fi/ohjelmisto/legend-of-harri-kala/" />
+	<meta property="og:locale" content="fi_FI" />
+	<meta property="og:locale:alternate" content="en_US" />
+	<meta property="og:type" content="article" />
+	<meta property="og:title" content="Legend of Harri Kala | Espoonteatteri" />
+	<meta property="og:description" content="Muinainen kalalegenda herää henkiin – Legend of Harri Kala yhdistää teatterin, pelaamisen ja suullisen tarinankerronnan. &amp;Louhi 9.10.–22.10.2026" />
+	<meta property="og:url" content="https://espoonteatteri.fi/ohjelmisto/legend-of-harri-kala/" />
+	<meta property="og:site_name" content="Espoonteatteri" />
+	<meta property="article:publisher" content="https://www.facebook.com/espoonteatteri/" />
+	<meta property="article:modified_time" content="2026-10-15T09:43:12+00:00" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:site" content="@espoonteatteri" />
 	<script type="application/ld+json" class="yoast-schema-graph">{"@context":"https:\/\/schema.org","@graph":[{"@type":"WebPage","@id":"https:\/\/espoonteatteri.fi\/ohjelmisto\/legend-of-harri-kala\/","url":"https:\/\/espoonteatteri.fi\/ohjelmisto\/legend-of-harri-kala\/","name":"Legend of Harri Kala | Espoonteatteri","isPartOf":{"@id":"https:\/\/espoonteatteri.fi\/#website"},"datePublished":"2026-02-26T07:41:07+00:00","dateModified":"2026-10-15T09:43:12+00:00","description":"Muinainen kalalegenda herää henkiin – Legend of Harri Kala yhdistää teatterin, pelaamisen ja suullisen tarinankerronnan. &Louhi 9.10.–22.10.2026","breadcrumb":{"@id":"https:\/\/espoonteatteri.fi\/ohjelmisto\/legend-of-harri-kala\/#breadcrumb"},"inLanguage":"fi","potentialAction":[{"@type":"ReadAction","target":["https:\/\/espoonteatteri.fi\/ohjelmisto\/legend-of-harri-kala\/"]}]},{"@type":"BreadcrumbList","@id":"https:\/\/espoonteatteri.fi\/ohjelmisto\/legend-of-harri-kala\/#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https:\/\/espoonteatteri.fi\/"},{"@type":"ListItem","position":2,"name":"Esitykset","item":"https:\/\/espoonteatteri.fi\/ohjelmisto\/"},{"@type":"ListItem","position":3,"name":"Legend of Harri Kala"}]},{"@type":"WebSite","@id":"https:\/\/espoonteatteri.fi\/#website","url":"https:\/\/espoonteatteri.fi\/","name":"Espoon Teatteri","description":"","potentialAction":[{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https:\/\/espoonteatteri.fi\/?s={search_term_string}"},"query-input":{"@type":"PropertyValueSpecification","valueRequired":true,"valueName":"search_term_string"}}],"inLanguage":"fi"}]}</script>
 	<!-- / Yoast SEO plugin. -->
 
 
-<link rel="alternate" title="oEmbed (JSON)" type="application/json+oembed" href="https://espoonteatteri.fi/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fespoonteatteri.fi%2Fohjelmisto%2Flegend-of-harri-kala%2F">
-<link rel="alternate" title="oEmbed (XML)" type="text/xml+oembed" href="https://espoonteatteri.fi/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fespoonteatteri.fi%2Fohjelmisto%2Flegend-of-harri-kala%2F&amp;format=xml">
+<link rel="alternate" title="oEmbed (JSON)" type="application/json+oembed" href="https://espoonteatteri.fi/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fespoonteatteri.fi%2Fohjelmisto%2Flegend-of-harri-kala%2F" />
+<link rel="alternate" title="oEmbed (XML)" type="text/xml+oembed" href="https://espoonteatteri.fi/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fespoonteatteri.fi%2Fohjelmisto%2Flegend-of-harri-kala%2F&#038;format=xml" />
+<style id="wp-img-auto-sizes-contain-inline-css">
+img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
+/*# sourceURL=wp-img-auto-sizes-contain-inline-css */
+</style>
 
+<style id="global-styles-inline-css">
+:root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--4-3: 4/3;--wp--preset--aspect-ratio--3-4: 3/4;--wp--preset--aspect-ratio--3-2: 3/2;--wp--preset--aspect-ratio--2-3: 2/3;--wp--preset--aspect-ratio--16-9: 16/9;--wp--preset--aspect-ratio--9-16: 9/16;--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgb(6,147,227) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgb(252,185,0) 0%,rgb(255,105,0) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgb(255,105,0) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgb(255, 255, 255), 6px 6px rgb(0, 0, 0);--wp--preset--shadow--crisp: 6px 6px 0px rgb(0, 0, 0);}.wp-block-button{--wp--preset--dimension--25: 25%;--wp--preset--dimension--50: 50%;--wp--preset--dimension--75: 75%;--wp--preset--dimension--100: 100%;}:where(body) { margin: 0; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}body{padding-top: 0px;padding-right: 0px;padding-bottom: 0px;padding-left: 0px;}:root :where(.wp-element-button, .wp-block-button__link){background-color: #32373c;border-width: 0;color: #fff;font-family: inherit;font-size: inherit;font-style: inherit;font-weight: inherit;letter-spacing: inherit;line-height: inherit;padding-top: calc(0.667em + 2px);padding-right: calc(1.333em + 2px);padding-bottom: calc(0.667em + 2px);padding-left: calc(1.333em + 2px);text-decoration: none;text-transform: inherit;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+/*# sourceURL=global-styles-inline-css */
+</style>
 
-
-
-<link rel="stylesheet" id="cookie-law-info-css" href="https://espoonteatteri.fi/wp-content/plugins/webtoffee-gdpr-cookie-consent/public/css/cookie-law-info-public.css?ver=2.5.0" media="all">
-<link rel="stylesheet" id="cookie-law-info-gdpr-css" href="https://espoonteatteri.fi/wp-content/plugins/webtoffee-gdpr-cookie-consent/public/css/cookie-law-info-gdpr.css?ver=2.5.0" media="all">
-
-<link rel="stylesheet" id="et-style-css" href="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/style.css?ver=1.0.0" media="all">
-<link rel="stylesheet" id="et-animate-style-css" href="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/css/animate.css?ver=20250130060907" media="all">
-<link rel="stylesheet" id="et-event-atf-style-css" href="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/css/event-atf.css?ver=20250130060907" media="all">
-
+<link rel='stylesheet' id='cookie-law-info-css' href='https://espoonteatteri.fi/wp-content/plugins/webtoffee-gdpr-cookie-consent/public/css/cookie-law-info-public.css?ver=2.5.0' media='all' />
+<link rel='stylesheet' id='cookie-law-info-gdpr-css' href='https://espoonteatteri.fi/wp-content/plugins/webtoffee-gdpr-cookie-consent/public/css/cookie-law-info-gdpr.css?ver=2.5.0' media='all' />
+<style id="cookie-law-info-gdpr-inline-css">
+.cli-modal-content, .cli-tab-content { background-color: #ffffff; }.cli-privacy-content-text, .cli-modal .cli-modal-dialog, .cli-tab-container p, a.cli-privacy-readmore { color: #000000; }.cli-tab-header { background-color: #f2f2f2; }.cli-tab-header, .cli-tab-header a.cli-nav-link,span.cli-necessary-caption,.cli-switch .cli-slider:after { color: #000000; }.cli-switch .cli-slider:before { background-color: #ffffff; }.cli-switch input:checked + .cli-slider:before { background-color: #ffffff; }.cli-switch .cli-slider { background-color: #e3e1e8; }.cli-switch input:checked + .cli-slider { background-color: #28a745; }.cli-modal-close svg { fill: #000000; }.cli-tab-footer .wt-cli-privacy-accept-all-btn { background-color: #00acad; color: #ffffff}.cli-tab-footer .wt-cli-privacy-accept-btn { background-color: #00acad; color: #ffffff}.cli-tab-header a:before{ border-right: 1px solid #000000; border-bottom: 1px solid #000000; }
+/*# sourceURL=cookie-law-info-gdpr-inline-css */
+</style>
+<link rel='stylesheet' id='et-style-css' href='https://espoonteatteri.fi/wp-content/themes/espoonteatteri/style.css?ver=1.0.0' media='all' />
+<link rel='stylesheet' id='et-animate-style-css' href='https://espoonteatteri.fi/wp-content/themes/espoonteatteri/css/animate.css?ver=20250130060907' media='all' />
+<link rel='stylesheet' id='et-event-atf-style-css' href='https://espoonteatteri.fi/wp-content/themes/espoonteatteri/css/event-atf.css?ver=20250130060907' media='all' />
+<style   data-wpacu-inline-css-file='1'>
+:root{--black:$black;--white:$white}body.osx .ticket-cta a.buy.button{padding:0.9rem 0.5rem 0.5rem}.ticket-cta{position:relative;text-transform:uppercase;text-align:left}.ticket-cta a.buy{overflow:hidden;position:relative;color:#000;white-space:nowrap;text-decoration:none!important;font-weight:800;display:inline-block;-webkit-box-align:center;-ms-flex-align:center;align-items:center;line-height:1}.ticket-cta a.buy .wrapper{display:inline-block;max-width:20rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ticket-cta a.buy.button{border:2px solid #000;padding:0.9rem 0.5rem 0.3rem;font-size:1.5rem;font-weight:500}@media screen and (max-width:834px){@supports (-webkit-touch-callout:none){.ticket-cta a.buy.button{padding:0.9rem 0.5rem 0.9rem}}}.ticket-cta a.buy.button.external span.arrow{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEUAAABFCAYAAAAcjSspAAAACXBIWXMAACxLAAAsSwGlPZapAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAHwSURBVHgB7dzNjdRAFEXhAyIAQrihDJFBKDcDQuhQmEzAV2IxEsO0f8p21bOP9Fb91Gp/tlre2HB3d7eyT08+F9fodcnyY5rfF5jv3CjbYB5w+o89HOYLd2/7MWfpwVhnusl85u6fbpR3enaf8vXvjJym+cn4x9EsTfOL5f8rZRPrQMqiiPUgJVHENpByKGIeSHYeXABFzAfJrimOIpaBJFMYRSwHSaYoilgHkkxBFLEeJJliKGIbSDKFUMR2kGSKoIg2IMkUQBHtQJIZHEW0BUlmYBTRHiSZQVHEPiDJDIgi9gNJZjAUsS9IMgOhiP1BkhkERRwDkswAKOI4kGQ6RxHHgiTTMYo4HiSZTlHEOSDJdIgizgNJpjMUcS5IMh2hiPNBkukERfQBkkwHKKIfkGRORhF9gSRzIoroDySZk1BEnyDJnIAi+gVJ5mAU0TdIMgeiiP5BkjkIRYwBkswBKGIckGR2RhFjgSSzI4oYDySZnVDEmCDJ7IAixgVJpjGKGBskmYYoYnyQZBqhiBogyTRAEXVAktmIImqBJLMBRdQDSWYliqgJkswKFFEXJJmFKKI2SDILUER9kGRmoohrgCQzA0VcBySZ/xzj20dwH9O8PPmi12m+sfDVGp32woyTm4WPrpQqV8jixPswlwL5A13AeIzlnlRMAAAAAElFTkSuQmCC)!important;background-repeat:no-repeat;background-position:center right;background-size:1.1rem auto;width:1.1rem;height:1.1rem;padding:0 1rem 0 0.75rem}.ticket-cta a.buy.external span.arrow{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC0AAAAsCAYAAADxRjE/AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDkuMS1jMDAxIDc5LmE4ZDQ3NTM0OSwgMjAyMy8wMy8yMy0xMzowNTo0NSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIDI0LjcgKFdpbmRvd3MpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjU5Mjc0MjQxM0MwMDExRUVBRkU0RjMyNTdDRDdGMzZFIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjU5Mjc0MjQyM0MwMDExRUVBRkU0RjMyNTdDRDdGMzZFIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6NTkyNzQyM0YzQzAwMTFFRUFGRTRGMzI1N0NEN0YzNkUiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6NTkyNzQyNDAzQzAwMTFFRUFGRTRGMzI1N0NEN0YzNkUiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz5ZMmR6AAABJklEQVR42uzY6w2CMBAA4JYwgBvICA7gD92AEdzAFbqJruAO7oGb4JVAQgzUPu5FwiXXQq6ELw0tSW3f92ZrUfvGWrtUO0HelTi95QUT7Ia7wExffFlZPry32tiXcfNNZTYYO3pHB8L61biy5R0gW+L3HyFdygPgtUbw59JAdqnb3uAVQmeBJdHZYCl0LLjTgk4BNxrQqWAjjc4Bi6JzwWLoErAIuhTMjsYAs6KxwGxoTDALGhtMjqYAk6KpwGRoSjAJmhqMjuYAo6K5wGhoTjAKmhtcjJYAF6GlwNloSXAWWhqcjNYATkJrAUejNYGj0NrAQXQ9DmgjMB/I69hzxHN2fR7793TeOxWckhkOnU2bpYXotIJD6F+4GvA/9ARXBZ6jvwIMAP0P/3GuekLQAAAAAElFTkSuQmCC);background-repeat:no-repeat;background-position:center right;background-size:0.75rem auto;width:0.75rem;height:0.75rem;padding:0 0 0 1.25rem;display:inline-block}.ticket-cta .only-few-left{font-weight:600;font-style:italic;display:block;text-transform:none;position:absolute;margin-top:0.5rem}.ticket-cta .sold-out{font-weight:600;font-style:italic;display:block;text-transform:none;color:#000}.small-media-component{overflow:hidden;margin-top:var(--component-top-margin);padding:0 var(--padding-relative);display:-ms-grid;display:grid;-ms-grid-columns:1fr 1fr 1fr 1fr;grid-template-columns:1fr 1fr 1fr 1fr;grid-template-areas:"a a b b"}.small-media-component .content{-ms-grid-row:1;-ms-grid-column:1;-ms-grid-column-span:2;margin-top:4rem;grid-area:a}.small-media-component .content h2,.small-media-component .content h3,.small-media-component .content h4{font-size:2rem;line-height:120%;margin:0;padding:0;text-decoration:none;text-transform:none}.small-media-component .content .text{margin-top:2rem;text-align:left;width:90%}.small-media-component .content .text p{margin:0 0 2rem 0}.small-media-component .content .text a:not(.tertiary){text-decoration:underline}.small-media-component .content .text a:hover{text-decoration:none}.small-media-component .image{-ms-grid-row:1;-ms-grid-column:3;-ms-grid-column-span:2;grid-area:b;margin-top:8.5rem;text-align:right}@media screen and (max-width:834px){.small-media-component .image{text-align:left}}.small-media-component .image picture{-ms-grid-row:1;-ms-grid-column:3;-ms-grid-column-span:2;width:50%;aspect-ratio:1;overflow:hidden;grid-area:b}@media screen and (max-width:1024px){.small-media-component .image picture{width:85%}}@media screen and (max-width:834px){.small-media-component .image picture{width:75%}}.small-media-component .image picture img{-o-object-fit:cover;object-fit:cover;width:100%;height:100%}.small-media-component.right-align{grid-template-areas:"a a c c"}.small-media-component.right-align .image{-ms-grid-row:1;-ms-grid-column:1;-ms-grid-column-span:2;grid-area:a;text-align:left}.small-media-component.right-align .content{-ms-grid-row:1;-ms-grid-column:3;-ms-grid-column-span:2;grid-area:c}@media screen and (max-width:834px){.small-media-component{margin-top:4rem;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse}.small-media-component .content{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;-ms-flex-direction:column;flex-direction:column}.small-media-component .content .text{margin:1rem 0 0 2rem}}.small-media-component .tertiary:hover{text-decoration:none}
+</style>
 <script id="et-js-variables-js-before">
 var jsVars = {"menuText":"Valikko","closeText":"Sulje","showMoreText":"N\u00e4yt\u00e4 lis\u00e4\u00e4","clearInput":"Tyhjenn\u00e4 kentt\u00e4","ajaxurl":"https:\/\/espoonteatteri.fi\/wp-admin\/admin-ajax.php"}
 //# sourceURL=et-js-variables-js-before
@@ -370,31 +63,45 @@ var iabConfig = {"status":"1","baseUrl":"https://espoonteatteri.fi/wp-content/up
 var iabTranslations = {"storageDisclosures":{"title":"Laitteen s\u00e4ilytystiedot","headers":{"name":"Nimi","type":"Tyyppi","duration":"Kesto","domain":"Verkkotunniste","purposes":"Tarkoitukset"}}};
 //# sourceURL=cli-iab-script-js-extra
 </script>
-<script id="cli-iab-script-js" src="https://espoonteatteri.fi/wp-content/plugins/webtoffee-gdpr-cookie-consent/public/modules/iab-tcf/assets/js/script.min.js?ver=2.5.0"></script>
-<script id="jquery-js" src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/js/dist/jquery-3.6.4.min.js?ver=20251212064325"></script>
+<script   id="cli-iab-script-js" src="https://espoonteatteri.fi/wp-content/plugins/webtoffee-gdpr-cookie-consent/public/modules/iab-tcf/assets/js/script.min.js?ver=2.5.0"></script>
+<script   id="jquery-js" src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/js/dist/jquery-3.6.4.min.js?ver=20251212064325"></script>
 <script id="cookie-law-info-js-extra">
 var Cli_Data = {"nn_cookie_ids":["cX_G","_hjAbsoluteSessionInProgress","pll_language","uid","_fbp","_hjSession_*","_hjFirstSeen","_hjSessionUser_*","cX_P","_ga","uuid2","_ga_*","test_cookie","IDE","_wpfuuid","_pctx","CookieLawInfoConsent","viewed_cookie_policy","_cookie_test","C","gckp","_hjIncludedInSessionSample_810557","_pcid"],"non_necessary_cookies":{"necessary":["cookielawinfo-checkbox-necessary","cookielawinfo-checkbox-functional","cookielawinfo-checkbox-performance","cookielawinfo-checkbox-analytics","cookielawinfo-checkbox-advertisement","cookielawinfo-checkbox-others","_wpfuuid","viewed_cookie_policy","CookieLawInfoConsent"],"functional":["pll_language","_hjAbsoluteSessionInProgress","cX_G"],"analytics":["_ga","cX_P","_hjSessionUser_*","_hjFirstSeen","_hjSession_*","_fbp","uid","_ga_*"],"advertisement":["IDE","test_cookie","uuid2"],"others":["_pctx","_pcid","_hjIncludedInSessionSample_810557","gckp","C","_cookie_test"]},"cookielist":{"necessary":{"id":585,"status":true,"priority":0,"title":"Necessary","strict":true,"default_state":false,"ccpa_optout":false,"loadonstart":false},"functional":{"id":587,"status":true,"priority":5,"title":"Functional","strict":false,"default_state":false,"ccpa_optout":false,"loadonstart":false},"performance":{"id":589,"status":true,"priority":4,"title":"Performance","strict":false,"default_state":false,"ccpa_optout":false,"loadonstart":false},"analytics":{"id":591,"status":true,"priority":3,"title":"Analytics FI","strict":false,"default_state":false,"ccpa_optout":false,"loadonstart":false},"advertisement":{"id":593,"status":true,"priority":2,"title":"Advertisement","strict":false,"default_state":false,"ccpa_optout":false,"loadonstart":false},"others":{"id":595,"status":true,"priority":1,"title":"Others","strict":false,"default_state":false,"ccpa_optout":false,"loadonstart":false}},"ajax_url":"https://espoonteatteri.fi/wp-admin/admin-ajax.php","current_lang":"fi","security":"3cc811098d","eu_countries":["GB"],"geoIP":"enabled","use_custom_geolocation_api":"","custom_geolocation_api":"https://geoip.cookieyes.com/geoip/checker/result.php","consentVersion":"1","strictlyEnabled":["necessary","obligatoire"],"cookieDomain":"","privacy_length":"250","ccpaEnabled":"","ccpaRegionBased":"","ccpaBarEnabled":"","ccpaType":"gdpr","triggerDomRefresh":"","secure_cookies":""};
 var log_object = {"ajax_url":"https://espoonteatteri.fi/wp-admin/admin-ajax.php"};
 //# sourceURL=cookie-law-info-js-extra
 </script>
-<script id="cookie-law-info-js" src="https://espoonteatteri.fi/wp-content/plugins/webtoffee-gdpr-cookie-consent/public/js/cookie-law-info-public.js?ver=2.5.0"></script>
-<script id="et-lettering-js-js" src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/js/dist/jquery.lettering.min.js?ver=20251212064325"></script>
-<script id="et-textillate-js-js" src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/js/dist/jquery.textillate.min.js?ver=20251212064325"></script>
-<link rel="https://api.w.org/" href="https://espoonteatteri.fi/wp-json/"><link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://espoonteatteri.fi/xmlrpc.php?rsd">
-<meta name="generator" content="WordPress 7.1.3">
-<link rel="shortlink" href="https://espoonteatteri.fi/?p=11427">
+<script   id="cookie-law-info-js" src="https://espoonteatteri.fi/wp-content/plugins/webtoffee-gdpr-cookie-consent/public/js/cookie-law-info-public.js?ver=2.5.0"></script>
+<script   id="et-lettering-js-js" src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/js/dist/jquery.lettering.min.js?ver=20251212064325"></script>
+<script   id="et-textillate-js-js" src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/js/dist/jquery.textillate.min.js?ver=20251212064325"></script>
+<link rel="https://api.w.org/" href="https://espoonteatteri.fi/wp-json/" /><link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://espoonteatteri.fi/xmlrpc.php?rsd" />
+<meta name="generator" content="WordPress 7.1.3" />
+<link rel='shortlink' href='https://espoonteatteri.fi/?p=11427' />
 <!-- Google Tag Manager -->
-<script type="text/plain" data-cli-class="cli-blocker-script" data-cli-category="analytics" data-cli-script-type="analytics" data-cli-block="true" data-cli-block-if-ccpa-optout="false" data-cli-element-position="head">(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+<script type="text/plain" data-cli-class="cli-blocker-script"  data-cli-category="analytics" data-cli-script-type="analytics" data-cli-block="true" data-cli-block-if-ccpa-optout="false" data-cli-element-position="head">(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','GTM-T2LFLTDC');</script>
 <!-- End Google Tag Manager -->
-            
-        
-<link rel="stylesheet" id="et-dimbox-style-css" href="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/css/dimbox.css?ver=20250130060907" media="all">
-<link rel="stylesheet" id="et-event-style-css" href="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/css/event.css?ver=20250130060907" media="all">
-<link rel="stylesheet" id="cookie-law-info-table-css" href="https://espoonteatteri.fi/wp-content/plugins/webtoffee-gdpr-cookie-consent/public/css/cookie-law-info-table.css?ver=2.5.0" media="all">
+            <style>
+                body {
+                    background-color: #d59a64;
+                }
+
+                footer.site-footer a {
+                    color: #d59a64 !important;
+                }
+
+                footer.site-footer .primary-nav li a {border-color: #d59a64 !important;}
+                
+                footer.site-footer .social-links ul li a:hover {border-left: 1px solid #d59a64 !important;}
+            </style>
+        <style   data-wpacu-inline-css-file='1'>
+:root{--black:$black;--white:$white}footer.site-footer{background:#000;padding:var(--padding,2rem);margin-top:14rem;min-height:30rem;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between;position:relative;overflow-x:hidden;width:100vw;z-index:9999999;--padding:4rem var(--padding-relative) 6rem}@media screen and (max-width:599px){footer.site-footer{--padding:1rem var(--padding-relative)}}footer.site-footer .et-font{font-weight:500}footer.site-footer a{color:#f7eeed}footer.site-footer a:focus-visible{outline-color:#f7eeed!important}footer.site-footer .footer-wrapper{display:-ms-grid;display:grid;-ms-grid-columns:2.5fr 2rem 3.75fr 2rem 1fr 2rem 1fr;grid-template-columns:2.5fr 3.75fr 1fr 1fr;grid-template-areas:"a b c d";grid-gap:2rem}@media screen and (max-width:1024px){footer.site-footer .footer-wrapper{-ms-grid-columns:2.5fr 2rem 3.75fr 2rem 1fr;grid-template-columns:2.5fr 3.75fr 1fr;grid-template-areas:"a b c"}}@media screen and (max-width:599px){footer.site-footer .footer-wrapper{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;-ms-flex-direction:column;flex-direction:column}}footer.site-footer .footer-wrapper .et-logo-footer-wrapper{width:210px;height:210px;margin-left:-1.5rem}@media screen and (max-width:599px){footer.site-footer .footer-wrapper .et-logo-footer-wrapper{width:138px;height:138px;margin-left:-0.9rem}}footer.site-footer .footer-wrapper .footer-et{-ms-grid-row:1;-ms-grid-column:1;grid-area:a;z-index:99999;width:210px;height:210px}@media screen and (max-width:599px){footer.site-footer .footer-wrapper .footer-et{width:138px;height:138px}}footer.site-footer .footer-wrapper nav.primary-nav{-ms-grid-row:1;-ms-grid-column:3;grid-area:b;font-size:2.8rem}@media screen and (max-width:599px){footer.site-footer .footer-wrapper nav.primary-nav{margin-top:0rem}}footer.site-footer .footer-wrapper nav.primary-nav li a{text-decoration:underline;white-space:nowrap}footer.site-footer .footer-wrapper nav.primary-nav li a:hover{border-bottom:2px solid white}@media screen and (max-width:599px){footer.site-footer .footer-wrapper nav.primary-nav{font-size:2.5rem}}footer.site-footer .footer-wrapper nav.secondary-nav{-ms-grid-row:1;-ms-grid-column:5;grid-area:c}@media screen and (max-width:1024px){footer.site-footer .footer-wrapper nav.secondary-nav{-ms-grid-row:1;-ms-grid-column:3;grid-area:b;-ms-grid-row:2;grid-row:2;margin-top:2rem}@media screen and (max-width:1024px){footer.site-footer .footer-wrapper .footer-et{-ms-grid-row:1;-ms-grid-column:1}footer.site-footer .footer-wrapper nav.primary-nav{-ms-grid-row:1;-ms-grid-column:3}footer.site-footer .footer-wrapper nav.secondary-nav{-ms-grid-row:1;-ms-grid-column:5}footer.site-footer .footer-wrapper nav.secondary-nav{-ms-grid-row:1;-ms-grid-column:3}}}footer.site-footer .footer-wrapper nav.secondary-nav li a{white-space:nowrap}footer.site-footer .footer-wrapper nav.secondary-nav li a:hover{text-decoration:underline}footer.site-footer .footer-wrapper nav ul{list-style:none;margin:0;padding:0;line-height:1}footer.site-footer .footer-wrapper nav ul li{margin-bottom:1.5rem}footer.site-footer .social-links{-webkit-box-ordinal-group:3;-ms-flex-order:2;order:2;float:right;bottom:0;padding:0;margin-right:0;position:absolute;right:var(--padding-relative)}@media screen and (max-width:599px){@supports (-webkit-touch-callout:none){footer.site-footer .social-links{right:2rem}}}footer.site-footer .social-links ul{position:relative;white-space:nowrap;padding:0;margin:0;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:horizontal;-webkit-box-direction:normal;-ms-flex-direction:row;flex-direction:row;-webkit-transform:scale(-1);transform:scale(-1);-webkit-writing-mode:vertical-lr;-ms-writing-mode:tb-lr;writing-mode:vertical-lr}footer.site-footer .social-links ul li{display:-webkit-box;display:-ms-flexbox;display:flex;margin-right:0;margin-top:2rem}footer.site-footer .social-links ul li a{border-left:1px solid transparent!important}body.osx .social-links{right:2.5rem!important}
+</style>
+<link rel='stylesheet' id='et-dimbox-style-css' href='https://espoonteatteri.fi/wp-content/themes/espoonteatteri/css/dimbox.css?ver=20250130060907' media='all' />
+<link rel='stylesheet' id='et-event-style-css' href='https://espoonteatteri.fi/wp-content/themes/espoonteatteri/css/event.css?ver=20250130060907' media='all' />
+<link rel='stylesheet' id='cookie-law-info-table-css' href='https://espoonteatteri.fi/wp-content/plugins/webtoffee-gdpr-cookie-consent/public/css/cookie-law-info-table.css?ver=2.5.0' media='all' />
 
 </head>
 
@@ -402,11 +109,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <body class="wp-singular events-template-default single single-events postid-11427 wp-theme-espoonteatteri" style="background-color:#d59a64;" data-post-name="/ohjelmisto/legend-of-harri-kala/">
 
     
-    <a class="screen-reader-text" href="https://espoonteatteri.fi/ohjelmisto/legend-of-harri-kala/#skip-to-content">Skip to content</a>
+    <a class="screen-reader-text" href="#skip-to-content">Skip to content</a>
 
     <header id="site-header" class="">
         
-                    <a href="https://espoonteatteri.fi/" aria-label="Etusivu" data-primary="1" id="et-logo" data-et-logo="" class="the-logo-et " data-key="23"><div style="position: relative; width: 100%; height: 100%; overflow: hidden; pointer-events: auto;"><div style="width: 100%; height: 100%;"><canvas data-engine="three.js r173" width="1905" height="150" style="display: block; width: 1905px; height: 150px;"></canvas></div></div></a>
+                    <a href="https://espoonteatteri.fi/" aria-label="Etusivu" data-primary="1" id="et-logo" data-et-logo class="the-logo-et " data-key="23"></a>
 
         
         <div id="header-actions-wrapper">
@@ -426,7 +133,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 </ul>
             <div id="menu-toggle-wrapper">
                 <button class="menu-toggle closed" aria-controls="main-menu" aria-expanded="false" style="color: #d59a64;">
-                    
+                    <style>
+                        .menu-toggle span:after {
+                            border-bottom-color: #d59a64 !important;
+                        }
+                    </style>
                     <div id="menu-styles" aria-hidden="true"></div>
                     <span>Valikko</span>
                 </button>
@@ -438,11 +149,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <div id="main-menu-wrapper">
         <nav id="site-navigation" class="main-navigation">
 
-            <ul id="main-menu"><li class=""><span class="description">Tyypit ja tarinat &amp;:n takana</span><a class="tlt-menu-item" href="https://espoonteatteri.fi/meista/" tabindex="-1">Meistä</a></li><li class=""><span class="description">Yllättävää esittävää taidetta ympäri maailman</span><a class="tlt-menu-item" href="https://espoonteatteri.fi/ohjelmisto/" tabindex="-1">Ohjelmisto</a></li><li class=""><span class="description">Sujuvan vierailun ainekset</span><a class="tlt-menu-item" href="https://espoonteatteri.fi/palvelut/" tabindex="-1">Palvelut</a></li><li class=""><span class="description"><span class="et-font" aria-hidden="true">&amp;&amp;</span><span role="text" class="sr-only">Espoon teatteri</span>yhteisö ja muita juttuja, joista inspiroidumme</span><a class="tlt-menu-item" href="https://espoonteatteri.fi/rakastaa/" tabindex="-1">&amp;&amp; rakastaa</a></li><li class=""><span class="description">Mitä kehitämme teatterilla – ja sen ulkopuolella</span><a class="tlt-menu-item" href="https://espoonteatteri.fi/projektit/" tabindex="-1">Projektit</a></li></ul>
+            <ul id="main-menu"><li  class=""><span class="description">Tyypit ja tarinat &:n takana</span><a class="tlt-menu-item" href="https://espoonteatteri.fi/meista/">Meistä</a></li><li  class=""><span class="description">Yllättävää esittävää taidetta ympäri maailman</span><a class="tlt-menu-item" href="https://espoonteatteri.fi/ohjelmisto/">Ohjelmisto</a></li><li  class=""><span class="description">Sujuvan vierailun ainekset</span><a class="tlt-menu-item" href="https://espoonteatteri.fi/palvelut/">Palvelut</a></li><li  class=""><span class="description"><span class='et-font' aria-hidden='true'>&&</span><span role='text' class='sr-only'>Espoon teatteri</span>yhteisö ja muita juttuja, joista inspiroidumme</span><a class="tlt-menu-item" href="https://espoonteatteri.fi/rakastaa/">&#038;&#038; rakastaa</a></li><li  class=""><span class="description">Mitä kehitämme teatterilla – ja sen ulkopuolella</span><a class="tlt-menu-item" href="https://espoonteatteri.fi/projektit/">Projektit</a></li></ul>
             <ul id="search-menu">
                 <li>
                     <span class="description">Search and find</span>
-                    <a class="search" href="https://espoonteatteri.fi/haku/" aria-label="Haku" tabindex="-1">
+                    <a class="search" href="https://espoonteatteri.fi/haku/" aria-label="Haku">
                         <!--  -->
                     </a>
                 </li>
@@ -464,8 +175,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     
 <article class="event-content-page">
     <header class="entry-header">
-        <h1 class="tlt animated.delay-tlt" style="opacity: 1;"><span style="visibility: hidden;" class="a" aria-label="Legend of Harri Kala"><span class="word1" aria-hidden="true" aria-label="Legend" style="display: inline-block; transform: translate3d(0px, 0px, 0px);"><span class="char1 animated fadeInUp" aria-hidden="true" style="display: inline-block; visibility: visible;">L</span><span class="char2 animated fadeInUp" aria-hidden="true" style="display: inline-block; visibility: visible;">e</span><span class="char3 animated fadeInUp" aria-hidden="true" style="display: inline-block; visibility: visible;">g</span><span class="char4 animated fadeInUp" aria-hidden="true" style="display: inline-block; visibility: visible;">e</span><span class="char5 animated fadeInUp" aria-hidden="true" style="display: inline-block; visibility: visible;">n</span><span class="char6 animated fadeInUp" aria-hidden="true" style="display: inline-block; visibility: visible;">d</span></span> <span class="word2" aria-hidden="true" aria-label="of" style="display: inline-block; transform: translate3d(0px, 0px, 0px);"><span class="char1 animated fadeInUp" aria-hidden="true" style="display: inline-block; visibility: visible;">o</span><span class="char2 animated fadeInUp" aria-hidden="true" style="display: inline-block; visibility: visible;">f</span></span> <span class="word3" aria-hidden="true" aria-label="Harri" style="display: inline-block; transform: translate3d(0px, 0px, 0px);"><span class="char1 animated fadeInUp" aria-hidden="true" style="display: inline-block; visibility: visible;">H</span><span class="char2 animated fadeInUp" aria-hidden="true" style="display: inline-block; visibility: visible;">a</span><span class="char3 animated fadeInUp" aria-hidden="true" style="display: inline-block; visibility: visible;">r</span><span class="char4 animated fadeInUp" aria-hidden="true" style="display: inline-block; visibility: visible;">r</span><span class="char5 animated fadeInUp" aria-hidden="true" style="display: inline-block; visibility: visible;">i</span></span> <span class="word4" aria-hidden="true" aria-label="Kala" style="display: inline-block; transform: translate3d(0px, 0px, 0px);"><span class="char1" aria-hidden="true" style="display: inline-block; visibility: hidden;">K</span><span class="char2" aria-hidden="true" style="display: inline-block; visibility: hidden;">a</span><span class="char3" aria-hidden="true" style="display: inline-block; visibility: hidden;">l</span><span class="char4" aria-hidden="true" style="display: inline-block; visibility: hidden;">a</span></span> </span><ul class="texts" style="display: none;"><li class="current">Legend of Harri Kala</li></ul></h1>
-        <span class="event-date-range tlt-anim active">9.10.<span class="date-separator"><span>-</span></span>22.10.</span>
+        <h1 class="tlt animated.delay-tlt">Legend of Harri Kala</h1>
+        <span class="event-date-range tlt-anim">9.10.<span class="date-separator"><span>-</span></span>22.10.</span>
     </header><!-- .entry-header -->
 
     
@@ -514,33 +225,33 @@ jQuery(function ($) {
 });
 
                     });
-                    </script>                                <div id="event-header-cta-wrapper"><div class="ticket-cta"><a href="https://espoonteatteri.lippu.fi/webshop/webticket/shop?production=338&amp;language=fi" class="buy  external button" target="_self"><span class="wrapper">Osta lippuja<span aria-hidden="true" class="arrow"></span></span></a></div></div>
+                    </script>                                <div id="event-header-cta-wrapper"></div>
             </div>
-            <div class="image-or-video  video tlt-anim" data-currentindex="0" data-count="0" data-name="name0">
-                <video autoplay="" loop="" muted="" playsinline="" class="desktop multiple-media"><source src="https://espoonteatteri.fi/wp-content/uploads/2026/02/LOHK_Website_1x1.mp4"></video><video autoplay="" loop="" muted="" playsinline="" class="mobile multiple-media"><source src="https://espoonteatteri.fi/wp-content/uploads/2026/02/LOHK_Trailer_4x5_NoText_NoDialogue_v01.mp4"></video><div class="gradient"></div><div class="video-controls"><div class="play-wrapper button-wrapper"><svg class="play video-control" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path fill-rule="evenodd" clip-rule="evenodd" d="M4.81494 3.33218L4.81494 17.5462L17.6842 10.4392L4.81494 3.33218ZM4.34617 0.999999L20 9.6448L20 11.2336L4.34616 19.8784L3 19.084L3 1.79438L4.34617 0.999999Z" fill="#d59a64"></path>
+            <div class="image-or-video  video tlt-anim">
+                <video autoplay loop muted playsinline class="desktop multiple-media"><source src="https://espoonteatteri.fi/wp-content/uploads/2026/02/LOHK_Website_1x1.mp4"></video><video autoplay loop muted playsinline class="mobile multiple-media"><source src="https://espoonteatteri.fi/wp-content/uploads/2026/02/LOHK_Trailer_4x5_NoText_NoDialogue_v01.mp4"></video><div class='gradient'></div><div class="video-controls"><div class='play-wrapper button-wrapper'><svg class='play video-control' width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'>
+    <path fill-rule='evenodd' clip-rule='evenodd' d='M4.81494 3.33218L4.81494 17.5462L17.6842 10.4392L4.81494 3.33218ZM4.34617 0.999999L20 9.6448L20 11.2336L4.34616 19.8784L3 19.084L3 1.79438L4.34617 0.999999Z' fill='#d59a64'/>
     </svg>
-    <span style="color: #d59a64;">Toista video</span></div><div class="pause-wrapper button-wrapper"><svg class="pause video-control" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M6 18V2H4L4 18H6ZM16 18L16 2H14L14 18H16Z" fill="#d59a64"></path>
-</svg><span style="color: #d59a64;">Pysäytä video</span></div></div>            </div>
+    <span style='color: #d59a64;'>Toista video</span></div><div class='pause-wrapper button-wrapper'><svg class='pause video-control' width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'>
+<path fill-rule='evenodd' clip-rule='evenodd' d='M6 18V2H4L4 18H6ZM16 18L16 2H14L14 18H16Z' fill='#d59a64'/>
+</svg><span style='color: #d59a64;'>Pysäytä video</span></div></div>            </div>
         </section>
 
-        <section class="event-details"><ul><li><strong>Näyttämö</strong><p><span class="et-font" aria-hidden="true">&amp;&amp;</span><span role="text" class="sr-only">Espoon teatteri</span>Louhi, Espoon kulttuurikeskus<br><a class=" tertiary" href="https://espoonteatteri.fi/louhi/" target="_self">Saapuminen ja palvelut</a></p></li><li><strong>Kieli</strong><p>englanti, ei tekstitystä</p></li><li><strong>Huomiot</strong><p>Ikäraja 18 v. pe 9.10., la 10.10. ja to 22.10. näytöksissä (baari auki esityksen ajan).<br>
-<br>
+        <section class="event-details"><ul><li><strong>Näyttämö</strong><p><span class='et-font' aria-hidden='true'>&&</span><span role='text' class='sr-only'>Espoon teatteri</span>Louhi, Espoon kulttuurikeskus<br/><a class=" tertiary" href="https://espoonteatteri.fi/louhi/" target="_self">Saapuminen ja palvelut</a></p></li><li><strong>Kieli</strong><p>englanti, ei tekstitystä</p></li><li><strong>Huomiot</strong><p>Ikäraja 18 v. pe 9.10., la 10.10. ja to 22.10. näytöksissä (baari auki esityksen ajan).<br />
+<br />
 Ikärajattomat näytökset ovat  ti 20.10. ja ke 21.10. </p></li></ul></section>
         <section class="about-the-event">
-            <div class="image"><picture><img src="https://espoonteatteri.fi/wp-content/uploads/2026/02/Harri-Kala-square.jpg" data-src="https://espoonteatteri.fi/wp-content/uploads/2026/02/Harri-Kala-square.jpg" alt="Teatterisalissa näyttämölle heijastettu kala. Näyttämöllä kaksi henkilöä valokeiloissa." loading="lazy"></picture></div><div class="text"><h2>Tietoa</h2><div aria-hidden="true" class="content e_idcea31deadab508" data-load-more-text="Näytä lisää" data-load-more-height="115" style="height: 115px;"><p>Jossakin Tapiolan kadonneiden metsien ja Itämeren syvyyksien välimaastossa myyttinen Harri Kala on herännyt henkiin. Lajiltaan hän on uhanalainen meriharjus, joka muinoin kukoisti Itämerellä, mutta on nyt kadonnut lähes kokonaan. Harri Kala ilmestyy tuomaan viestejä esivanhemmiltaan ja pohtimaan ihmisten kanssa vesien, maailman ja tulevaisuuden tilaa. Uusi seikkailu odottaa, ja yleisöllä on tärkeä rooli!</p>
+            <div class="image"><picture><img src="https://espoonteatteri.fi/wp-content/uploads/2026/02/Harri-Kala-square.jpg" data-src="https://espoonteatteri.fi/wp-content/uploads/2026/02/Harri-Kala-square.jpg" alt="Teatterisalissa näyttämölle heijastettu kala. Näyttämöllä kaksi henkilöä valokeiloissa." loading="lazy"></picture></div><div class="text"><h2>Tietoa</h2><div aria-hidden="true" class="content" data-load-more-text="Näytä lisää" data-load-more-height="115"><p>Jossakin Tapiolan kadonneiden metsien ja Itämeren syvyyksien välimaastossa myyttinen Harri Kala on herännyt henkiin. Lajiltaan hän on uhanalainen meriharjus, joka muinoin kukoisti Itämerellä, mutta on nyt kadonnut lähes kokonaan. Harri Kala ilmestyy tuomaan viestejä esivanhemmiltaan ja pohtimaan ihmisten kanssa vesien, maailman ja tulevaisuuden tilaa. Uusi seikkailu odottaa, ja yleisöllä on tärkeä rooli!</p>
 <p>Legend of Harri Kala on Harold Hejazin uusin teos, joka yhdistelee improvisaatioteatteria, tekoälyä ja monipelaamista. Esityksen ja pelattavan rituaalin yhdistelmä kutsuu astumaan Harriharri-universumiin, jossa yleisö muovaa peliä omaan tahtiinsa kuuntelemalla, puhumalla ja pelaamalla yhdessä. Esitys heijastelee suullisen tarinankerronnan perinnettä, joka vaikuttaa meitä ympäröivään maailmaan edelleen.</p>
 <p>Teos on palkitun Adventures of Harriharri -videopeliesityssarjan neljäs osa. Aiempia osia on esitetty Ateneumissa, Helsingin kaupunginteatterissa sekä ulkomailla Itävallassa, Ruotsissa ja Saksassa. Legend of Harri Kalassa Tapiola on osa esityksen maailmaa.</p>
 <p>Esitystä ovat tukeneet Espoon kaupunki, Taiteen edistämiskeskus, Suomen kulttuurirahasto ja Saastamoisen säätiö. </p>
-</div><button class="show-more tertiary b_idcea31deadab508">Näytä lisää</button></div>        </section>
+</div></div>        </section>
 
-        <section class="banner-component"><div class="heading"><h2>Auta pe­las­ta­maan Itämeri!</h2></div><div class="content"><p>Lahjoitamme ensi-iltalippujen tuotosta 50% John Nurmisen Säätiölle Itämeren suojeluun. Osallistu ostamalla liput ensi-iltaan tai lahjoita MobilePaylla numeroon 74792.</p><a href="https://espoonteatteri.fi/uutiset/auta-pelastamaan-itameri/" class="tertiary " target="_self">Lue lisää keräyksestä</a></div></section>
+        <section class="banner-component"><div class="heading"><h2>Auta pelastamaan Itämeri!</h2></div><div class="content"><p>Lahjoitamme ensi-iltalippujen tuotosta 50% John Nurmisen Säätiölle Itämeren suojeluun. Osallistu ostamalla liput ensi-iltaan tai lahjoita MobilePaylla numeroon 74792.</p><a href="https://espoonteatteri.fi/uutiset/auta-pelastamaan-itameri/" class="tertiary " target="_self">Lue lisää keräyksestä</a></div></section>
         
         <section class="separator-image">
             <picture><source srcset="https://espoonteatteri.fi/wp-content/uploads/2026/02/LOHK_Still_Shot_3_4x5_web.jpg" media="(max-width: 768px)"><img src="https://espoonteatteri.fi/wp-content/uploads/2026/02/LOHK_Still_Shot_3_16x9_web-scaled.jpg" data-src="https://espoonteatteri.fi/wp-content/uploads/2026/02/LOHK_Still_Shot_3_16x9_web-scaled.jpg" alt="Animoitu kuvituskuva muovikassista Itämeressä." loading="lazy"></picture>        </section>
 
-        <section class="event-team"><div><h2>Työ­ryh­mä</h2></div><div><table data-load-more-text="Näytä kaikki" data-load-more-rows="5" class="e_id7c33d7bad021a"><tbody><tr><th><h3> </h3></th><td>Harold Hejazi, Milla Millasnoore, magu, Rolands Tīss, Eliel Tammiharju, Jokke Heikkilä, Miika Kotila, Judit Vikman, Jukka Vikman, Adam Streicher </td></tr></tbody></table></div></section>
+        <section class="event-team"><div><h2>Työryhmä</h2></div><div><table data-load-more-text="Näytä kaikki" data-load-more-rows="5"><tr><th><h3> </h3></th><td>Harold Hejazi, Milla Millasnoore, magu, Rolands Tīss, Eliel Tammiharju, Jokke Heikkilä, Miika Kotila, Judit Vikman, Jukka Vikman, Adam Streicher </td></tr></table></div></section>
         <script>
                 document.addEventListener('DOMContentLoaded', function() {
                     var eventShowsId = 338;
@@ -570,45 +281,15 @@ jQuery(function ($) {
 });
 
                 });
-                </script>        <div id="event-shows-wrapper"><section class="event-performances"><span class="total">Yht. 3 näytöstä</span><table><tbody><tr><th class="">
-                    <div>
-                        <div>
-                            <div>
-                                <span class="date">ti 20.10.</span> <span class="time">19.00</span>
-                            </div>
-                            
-                        </div>
-                        <div class="ticket-cta"><a href="https://espoonteatteri.lippu.fi/webshop/webticket/shop?event=3086&amp;language=fi" class="buy  external button" target="_self"><span class="wrapper">Osta lippuja<span aria-hidden="true" class="arrow"></span></span></a></div>
-                    </div>
-                </th><td class="last"><div class="ticket-cta"><a href="https://espoonteatteri.lippu.fi/webshop/webticket/shop?event=3086&amp;language=fi" class="buy  external button" target="_self"><span class="wrapper">Osta lippuja<span aria-hidden="true" class="arrow"></span></span></a></div></td></tr><tr><th class="">
-                    <div>
-                        <div>
-                            <div>
-                                <span class="date">ke 21.10.</span> <span class="time">19.00</span>
-                            </div>
-                            
-                        </div>
-                        <div class="ticket-cta"><a href="https://espoonteatteri.lippu.fi/webshop/webticket/shop?event=3084&amp;language=fi" class="buy  external button" target="_self"><span class="wrapper">Osta lippuja<span aria-hidden="true" class="arrow"></span></span></a></div>
-                    </div>
-                </th><td class="last"><div class="ticket-cta"><a href="https://espoonteatteri.lippu.fi/webshop/webticket/shop?event=3084&amp;language=fi" class="buy  external button" target="_self"><span class="wrapper">Osta lippuja<span aria-hidden="true" class="arrow"></span></span></a></div></td></tr><tr><th class="">
-                    <div>
-                        <div>
-                            <div>
-                                <span class="date">to 22.10.</span> <span class="time">19.00</span>
-                            </div>
-                            <div class="details"><span class="detail"><img src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/assets/svg/K18.svg" alt="K-18" width="300" height="150">K-18</span></div>
-                        </div>
-                        <div class="ticket-cta"><a href="https://espoonteatteri.lippu.fi/webshop/webticket/shop?event=3085&amp;language=fi" class="buy  external button" target="_self"><span class="wrapper">Osta lippuja<span aria-hidden="true" class="arrow"></span></span></a></div>
-                    </div>
-                </th><td class="last"><div class="ticket-cta"><a href="https://espoonteatteri.lippu.fi/webshop/webticket/shop?event=3085&amp;language=fi" class="buy  external button" target="_self"><span class="wrapper">Osta lippuja<span aria-hidden="true" class="arrow"></span></span></a></div></td></tr></tbody></table><a href="https://espoonteatteri.lippu.fi/webshop/webticket/shop?production=338&amp;language=fi" class="view-all tertiary external-link" target="_self">Kaikki näytökset</a></section></div>
+                </script>        <div id="event-shows-wrapper"></div>
 
-        <section class="event-pricing"><h2>Hin­nas­to</h2><ul><li><span class="type"><span style="box-shadow: 0.5em 0 0 0px #d59a64, 0px 0 0 0px #d59a64; background: #d59a64;">Peruslippu</span></span><span class="price" style="background: #d59a64;">30 €</span></li><li><span class="type"><span style="box-shadow: 0.5em 0 0 0px #d59a64, 0px 0 0 0px #d59a64; background: #d59a64;">Kimppalippu (4+)</span></span><span class="price" style="background: #d59a64;">28 €</span></li><li><span class="type"><span style="box-shadow: 0.5em 0 0 0px #d59a64, 0px 0 0 0px #d59a64; background: #d59a64;">Eläkeläinen</span></span><span class="price" style="background: #d59a64;">26 €</span></li><li><span class="type"><span style="box-shadow: 0.5em 0 0 0px #d59a64, 0px 0 0 0px #d59a64; background: #d59a64;">Ryhmälippu (20+)</span></span><span class="price" style="background: #d59a64;">26 €</span></li><li><span class="type"><span style="box-shadow: 0.5em 0 0 0px #d59a64, 0px 0 0 0px #d59a64; background: #d59a64;">Opiskelija, työtön, alle 26 v.</span></span><span class="price" style="background: #d59a64;">20 €</span></li><li><span class="type"><span style="box-shadow: 0.5em 0 0 0px #d59a64, 0px 0 0 0px #d59a64; background: #d59a64;">Teatterialan kortilla (10 päivää ennen)</span></span><span class="price" style="background: #d59a64;">20 €</span></li></ul></section>
+        <section class="event-pricing"><h2>Hinnasto</h2><ul><li><span class="type"><span style="box-shadow: 0.5em 0 0 0px #d59a64, 0px 0 0 0px #d59a64; background: #d59a64;">Peruslippu</span></span><span class="price" style="background: #d59a64;">30 €</span></li><li><span class="type"><span style="box-shadow: 0.5em 0 0 0px #d59a64, 0px 0 0 0px #d59a64; background: #d59a64;">Kimppalippu (4+)</span></span><span class="price" style="background: #d59a64;">28 €</span></li><li><span class="type"><span style="box-shadow: 0.5em 0 0 0px #d59a64, 0px 0 0 0px #d59a64; background: #d59a64;">Eläkeläinen</span></span><span class="price" style="background: #d59a64;">26 €</span></li><li><span class="type"><span style="box-shadow: 0.5em 0 0 0px #d59a64, 0px 0 0 0px #d59a64; background: #d59a64;">Ryhmälippu (20+)</span></span><span class="price" style="background: #d59a64;">26 €</span></li><li><span class="type"><span style="box-shadow: 0.5em 0 0 0px #d59a64, 0px 0 0 0px #d59a64; background: #d59a64;">Opiskelija, työtön, alle 26 v.</span></span><span class="price" style="background: #d59a64;">20 €</span></li><li><span class="type"><span style="box-shadow: 0.5em 0 0 0px #d59a64, 0px 0 0 0px #d59a64; background: #d59a64;">Teatterialan kortilla (10 päivää ennen)</span></span><span class="price" style="background: #d59a64;">20 €</span></li></ul></section>
         <section class="additional-event-info"><div class="asteriks"></div><div class="content"><strong>Kisastudio pe 9.10. </strong><div class="text"><p>Tule virittäytymään ensi-iltatunnelmaan ja esitykseen näyttelytila Ahjoon klo 18.15 alkaen. Vieraanamme Maija Soljanlahti (John Nurmisen Säätiö).</p>
 </div></div></section>
-        <section class="gallery count-4 e_idb6c35518c3268" data-load-more-text="Näytä lisää" data-load-more-images="5"><span class="grid-item"><a href="https://espoonteatteri.fi/wp-content/uploads/2026/02/Lohk-ensi-ilta-1-scaled.jpg" class="item-content" data-dimbox="et-gallery"><img width="640" height="764" src="https://espoonteatteri.fi/wp-content/uploads/2026/02/Lohk-ensi-ilta-1-858x1024.jpg" class="attachment-large size-large" alt="" loading="lazy" decoding="async"></a></span><span class="grid-item"><span class="item-content"><span class="text guide">Klikkaa kuvia ja videoita nähdäksesi ne isompina</span></span></span><span class="grid-item"><a href="https://espoonteatteri.fi/wp-content/uploads/2026/02/LOHK_Shot_7_16x9_web-scaled.jpg" class="item-content" data-dimbox="et-gallery"><img width="640" height="360" src="https://espoonteatteri.fi/wp-content/uploads/2026/02/LOHK_Shot_7_16x9_web-1024x576.jpg" class="attachment-large size-large" alt="Animoitu kuvituskuva kalasta Itämeressä." loading="lazy" decoding="async"></a></span><span class="grid-item video-item"><a href="https://www.youtube.com/embed/kuDtE1WnQNY" class="item-content video-item" data-dimbox="et-gallery" data-dimbox-ratio="16x9"><img src="https://img.youtube.com/vi/kuDtE1WnQNY/maxresdefault.jpg" loading="lazy" data-src="https://img.youtube.com/vi/kuDtE1WnQNY/maxresdefault.jpg"><span class="video text white"><svg class="play video-control" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path fill-rule="evenodd" clip-rule="evenodd" d="M4.81494 3.33218L4.81494 17.5462L17.6842 10.4392L4.81494 3.33218ZM4.34617 0.999999L20 9.6448L20 11.2336L4.34616 19.8784L3 19.084L3 1.79438L4.34617 0.999999Z" fill="#d59a64"></path>
+        <section class="gallery count-4" data-load-more-text="Näytä lisää" data-load-more-images="5"><span class="grid-item"><a href="https://espoonteatteri.fi/wp-content/uploads/2026/02/Lohk-ensi-ilta-1-scaled.jpg" class="item-content" data-dimbox="et-gallery"><img width="640" height="764" src="https://espoonteatteri.fi/wp-content/uploads/2026/02/Lohk-ensi-ilta-1-858x1024.jpg" class="attachment-large size-large" alt="" loading="lazy" decoding="async" srcset="https://espoonteatteri.fi/wp-content/uploads/2026/02/Lohk-ensi-ilta-1-858x1024.jpg 858w, https://espoonteatteri.fi/wp-content/uploads/2026/02/Lohk-ensi-ilta-1-251x300.jpg 251w, https://espoonteatteri.fi/wp-content/uploads/2026/02/Lohk-ensi-ilta-1-768x916.jpg 768w, https://espoonteatteri.fi/wp-content/uploads/2026/02/Lohk-ensi-ilta-1-1287x1536.jpg 1287w, https://espoonteatteri.fi/wp-content/uploads/2026/02/Lohk-ensi-ilta-1-1717x2048.jpg 1717w" sizes="auto, (max-width: 640px) 100vw, 640px" /></a></span><span class="grid-item"><span class="item-content"><span class="text guide">Klikkaa kuvia ja videoita nähdäksesi ne isompina</span></span></span><span class="grid-item"><a href="https://espoonteatteri.fi/wp-content/uploads/2026/02/LOHK_Shot_7_16x9_web-scaled.jpg" class="item-content" data-dimbox="et-gallery"><img width="640" height="360" src="https://espoonteatteri.fi/wp-content/uploads/2026/02/LOHK_Shot_7_16x9_web-1024x576.jpg" class="attachment-large size-large" alt="Animoitu kuvituskuva kalasta Itämeressä." loading="lazy" decoding="async" srcset="https://espoonteatteri.fi/wp-content/uploads/2026/02/LOHK_Shot_7_16x9_web-1024x576.jpg 1024w, https://espoonteatteri.fi/wp-content/uploads/2026/02/LOHK_Shot_7_16x9_web-300x169.jpg 300w, https://espoonteatteri.fi/wp-content/uploads/2026/02/LOHK_Shot_7_16x9_web-768x432.jpg 768w, https://espoonteatteri.fi/wp-content/uploads/2026/02/LOHK_Shot_7_16x9_web-1536x864.jpg 1536w, https://espoonteatteri.fi/wp-content/uploads/2026/02/LOHK_Shot_7_16x9_web-2048x1152.jpg 2048w" sizes="auto, (max-width: 640px) 100vw, 640px" /></a></span><span class="grid-item video-item"><a href="https://www.youtube.com/embed/kuDtE1WnQNY" class="item-content video-item" data-dimbox="et-gallery" data-dimbox-ratio="16x9"><img src="https://img.youtube.com/vi/kuDtE1WnQNY/maxresdefault.jpg" loading="lazy" data-src="https://img.youtube.com/vi/kuDtE1WnQNY/maxresdefault.jpg" /><span class="video text white"><svg class='play video-control' width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'>
+    <path fill-rule='evenodd' clip-rule='evenodd' d='M4.81494 3.33218L4.81494 17.5462L17.6842 10.4392L4.81494 3.33218ZM4.34617 0.999999L20 9.6448L20 11.2336L4.34616 19.8784L3 19.084L3 1.79438L4.34617 0.999999Z' fill='#d59a64'/>
     </svg>
-    </span></a></span><span class="grid-item"><a href="https://espoonteatteri.fi/wp-content/uploads/2026/02/LOHK-ensi-ilta-2.jpg" class="item-content" data-dimbox="et-gallery"><img width="640" height="471" src="https://espoonteatteri.fi/wp-content/uploads/2026/02/LOHK-ensi-ilta-2-1024x753.jpg" class="attachment-large size-large" alt="Pimeän teatterisalin katsomossa yleisöä, etualalla kaksi henkilöä seisoo näyttämöllä peliohjaimet kädessään." loading="lazy" decoding="async"></a></span></section>
+    </span></a></span><span class="grid-item"><a href="https://espoonteatteri.fi/wp-content/uploads/2026/02/LOHK-ensi-ilta-2.jpg" class="item-content" data-dimbox="et-gallery"><img width="640" height="471" src="https://espoonteatteri.fi/wp-content/uploads/2026/02/LOHK-ensi-ilta-2-1024x753.jpg" class="attachment-large size-large" alt="Pimeän teatterisalin katsomossa yleisöä, etualalla kaksi henkilöä seisoo näyttämöllä peliohjaimet kädessään." loading="lazy" decoding="async" srcset="https://espoonteatteri.fi/wp-content/uploads/2026/02/LOHK-ensi-ilta-2-1024x753.jpg 1024w, https://espoonteatteri.fi/wp-content/uploads/2026/02/LOHK-ensi-ilta-2-300x221.jpg 300w, https://espoonteatteri.fi/wp-content/uploads/2026/02/LOHK-ensi-ilta-2-768x565.jpg 768w, https://espoonteatteri.fi/wp-content/uploads/2026/02/LOHK-ensi-ilta-2.jpg 1200w" sizes="auto, (max-width: 640px) 100vw, 640px" /></a></span></section>
         <section class="small-media-component"><div class="content"><h2>Harold Hejazi</h2><div class="text"><p>Kanadasta kotoisin oleva Harold Hejazi on tehnyt pelejä ja osallistavia esityksiä vuodesta 2015 lähtien. Hänen yhdistää työssään esiintyjän, pelisuunnittelijan ja pedagogin roolit – usein samanaikaisesti.</p>
 <p>Hejazille teatterilavoja ovat museot, julkiset tilat ja digitaaliset ympäristöt. Hän kutsuu yleisön mukaan dynaamisiin, improvisoituihin kohtaamisiin, jotka haastavat institutionaalisia ja sosiaalisia normeja. Hejazi lähestyy pelaamista spekulatiivisena tilana, jossa osallistujat astuvat mielikuvituksellisiin maailmoihin ja mahdollisuuksien valtakuntiin ja voivat tutkia ajatuksia, joita on vaikea kohdata arkielämässä. Suunnittelipa hän teosta museoon tai teatteriin, Hejazia kiinnostaa aina se, miten leikki syventää oppimista, yhteyden kokemusta ja tarinankerrontaa.</p>
 </div></div><div class="image"><picture><img src="https://espoonteatteri.fi/wp-content/uploads/2026/02/Harold.jpg" data-src="https://espoonteatteri.fi/wp-content/uploads/2026/02/Harold.jpg" alt="Harold Hejazi." loading="lazy"></picture></div></section>
@@ -623,17 +304,22 @@ jQuery(function ($) {
     
     <div class="footer-wrapper">
                 <div class="et-logo-footer-wrapper">
-            <a href="https://espoonteatteri.fi/" aria-label="Etusivu" id="et-logo-footer" data-et-logo="" data-key="0" data-number="23" class="footer-et et-sign the-logo-et" data-new="23" data-et-color="#d59a64" data-color="#d59a64"><div style="position: relative; width: 100%; height: 100%; overflow: hidden; pointer-events: auto;"><div style="width: 100%; height: 100%;"><canvas data-engine="three.js r173" width="210" height="210" style="display: block; width: 210px; height: 210px;"></canvas></div></div></a>
+            <a href="https://espoonteatteri.fi/" aria-label="Etusivu"
+                id="et-logo-footer" data-et-logo data-key="0" data-number="23"
+                class="footer-et et-sign the-logo-et" data-new="23"
+                data-et-color="#d59a64" data-color="#d59a64">
+            </a>
         </div>
         <nav class="primary-nav">
-            <ul id=""><li class=""><a class="" href="https://espoonteatteri.fi/meista/">Meistä</a></li><li class=""><a class="" href="https://espoonteatteri.fi/ohjelmisto/">Ohjelmisto</a></li><li class=""><a class="" href="https://espoonteatteri.fi/palvelut/">Palvelut</a></li><li class=""><a class="" href="https://espoonteatteri.fi/rakastaa/"><span class="et-font" aria-hidden="true">&amp;&amp;</span><span role="text" class="sr-only">Espoon teatteri</span> rakastaa</a></li><li class=""><a class="" href="https://espoonteatteri.fi/projektit/">Projektit</a></li></ul>        </nav>
+            <ul id=""><li  class=""><a class="" href="https://espoonteatteri.fi/meista/">Meistä</a></li><li  class=""><a class="" href="https://espoonteatteri.fi/ohjelmisto/">Ohjelmisto</a></li><li  class=""><a class="" href="https://espoonteatteri.fi/palvelut/">Palvelut</a></li><li  class=""><a class="" href="https://espoonteatteri.fi/rakastaa/"><span class='et-font' aria-hidden='true'>&#038;&#038;</span><span role='text' class='sr-only'>Espoon teatteri</span> rakastaa</a></li><li  class=""><a class="" href="https://espoonteatteri.fi/projektit/">Projektit</a></li></ul>        </nav>
         <nav class="secondary-nav">
-            <ul id=""><li class=""><a class="" href="https://espoonteatteri.fi/meista/yhteystiedot/">Yhteystiedot</a></li><li class=""><a class="" href="https://espoonteatteri.fi/saavutettavuus/">Saavutettavuus</a></li><li class=""><a class="" href="https://espoonteatteri.fi/palautelomake/">Anna palautetta</a></li><li class=""><a class="" href="https://espoonteatteri.fi/medialle/">Medialle</a></li><li class=""><a class="" href="https://espoonteatteri.fi/tietosuojaseloste/">Tietosuojaseloste</a></li></ul>        </nav>
+            <ul id=""><li  class=""><a class="" href="https://espoonteatteri.fi/meista/yhteystiedot/">Yhteystiedot</a></li><li  class=""><a class="" href="https://espoonteatteri.fi/saavutettavuus/">Saavutettavuus</a></li><li  class=""><a class="" href="https://espoonteatteri.fi/palautelomake/">Anna palautetta</a></li><li  class=""><a class="" href="https://espoonteatteri.fi/medialle/">Medialle</a></li><li  class=""><a class="" href="https://espoonteatteri.fi/tietosuojaseloste/">Tietosuojaseloste</a></li></ul>        </nav>
     </div>
 
     <div class="social-links">
         <ul>
-            <li><a href="https://espoonteatteri.fi/uutiskirje/">Uutiskirje</a>
+            <li><a
+                    href="https://espoonteatteri.fi/uutiskirje/">Uutiskirje</a>
             </li>
                                                             <li><a href="https://www.facebook.com/espoonteatteri.fi/" target="_blank">FB</a></li>
             
@@ -653,7 +339,7 @@ jQuery(function ($) {
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe data-cli-class="cli-blocker-script" data-cli-label="Google Tag Manager"  data-cli-script-type="analytics" data-cli-block="true" data-cli-block-if-ccpa-optout="false" data-cli-element-position="body" data-cli-placeholder="Hyväksy <a class='cli_manage_current_consent'> Analytics FI</a> evästeet nähdäksesi sisällön." data-cli-src="https://www.googletagmanager.com/ns.html?id=GTM-T2LFLTDC"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) --><div class="wt-cli-cookie-bar-container" data-nosnippet="true" data-banner-version="3.0"><!--googleoff: all--><div id="cookie-law-info-bar" role="dialog" aria-live="polite" aria-label="cookieconsent" aria-describedby="wt-cli-cookie-banner" data-cli-geo-loc="0" style="text-align:left; padding:20px 30px; border-color:rgb(51, 51, 51); font-size:16px;" class="wt-cli-cookie-bar"><div class="cli-wrapper"><h5 role="heading" aria-level="5" tabindex="0" id="wt-cli-cookie-banner-title" style="display:block; background-color:rgba(0, 0, 0, 0); color:rgb(33, 33, 33); border-color:rgb(33, 33, 33); font-weight:500; font-size:20px;">TÄMÄ SIVUSTO KÄYTTÄÄ EVÄS­TEI­TÄ</h5><span id="wt-cli-cookie-banner"><div class="cli-bar-container cli-style-v2"><div class="cli-bar-message">Käytämme yksilöiviä tietoja kerääviä evästeitä muun muassa tarjoamamme sisällön, markkinointimme ja palvelumme kehittämiseen ja räätälöimiseen. Ole hyvä ja hyväksy tai hylkää yksilöiviä tietoja keräävien evästeiden käyttö.</div><div class="cli-bar-btn_container"><a id="wt-cli-reject-btn" tabindex="0" role="button" style="padding:8px 30px; border-color:rgb(0, 0, 0); font-size:16px; font-weight:600; border-width:0px; font-style:italic;" class="wt-cli-element medium cli-plugin-button cli-plugin-main-button cookie_action_close_header_reject cli_action_button" data-cli_action="reject">Hylkää</a><a id="wt-cli-accept-all-btn" tabindex="0" role="button" style="padding:8px 16px; border-color:rgb(10, 10, 10); border-width:2px; font-style:normal; font-weight:900; border-radius:1px;" data-cli_action="accept_all" class="wt-cli-element medium cli-plugin-button wt-cli-accept-all-btn cookie_action_close_header cli_action_button">HYVÄKSY KAIKKI</a></div></div></span></div></div><div tabindex="0" id="cookie-law-info-again" style="display:none;"><span id="cookie_hdr_showagain">Suostumusasetukset</span></div><div class="cli-modal" id="cliSettingsPopup" role="dialog" aria-labelledby="wt-cli-privacy-title" tabindex="-1" aria-hidden="true">
+<!-- End Google Tag Manager (noscript) --><div class="wt-cli-cookie-bar-container" data-nosnippet="true"  data-banner-version="3.0"><!--googleoff: all--><div id="cookie-law-info-bar" role="dialog" aria-live="polite" aria-label="cookieconsent" aria-describedby="wt-cli-cookie-banner" data-cli-geo-loc="0" style="text-align:left; padding:20px 30px; border-color:rgb(51, 51, 51); font-size:16px;" class="wt-cli-cookie-bar"><div class="cli-wrapper"><h5 role="heading" aria-level="5" tabindex="0" id="wt-cli-cookie-banner-title" style="display:block; background-color:rgba(0, 0, 0, 0); color:rgb(33, 33, 33); border-color:rgb(33, 33, 33); font-weight:500; font-size:20px;">TÄMÄ SIVUSTO KÄYTTÄÄ EVÄSTEITÄ</h5><span id="wt-cli-cookie-banner"><div class="cli-bar-container cli-style-v2"><div class="cli-bar-message">Käytämme yksilöiviä tietoja kerääviä evästeitä muun muassa tarjoamamme sisällön, markkinointimme ja palvelumme kehittämiseen ja räätälöimiseen. Ole hyvä ja hyväksy tai hylkää yksilöiviä tietoja keräävien evästeiden käyttö.</div><div class="cli-bar-btn_container"><a id="wt-cli-reject-btn" tabindex="0" role='button' style="padding:8px 30px; border-color:rgb(0, 0, 0); font-size:16px; font-weight:600; border-width:0px; font-style:italic;"  class="wt-cli-element medium cli-plugin-button cli-plugin-main-button cookie_action_close_header_reject cli_action_button"  data-cli_action="reject">Hylkää</a><a id="wt-cli-accept-all-btn" tabindex="0" role='button' style="padding:8px 16px; border-color:rgb(10, 10, 10); border-width:2px; font-style:normal; font-weight:900; border-radius:1px;" data-cli_action="accept_all"  class="wt-cli-element medium cli-plugin-button wt-cli-accept-all-btn cookie_action_close_header cli_action_button" >HYVÄKSY KAIKKI</a></div></div></span></div></div><div tabindex="0" id="cookie-law-info-again" style="display:none;"><span id="cookie_hdr_showagain">Suostumusasetukset</span></div><div class="cli-modal" id="cliSettingsPopup" role="dialog" aria-labelledby="wt-cli-privacy-title" tabindex="-1" aria-hidden="true">
   <div class="cli-modal-dialog" role="document">
     <div class="cli-modal-content cli-bar-popup">
       <button aria-label="Sulje" type="button" class="cli-modal-close" id="cliModalClose">
@@ -666,10 +352,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="cli-row">
                             <div class="cli-col-12 cli-align-items-stretch cli-px-0">
                     <div class="cli-privacy-overview">
-                        <h4 id="wt-cli-privacy-title">Cus­to­mize Consent Pre­fe­rences</h4>                        <div class="cli-privacy-content">
+                        <h4 id='wt-cli-privacy-title'>Customize Consent Preferences</h4>                        <div class="cli-privacy-content">
                             <div class="cli-privacy-content-text">This website uses cookies to improve your experience while you navigate through the website. Out of these cookies, the cookies that are categorized as necessary are stored on your browser as they are essential for the working of basic functionalities of the website. We also use third-party cookies that help us analyze and understand how you use this website. These cookies will be stored in your browser only with your consent. You also have the option to opt-out of these cookies. But opting out of some of these cookies may have an effect on your browsing experience.</div>
                         </div>
-                        <a id="wt-cli-privacy-readmore" tabindex="0" role="button" class="cli-privacy-readmore" data-readmore-text="Näytä lisää" data-readless-text="Näytä vähemmän"></a>                    </div>
+                        <a id="wt-cli-privacy-readmore"  tabindex="0" role="button" class="cli-privacy-readmore" data-readmore-text="Näytä lisää" data-readless-text="Näytä vähemmän"></a>                    </div>
                 </div>
                         <div class="cli-col-12 cli-align-items-stretch cli-px-0 cli-tab-section-container" role="tablist">
 
@@ -679,7 +365,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <a id="wt-cli-tab-link-necessary" tabindex="0" role="tab" aria-expanded="false" aria-describedby="wt-cli-tab-necessary" aria-controls="wt-cli-tab-necessary" class="cli-nav-link cli-settings-mobile" data-target="necessary" data-toggle="cli-toggle-tab">
                                 Necessary                            </a>
                                                                                         <div class="wt-cli-necessary-checkbox">
-                                    <input type="checkbox" class="cli-user-preference-checkbox" id="wt-cli-checkbox-necessary" aria-label="Necessary" data-id="checkbox-necessary" checked="checked">
+                                    <input type="checkbox" class="cli-user-preference-checkbox" id="wt-cli-checkbox-necessary" aria-label="Necessary" data-id="checkbox-necessary" checked="checked" />
                                     <label class="form-check-label" for="wt-cli-checkbox-necessary"> Necessary </label>
                                 </div>
                                 <span class="cli-necessary-caption">
@@ -697,7 +383,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <a id="wt-cli-tab-link-functional" tabindex="0" role="tab" aria-expanded="false" aria-describedby="wt-cli-tab-functional" aria-controls="wt-cli-tab-functional" class="cli-nav-link cli-settings-mobile" data-target="functional" data-toggle="cli-toggle-tab">
                                 Functional                            </a>
                                                                                         <div class="cli-switch">
-                                    <input type="checkbox" class="cli-user-preference-checkbox" id="wt-cli-checkbox-functional" aria-label="functional" data-id="checkbox-functional" role="switch" aria-controls="wt-cli-tab-link-functional" aria-labelledby="wt-cli-tab-link-functional">
+                                    <input type="checkbox" class="cli-user-preference-checkbox"  id="wt-cli-checkbox-functional" aria-label="functional" data-id="checkbox-functional" role="switch" aria-controls="wt-cli-tab-link-functional" aria-labelledby="wt-cli-tab-link-functional"  />
                                     <label for="wt-cli-checkbox-functional" class="cli-slider" data-cli-enable="Käytössä" data-cli-disable="Pois käytöstä"><span class="wt-cli-sr-only">functional</span></label>
                                 </div>
                                                     </div>
@@ -713,7 +399,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <a id="wt-cli-tab-link-performance" tabindex="0" role="tab" aria-expanded="false" aria-describedby="wt-cli-tab-performance" aria-controls="wt-cli-tab-performance" class="cli-nav-link cli-settings-mobile" data-target="performance" data-toggle="cli-toggle-tab">
                                 Performance                            </a>
                                                                                         <div class="cli-switch">
-                                    <input type="checkbox" class="cli-user-preference-checkbox" id="wt-cli-checkbox-performance" aria-label="performance" data-id="checkbox-performance" role="switch" aria-controls="wt-cli-tab-link-performance" aria-labelledby="wt-cli-tab-link-performance">
+                                    <input type="checkbox" class="cli-user-preference-checkbox"  id="wt-cli-checkbox-performance" aria-label="performance" data-id="checkbox-performance" role="switch" aria-controls="wt-cli-tab-link-performance" aria-labelledby="wt-cli-tab-link-performance"  />
                                     <label for="wt-cli-checkbox-performance" class="cli-slider" data-cli-enable="Käytössä" data-cli-disable="Pois käytöstä"><span class="wt-cli-sr-only">performance</span></label>
                                 </div>
                                                     </div>
@@ -729,7 +415,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <a id="wt-cli-tab-link-analytics" tabindex="0" role="tab" aria-expanded="false" aria-describedby="wt-cli-tab-analytics" aria-controls="wt-cli-tab-analytics" class="cli-nav-link cli-settings-mobile" data-target="analytics" data-toggle="cli-toggle-tab">
                                 Analytics FI                            </a>
                                                                                         <div class="cli-switch">
-                                    <input type="checkbox" class="cli-user-preference-checkbox" id="wt-cli-checkbox-analytics" aria-label="analytics" data-id="checkbox-analytics" role="switch" aria-controls="wt-cli-tab-link-analytics" aria-labelledby="wt-cli-tab-link-analytics">
+                                    <input type="checkbox" class="cli-user-preference-checkbox"  id="wt-cli-checkbox-analytics" aria-label="analytics" data-id="checkbox-analytics" role="switch" aria-controls="wt-cli-tab-link-analytics" aria-labelledby="wt-cli-tab-link-analytics"  />
                                     <label for="wt-cli-checkbox-analytics" class="cli-slider" data-cli-enable="Käytössä" data-cli-disable="Pois käytöstä"><span class="wt-cli-sr-only">analytics</span></label>
                                 </div>
                                                     </div>
@@ -745,7 +431,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <a id="wt-cli-tab-link-advertisement" tabindex="0" role="tab" aria-expanded="false" aria-describedby="wt-cli-tab-advertisement" aria-controls="wt-cli-tab-advertisement" class="cli-nav-link cli-settings-mobile" data-target="advertisement" data-toggle="cli-toggle-tab">
                                 Advertisement                            </a>
                                                                                         <div class="cli-switch">
-                                    <input type="checkbox" class="cli-user-preference-checkbox" id="wt-cli-checkbox-advertisement" aria-label="advertisement" data-id="checkbox-advertisement" role="switch" aria-controls="wt-cli-tab-link-advertisement" aria-labelledby="wt-cli-tab-link-advertisement">
+                                    <input type="checkbox" class="cli-user-preference-checkbox"  id="wt-cli-checkbox-advertisement" aria-label="advertisement" data-id="checkbox-advertisement" role="switch" aria-controls="wt-cli-tab-link-advertisement" aria-labelledby="wt-cli-tab-link-advertisement"  />
                                     <label for="wt-cli-checkbox-advertisement" class="cli-slider" data-cli-enable="Käytössä" data-cli-disable="Pois käytöstä"><span class="wt-cli-sr-only">advertisement</span></label>
                                 </div>
                                                     </div>
@@ -761,7 +447,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <a id="wt-cli-tab-link-others" tabindex="0" role="tab" aria-expanded="false" aria-describedby="wt-cli-tab-others" aria-controls="wt-cli-tab-others" class="cli-nav-link cli-settings-mobile" data-target="others" data-toggle="cli-toggle-tab">
                                 Others                            </a>
                                                                                         <div class="cli-switch">
-                                    <input type="checkbox" class="cli-user-preference-checkbox" id="wt-cli-checkbox-others" aria-label="others" data-id="checkbox-others" role="switch" aria-controls="wt-cli-tab-link-others" aria-labelledby="wt-cli-tab-link-others">
+                                    <input type="checkbox" class="cli-user-preference-checkbox"  id="wt-cli-checkbox-others" aria-label="others" data-id="checkbox-others" role="switch" aria-controls="wt-cli-tab-link-others" aria-labelledby="wt-cli-tab-link-others"  />
                                     <label for="wt-cli-checkbox-others" class="cli-slider" data-cli-enable="Käytössä" data-cli-disable="Pois käytöstä"><span class="wt-cli-sr-only">others</span></label>
                                 </div>
                                                     </div>
@@ -783,7 +469,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="cli-col-12 cli-align-items-stretch cli-px-0">
                 <div class="cli-tab-footer wt-cli-privacy-overview-actions">
                                     <div class="cli-preference-btn-wrapper">
-						<a id="wt-cli-reject-btn" tabindex="0" role="button" style="padding:8px 30px; border-color:rgb(0, 0, 0); font-size:16px; font-weight:600; border-width:0px; font-style:italic;" class="wt-cli-element medium cli-plugin-button cli-plugin-main-button cookie_action_close_header_reject cli_action_button" data-cli_action="reject">Hylkää</a>						<a id="wt-cli-save-preferences-btn" tabindex="0" style="padding:8px 25px 8px 25px; color:#000000; border-radius:0px;" class="wt-cli-element medium cli-plugin-button wt-cli-save-preferences-btn">TALLENNA VALITUT</a>						<a id="wt-cli-accept-all-btn" tabindex="0" role="button" style="padding:8px 16px; border-color:rgb(10, 10, 10); border-width:2px; font-style:normal; font-weight:900; border-radius:1px;" data-cli_action="accept_all" class="wt-cli-element medium cli-plugin-button wt-cli-accept-all-btn cookie_action_close_header cli_action_button">HYVÄKSY KAIKKI</a>					</div>
+						<a id="wt-cli-reject-btn" tabindex="0" role='button' style="padding:8px 30px; border-color:rgb(0, 0, 0); font-size:16px; font-weight:600; border-width:0px; font-style:italic;"  class="wt-cli-element medium cli-plugin-button cli-plugin-main-button cookie_action_close_header_reject cli_action_button"  data-cli_action="reject">Hylkää</a>						<a id="wt-cli-save-preferences-btn" tabindex="0" style="padding:8px 25px 8px 25px; color:#000000; border-radius:0px;"  class="wt-cli-element medium cli-plugin-button wt-cli-save-preferences-btn" >TALLENNA VALITUT</a>						<a id="wt-cli-accept-all-btn" tabindex="0" role='button' style="padding:8px 16px; border-color:rgb(10, 10, 10); border-width:2px; font-style:normal; font-weight:900; border-radius:1px;" data-cli_action="accept_all"  class="wt-cli-element medium cli-plugin-button wt-cli-accept-all-btn cookie_action_close_header cli_action_button" >HYVÄKSY KAIKKI</a>					</div>
                                
                     
                 </div>
@@ -813,23 +499,23 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			}());
 
 </script>
-<script id="locomotive-js" src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/js/dist/locomotive-scroll.min.js?ver=20251212064325"></script>
-<script id="et-navigation-js-js" src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/js/dist/navigation.min.js?ver=20251212064325"></script>
-<script id="et-button-scroll-js-js" src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/js/dist/button-scroll.min.js?ver=20251212064325"></script>
-<script id="et-clickable-elements-js-js" src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/js/dist/clickable-elements.min.js?ver=20251212064325"></script>
-<script id="et-infinite-scroll-js-js" src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/js/dist/infinite-scroll.min.js?ver=20251212064325"></script>
-<script type="module" crossorigin="" src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/assets/index.js?ver=20250509092417"></script><script id="et-hyphenate-js-js" src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/js/dist/hyphenate.min.js?ver=20251212064325"></script>
-<script id="et-platform-js-js" src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/js/dist/platform.min.js?ver=20251212064325"></script>
-<script id="et-datalayer-handlers-js-js" src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/js/dist/datalayer-handlers.min.js?ver=20251212064325"></script>
-<script id="et-dimbox-js-js" src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/js/dist/dimbox.min.js?ver=20251212064325"></script>
-<script id="et-video-controls-js-js" src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/js/dist/video-controls.min.js?ver=20251212064325"></script>
-<script id="et-load-more-js-js" src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/js/dist/load-more.min.js?ver=20251212064325"></script>
-<script id="et-image-fader-js-js" src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/js/dist/image-fader.min.js?ver=20251212064325"></script>
+<script   id="locomotive-js" src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/js/dist/locomotive-scroll.min.js?ver=20251212064325"></script>
+<script   id="et-navigation-js-js" src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/js/dist/navigation.min.js?ver=20251212064325"></script>
+<script   id="et-button-scroll-js-js" src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/js/dist/button-scroll.min.js?ver=20251212064325"></script>
+<script   id="et-clickable-elements-js-js" src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/js/dist/clickable-elements.min.js?ver=20251212064325"></script>
+<script   id="et-infinite-scroll-js-js" src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/js/dist/infinite-scroll.min.js?ver=20251212064325"></script>
+<script   type="module" crossorigin src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/assets/index.js?ver=20250509092417"></script><script   id="et-hyphenate-js-js" src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/js/dist/hyphenate.min.js?ver=20251212064325"></script>
+<script   id="et-platform-js-js" src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/js/dist/platform.min.js?ver=20251212064325"></script>
+<script   id="et-datalayer-handlers-js-js" src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/js/dist/datalayer-handlers.min.js?ver=20251212064325"></script>
+<script   id="et-dimbox-js-js" src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/js/dist/dimbox.min.js?ver=20251212064325"></script>
+<script   id="et-video-controls-js-js" src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/js/dist/video-controls.min.js?ver=20251212064325"></script>
+<script   id="et-load-more-js-js" src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/js/dist/load-more.min.js?ver=20251212064325"></script>
+<script   id="et-image-fader-js-js" src="https://espoonteatteri.fi/wp-content/themes/espoonteatteri/js/dist/image-fader.min.js?ver=20251212064325"></script>
 
+</body>
 
+</html>
+<!-- Dynamic page generated in 0.362 seconds. -->
+<!-- Cached page generated by WP-Super-Cache on 2026-10-18 13:04:08 -->
 
-
-
-
-
-</body></html><!-- Dynamic page generated in 0.362 seconds. --><!-- Cached page generated by WP-Super-Cache on 2026-10-18 13:04:08 --><!-- Compression = gzip -->
+<!-- Compression = gzip -->

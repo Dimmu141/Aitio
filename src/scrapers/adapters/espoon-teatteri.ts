@@ -1,8 +1,7 @@
 import * as cheerio from "cheerio";
 import { politeFetch } from "../http";
-import { collectPages } from "../paginate";
 import { mapRoleText } from "../roles";
-import { cleanText, helsinkiToUtc, languageCodes, yearFromWeekday } from "../text";
+import { cleanText, helsinkiToUtc, languageCodes, personName, yearFromWeekday } from "../text";
 import {
   rawProductionDetailSchema,
   rawProductionSchema,
@@ -14,16 +13,21 @@ import {
 } from "../types";
 
 /**
- * Espoon Teatteri. The repertoire is server-rendered with pagination. A production page
- * loads its performances through admin-ajax.php (action get_event_shows) and only ever
- * shows the next few of them; the full schedule is only in the theatre's Lippu.fi shop,
+ * Espoon Teatteri. The repertoire page is an empty shell: its script fills it from
+ * admin-ajax.php (action get_dynamic_content, no filters = the whole current
+ * repertoire, one response). A production page loads its performances the same way
+ * (action get_event_shows) and only ever shows the next few of them; the full schedule is only in the theatre's Lippu.fi shop,
  * which we never fetch. So the performance list is marked partial (see normalise.ts).
  * Dates have no year: the printed weekday pins it down exactly.
  */
 const BASE = "https://espoonteatteri.fi";
-export const LIST_URL = `${BASE}/ohjelmisto/`;
-const AJAX_URL = `${BASE}/wp-admin/admin-ajax.php`;
-const MAX_LIST_PAGES = 10;
+export const AJAX_URL = `${BASE}/wp-admin/admin-ajax.php`;
+export const LIST_FORM = { action: "get_dynamic_content" };
+
+/** The form the production page's script posts for its performances. */
+export function showsForm(showsId: string): Record<string, string> {
+  return { action: "get_event_shows", event_id: showsId };
+}
 
 type Page = cheerio.CheerioAPI;
 
@@ -44,10 +48,6 @@ export function parseList(html: string): RawProduction[] {
     results.set(externalId, rawProductionSchema.parse({ externalId, title, url, isVisiting: false }));
   });
   return [...results.values()];
-}
-
-export function parseNextPage(html: string): string | null {
-  return cheerio.load(html)('link[rel="next"]').attr("href") ?? null;
 }
 
 /** The id the page's own script posts to admin-ajax.php to load its performances. */
@@ -97,7 +97,7 @@ function parseCredits($: Page): RawCredit[] {
     const roles = roleText ? mapRoleText(roleText) : ["OTHER" as const];
     if (roles.length === 0) return;
     for (const name of $(element).find("td").text().split(/,|\sja\s/)) {
-      const clean = cleanText(name);
+      const clean = personName(name);
       if (clean) credits.push({ name: clean, roleText: roleText || "Työryhmä", roles });
     }
   });
@@ -192,14 +192,14 @@ export function parseDetail(
 export const espoonTeatteriAdapter: SourceAdapter = {
   id: "espoon-teatteri",
   async fetchProductions() {
-    return collectPages(LIST_URL, (url) => politeFetch(url), parseList, parseNextPage, MAX_LIST_PAGES);
+    return parseList(await politeFetch(AJAX_URL, LIST_FORM));
   },
   async fetchProductionDetail(ref) {
     const html = await politeFetch(ref.url);
     const hasShows = cheerio.load(html)(".event-performances tr").length > 0;
     const showsId = parseShowsId(html);
     const showsHtml =
-      !hasShows && showsId ? await politeFetch(AJAX_URL, { action: "get_event_shows", event_id: showsId }) : null;
+      !hasShows && showsId ? await politeFetch(AJAX_URL, showsForm(showsId)) : null;
     return parseDetail(html, showsHtml, ref);
   },
 };

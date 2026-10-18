@@ -74,8 +74,8 @@ function fixtureDetails(): Array<{ sourceId: string; detail: RawProductionDetail
       sourceId: espoo.espoonTeatteriAdapter.id,
       detail: espoo.parseDetail(
         read(`fixtures/espoon-teatteri/production-${slug}.html`),
-        null,
-        findRef(espoo.parseList(read("fixtures/espoon-teatteri/ohjelmisto.html")), `https://espoonteatteri.fi/ohjelmisto/${slug}/`),
+        read(`fixtures/espoon-teatteri/shows-${slug}.html`),
+        findRef(espoo.parseList(read("fixtures/espoon-teatteri/ohjelmisto-ajax.html")), `https://espoonteatteri.fi/ohjelmisto/${slug}/`),
       ),
     })),
   ];

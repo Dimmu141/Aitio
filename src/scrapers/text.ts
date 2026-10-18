@@ -133,3 +133,20 @@ export function yearFromWeekday(day: number, month: number, weekday: string, nea
   );
   return candidates[0] ?? null;
 }
+
+const NAME_PARTICLES = new Set(["af", "av", "da", "de", "del", "della", "der", "di", "dos", "du", "la", "le", "van", "von", "y", "zu"]);
+
+/**
+ * A credit candidate as a person's name, or null when it is a phrase instead.
+ * "Anacarsis Ramos / Pornotráfico" → "Anacarsis Ramos" (the company after the slash
+ * goes), and "Anacarsis Ramos Josefina Orlainetan arkistojen pohjalta" ("based on her
+ * archives") is not a name: real names have no ordinary lowercase words in them.
+ * A single lowercase word passes, because some artists use one ("magu").
+ */
+export function personName(raw: string): string | null {
+  const name = cleanText(raw.split(/\s+\/\s+/)[0]);
+  const words = name.split(" ").filter(Boolean);
+  if (words.length === 0) return null;
+  const prose = words.length > 1 && words.some((word) => /^\p{Ll}/u.test(word) && !NAME_PARTICLES.has(word));
+  return prose ? null : name;
+}
