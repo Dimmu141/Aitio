@@ -80,3 +80,12 @@ test("sitemap, robots and manifest are served", async ({ request }) => {
   const manifest = (await (await request.get("/manifest.webmanifest")).json()) as { icons: unknown[] };
   expect(manifest.icons).toHaveLength(3);
 });
+
+test("the revalidate endpoint needs the secret and known tags", async ({ request }) => {
+  const post = (secret: string, tags: string[]) =>
+    request.post("/api/revalidate", { headers: { Authorization: `Bearer ${secret}` }, data: { tags, immediate: true } });
+  expect((await post("wrong", ["catalogue"])).status()).toBe(401);
+  expect((await post("e2e-revalidate-secret", ["../etc"])).status()).toBe(400);
+  const ok = await post("e2e-revalidate-secret", ["production:nattland-svenska-teatern"]);
+  expect(ok.status()).toBe(200);
+});

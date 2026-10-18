@@ -1,4 +1,5 @@
 import { defineConfig } from "@playwright/test";
+import { EMAIL_LOG } from "./e2e/helpers";
 
 /**
  * Smoke tests against a production build, at the narrowest phone width we support.
@@ -9,6 +10,7 @@ const executablePath = process.env.CHROMIUM_PATH;
 
 export default defineConfig({
   testDir: "e2e",
+  globalTeardown: "./e2e/global-teardown.ts",
   fullyParallel: true,
   reporter: "list",
   use: {
@@ -22,6 +24,8 @@ export default defineConfig({
   ],
   webServer: {
     command: "pnpm start",
+    // Sign-in emails go to a file the tests read instead of being sent.
+    env: { DEV_EMAIL_LOG_FILE: EMAIL_LOG, REVALIDATE_SECRET: "e2e-revalidate-secret" },
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
   },
