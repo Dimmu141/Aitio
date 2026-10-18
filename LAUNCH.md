@@ -30,7 +30,18 @@ done
 credits that match the theatre's own page. The HKT, Ryhmäteatteri, KOM and Espoo fixtures
 were captured after JavaScript ran (Firecrawl), so expect at least one parser fix.
 
-## 1. Database: Neon, Frankfurt
+## 1. Database: Neon, Frankfurt ✓ done 18 Oct 2026
+
+Neon project **aitio** (`bold-sound-80975446`) in your personal Neon organisation, AWS
+eu-central-1, PostgreSQL 17, database `aitio`, owner role `aitio_owner`. All six migrations
+are applied and recorded in `_prisma_migrations` with Prisma's own checksums (so
+`prisma migrate deploy` sees them as done), and the 6 theatres and 12 tags are seeded. The
+schema was verified identical to the local one. It was created through the Neon connector,
+not the Vercel Marketplace, so `DATABASE_URL` must be set in Vercel by hand (use the
+**pooled** connection string). Free plan restore window: 6 hours, within `BACKUP_DAYS`.
+
+What follows is how it was done, for a rebuild:
+
 
 - Vercel dashboard → Storage → Marketplace → Neon. Pick region **AWS eu-central-1
   (Frankfurt)**: it matches `"regions": ["fra1"]` in `vercel.json` and what the privacy policy says.
