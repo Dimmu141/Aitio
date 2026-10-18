@@ -13,7 +13,7 @@ describe.skipIf(!url)("launch housekeeping (integration)", () => {
   beforeAll(async () => {
     process.env.DATABASE_URL = url;
     db = (await import("@/lib/db")).db;
-    for (const table of ["report", "diaryEntry", "session", "verification", "rateLimit", "user"] as const) {
+    for (const table of ["report", "watchItem", "diaryEntry", "session", "verification", "rateLimit", "user"] as const) {
       await (db[table] as { deleteMany: () => Promise<unknown> }).deleteMany();
     }
   });

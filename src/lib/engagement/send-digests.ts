@@ -65,6 +65,7 @@ export async function sendDigests(asOf: Date, deps: DigestDeps = defaultDeps): P
       email: true,
       locale: true,
       diaryEntries: { select: { production: { select: { slug: true } } } },
+      watchlist: { select: { production: { select: { slug: true } } } },
     },
     orderBy: [{ digestSentAt: { sort: "asc", nulls: "first" } }, { createdAt: "asc" }],
     take: BATCH_SIZE,
@@ -85,6 +86,7 @@ export async function sendDigests(asOf: Date, deps: DigestDeps = defaultDeps): P
       items,
       { absolute: absoluteUrl, unsubscribeUrl: unsubscribePageUrl(user.id, locale) },
       asOf,
+      new Set(user.watchlist.map((item) => item.production.slug)),
     );
     try {
       await deps.send({

@@ -95,6 +95,7 @@ function fi(config: PrivacyConfig, updated: string): Policy {
             "Sähköpostiosoite: kirjautumislinkkien lähettäminen ja tilisi tunnistaminen. Peruste: palvelun tarjoaminen sinulle (tietosuoja-asetuksen 6.1 b artikla, sopimus).",
             "Nimi tai nimimerkki, jos annat sen: näytetään julkisten arvioidesi yhteydessä. Peruste: palvelu (6.1 b).",
             "Päiväkirja: näkemäsi esitykset, päivämäärät, arvosanat, tunnisteet ja kirjoittamasi arviot. Peruste: palvelu (6.1 b). Julkiseksi jättämäsi arvio näkyy esityksen sivulla nimesi kanssa. Arvosanat ja tunnisteet näkyvät muille vain yhteenlaskettuina, ilman nimeä.",
+            "Haluan nähdä -lista: esitykset, jotka olet tallentanut nähtäväksi, ja milloin tallensit ne. Peruste: palvelu (6.1 b). Lista näkyy vain sinulle, ja esitys poistuu siltä, kun merkitset sen nähdyksi. Jos tilaat viikkoviestin, listasi esitykset nostetaan siinä ensimmäisiksi.",
             "Viikkoviesti päättyvistä esityksistä, jos tilaat sen: sähköpostiosoite ja tieto tilauksesta. Peruste: suostumus (6.1 a), jonka voit perua milloin tahansa viestin linkistä tai asetuksista.",
             "Ilmoitukset arvioista: kuka ilmoitti ja miksi, jotta samasta arviosta ei voi ilmoittaa moneen kertaan. Peruste: oikeutettu etu palvelun asiallisuuden ylläpitämiseen (6.1 f).",
             "Tekniset tiedot: kirjautumisistuntoon tallentuvat IP-osoite ja selaimen tunniste, ja käyttörajoituksiin IP-osoite ja sähköpostiosoite lyhyeksi ajaksi. Peruste: oikeutettu etu tietoturvaan ja väärinkäytösten estämiseen (6.1 f).",
@@ -118,7 +119,7 @@ function fi(config: PrivacyConfig, updated: string): Policy {
         heading: "Kuinka kauan tietoja säilytetään",
         blocks: [
           [
-            "Tilin tiedot, päiväkirja ja arviot: kunnes poistat tilin. Poisto asetuksista poistaa kaiken heti, myös julkiset arviot.",
+            "Tilin tiedot, päiväkirja, Haluan nähdä -lista ja arviot: kunnes poistat tilin. Poisto asetuksista poistaa kaiken heti, myös julkiset arviot.",
             `Kirjautumisistunnot: enintään ${SESSION_DAYS} päivää, ja vanhentuneet poistetaan päivittäin.`,
             `Kirjautumislinkit: voimassa ${MAGIC_LINK_MINUTES} minuuttia, ja vanhentuneet poistetaan päivittäin.`,
             `Käyttörajoitusten tiedot: enintään ${RATE_LIMIT_RETENTION_DAYS} vuorokautta.`,
@@ -161,6 +162,7 @@ function sv(config: PrivacyConfig, updated: string): Policy {
             "E-postadress: för att skicka inloggningslänkar och känna igen ditt konto. Grund: att tillhandahålla tjänsten åt dig (dataskyddsförordningen artikel 6.1 b, avtal).",
             "Namn eller signatur, om du anger det: visas med dina offentliga recensioner. Grund: tjänsten (6.1 b).",
             "Dagboken: föreställningar du sett, datum, betyg, taggar och recensioner du skrivit. Grund: tjänsten (6.1 b). En recension du låter vara offentlig syns på föreställningens sida med ditt namn. Betyg och taggar syns för andra bara sammanräknade, utan namn.",
+            "Listan Vill se: föreställningar du sparat för att se dem, och när du sparade dem. Grund: tjänsten (6.1 b). Bara du ser listan, och en föreställning försvinner från den när du markerar den som sedd. Om du beställt veckomejlet kommer föreställningarna på din lista först i det.",
             "Veckomeddelandet om föreställningar som slutar, om du beställer det: e-postadressen och uppgiften om beställningen. Grund: samtycke (6.1 a), som du kan återkalla när som helst via länken i meddelandet eller i inställningarna.",
             "Anmälningar av recensioner: vem som anmälde och varför, så att samma recension inte kan anmälas flera gånger. Grund: berättigat intresse att hålla tjänsten saklig (6.1 f).",
             "Tekniska uppgifter: inloggningssessionen sparar IP-adress och webbläsarens identifierare, och begränsningen av antalet försök sparar IP-adress och e-postadress en kort tid. Grund: berättigat intresse för informationssäkerhet och för att förhindra missbruk (6.1 f).",
@@ -184,7 +186,7 @@ function sv(config: PrivacyConfig, updated: string): Policy {
         heading: "Hur länge uppgifterna sparas",
         blocks: [
           [
-            "Kontot, dagboken och recensionerna: tills du tar bort kontot. Borttagningen i inställningarna tar bort allt direkt, också offentliga recensioner.",
+            "Kontot, dagboken, listan Vill se och recensionerna: tills du tar bort kontot. Borttagningen i inställningarna tar bort allt direkt, också offentliga recensioner.",
             `Inloggningssessioner: högst ${SESSION_DAYS} dagar, och utgångna tas bort dagligen.`,
             `Inloggningslänkar: gäller i ${MAGIC_LINK_MINUTES} minuter, och utgångna tas bort dagligen.`,
             `Uppgifter för begränsningen av antalet försök: högst ${RATE_LIMIT_RETENTION_DAYS} dygn.`,
@@ -227,6 +229,7 @@ function en(config: PrivacyConfig, updated: string): Policy {
             "Email address: to send sign-in links and recognise your account. Basis: providing the service you asked for (GDPR Article 6(1)(b), contract).",
             "Name or nickname, if you give one: shown with your public reviews. Basis: the service (6(1)(b)).",
             "Your diary: shows you saw, dates, ratings, tags and the reviews you write. Basis: the service (6(1)(b)). A review you leave public appears on the show's page with your name. Ratings and tags are only shown to others as totals, without names.",
+            "Your “Want to see” list: shows you saved to see, and when you saved them. Basis: the service (6(1)(b)). Only you can see the list, and a show leaves it when you log it as seen. If you get the weekly email, shows on your list come first in it.",
             "The weekly email about closing shows, if you sign up: your email address and the fact that you signed up. Basis: consent (6(1)(a)), which you can withdraw at any time from the link in the email or in your settings.",
             "Reports about reviews: who reported and why, so the same review can't be reported twice by one person. Basis: legitimate interest in keeping the service civil (6(1)(f)).",
             "Technical data: your sign-in session stores your IP address and browser identifier, and rate limiting keeps IP and email addresses for a short time. Basis: legitimate interest in security and preventing abuse (6(1)(f)).",
@@ -250,7 +253,7 @@ function en(config: PrivacyConfig, updated: string): Policy {
         heading: "How long we keep data",
         blocks: [
           [
-            "Account, diary and reviews: until you delete your account. Deleting it in the settings removes everything at once, public reviews included.",
+            "Account, diary, “Want to see” list and reviews: until you delete your account. Deleting it in the settings removes everything at once, public reviews included.",
             `Sign-in sessions: at most ${SESSION_DAYS} days; expired ones are deleted daily.`,
             `Sign-in links: valid for ${MAGIC_LINK_MINUTES} minutes; expired ones are deleted daily.`,
             `Rate-limiting data: at most ${RATE_LIMIT_RETENTION_DAYS} days.`,

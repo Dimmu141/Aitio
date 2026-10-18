@@ -23,7 +23,7 @@ describe.skipIf(!url)("engagement (integration)", () => {
     db = (await import("@/lib/db")).db;
     digests = await import("@/lib/engagement/send-digests");
     facts = await import("@/lib/engagement/facts");
-    for (const table of ["report", "diaryEntry", "session", "user", "credit", "criticReview", "performance", "production", "person", "stage", "theatre", "tag"] as const) {
+    for (const table of ["report", "watchItem", "diaryEntry", "session", "user", "credit", "criticReview", "performance", "production", "person", "stage", "theatre", "tag"] as const) {
       await (db[table] as { deleteMany: () => Promise<unknown> }).deleteMany();
     }
     const theatre = await db.theatre.create({

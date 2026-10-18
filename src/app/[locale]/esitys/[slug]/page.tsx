@@ -14,6 +14,7 @@ import type { CreditRole } from "@/generated/prisma/enums";
 import type { Dictionary } from "@/i18n/dictionaries/fi";
 import type { Locale } from "@/i18n/config";
 import { href } from "@/i18n/paths";
+import { watchAction } from "@/lib/actions";
 import { getAllSlugs, getProduction, type ProductionPage } from "@/lib/catalogue/queries";
 import { withPlaceholder } from "@/lib/static-params";
 import { formatPerformance, formatShortDate } from "@/lib/format";
@@ -127,6 +128,15 @@ export default async function ProductionRoute({ params }: PageProps<"/[locale]/e
         <Link href={href(locale, "merkitse", page.slug)} className={buttonPrimary}>
           <span aria-hidden="true">＋</span> {t.log.button}
         </Link>
+        {page.next && (
+          <form action={watchAction} className="contents">
+            <input type="hidden" name="locale" value={locale} />
+            <input type="hidden" name="slug" value={page.slug} />
+            <button type="submit" className={buttonSecondary}>
+              <span aria-hidden="true">☆</span> {t.watch.add}
+            </button>
+          </form>
+        )}
         {page.next && page.ticketUrl && !rowTickets && (
           <ExternalLink href={page.ticketUrl} hint={t.production.externalLink} className={buttonSecondary}>
             {t.production.buyTickets}
@@ -134,7 +144,7 @@ export default async function ProductionRoute({ params }: PageProps<"/[locale]/e
         )}
       </div>
 
-      <PerformanceList rows={page.performances} asOf={page.asOf} locale={locale} t={t} />
+      <PerformanceList rows={page.performances} slug={page.slug} asOf={page.asOf} locale={locale} t={t} />
       <AudienceSection ratings={page.ratings} tags={page.tags} reviews={page.reviews} locale={locale} t={t} />
       <CriticLinks critics={page.critics} blogs={page.blogs} locale={locale} t={t} />
       <CreditList credits={page.credits} locale={locale} t={t} />

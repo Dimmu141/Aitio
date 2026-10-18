@@ -8,6 +8,7 @@ import { href } from "@/i18n/paths";
 import { type DiaryEntryView, getDiary } from "@/lib/diary/service";
 import { badges } from "@/lib/engagement/badges";
 import { getEntryFacts, theatreCount } from "@/lib/engagement/facts";
+import { watchlistCount } from "@/lib/diary/watchlist";
 import { helsinkiDate } from "@/lib/format";
 import { requireUser } from "@/lib/session";
 
@@ -28,7 +29,12 @@ function byYear(entries: DiaryEntryView[]): Array<[number, DiaryEntryView[]]> {
 export default async function DiaryPage({ searchParams }: PageProps<"/[locale]/paivakirja">) {
   const [{ locale, t }, query] = await Promise.all([getDictionary(), searchParams]);
   const user = await requireUser(locale, href(locale, "paivakirja"));
-  const [entries, facts, theatres] = await Promise.all([getDiary(user.id), getEntryFacts(user.id), theatreCount()]);
+  const [entries, facts, theatres, watching] = await Promise.all([
+    getDiary(user.id),
+    getEntryFacts(user.id),
+    theatreCount(),
+    watchlistCount(user.id),
+  ]);
   const earned = badges(facts, theatres, helsinkiDate(new Date()));
   const saved = typeof query.saved === "string" ? query.saved : null;
 
@@ -40,6 +46,9 @@ export default async function DiaryPage({ searchParams }: PageProps<"/[locale]/p
           {user.name && <p className="text-lg text-ink-muted">{user.name}</p>}
         </div>
         <nav className="flex flex-wrap gap-x-6">
+          <Link href={href(locale, "haluan-nahda")} className="inline-flex min-h-tap items-center">
+            {t.watch.link(watching)}
+          </Link>
           {entries.length > 0 && (
             <a href="#badges" className="inline-flex min-h-tap items-center">
               {t.badges.title}

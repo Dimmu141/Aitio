@@ -50,6 +50,7 @@ export const fi = {
     clear: "Tyhjennä valinnat",
   },
   production: {
+    addToCalendar: "Kalenteriin",
     durationShort: (minutes: number) => {
       const h = Math.floor(minutes / 60);
       const m = minutes % 60;
@@ -132,6 +133,24 @@ export const fi = {
     people: "Tekijät",
     theatres: "Teatterit",
     credits: (n: number) => (n === 1 ? "1 produktio" : `${n} produktiota`),
+  },
+  watch: {
+    rate: "Olet lisännyt tänään jo paljon esityksiä. Yritä huomenna uudelleen.",
+    title: "Haluan nähdä",
+    add: "Haluan nähdä",
+    added: (title: string) => `${title} on nyt listallasi.`,
+    confirm: (title: string) => `Lisätäänkö ${title} listallesi?`,
+    confirmButton: "Lisää listalle",
+    remove: "Poista listalta",
+    removed: "Poistettu listalta.",
+    intro: "Esitykset, jotka aiot nähdä. Lista näkyy vain sinulle, ja esitys poistuu siltä, kun merkitset sen nähdyksi.",
+    playing: "Ohjelmassa",
+    gone: "Ei enää ohjelmassa",
+    empty: "Listasi on tyhjä. Lisää esityksiä niiden omalta sivulta painikkeella ”Haluan nähdä”.",
+    digestHint: "Haluatko muistutuksen, ennen kuin nämä päättyvät?",
+    digestLink: "Tilaa torstaiviesti asetuksista",
+    digestOn: "Torstaiviesti muistuttaa, kun jokin näistä on päättymässä.",
+    link: (n: number) => `Haluan nähdä (${n})`,
   },
   auth: {
     title: "Kirjaudu",
@@ -249,9 +268,12 @@ export const fi = {
     },
   },
   digest: {
+    subjectSaved: (n: number) => (n === 1 ? "Listaltasi päättyy pian 1 esitys" : `Listaltasi päättyy pian ${n} esitystä`),
+    savedIntro: "Nämä listallasi olevat esitykset päättyvät kahden viikon sisällä:",
+    othersIntro: "Myös nämä päättyvät kahden viikon sisällä:",
     settingsTitle: "Viimeiset esitykset sähköpostiin",
     settingsBody:
-      "Torstaisin lyhyt viesti esityksistä, jotka päättyvät kahden viikon sisällä. Jo näkemäsi jätetään pois, eikä viestiä tule, jos päättyviä esityksiä ei ole.",
+      "Torstaisin lyhyt viesti esityksistä, jotka päättyvät kahden viikon sisällä. Haluan nähdä -listasi esitykset tulevat ensin, jo näkemäsi jätetään pois, eikä viestiä tule, jos päättyviä esityksiä ei ole.",
     optIn: "Haluan viestin torstaisin",
     save: "Tallenna valinta",
     homeLink: "Saa nämä sähköpostiisi torstaisin",

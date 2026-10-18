@@ -10,7 +10,7 @@ function within(pathname: string, base: string): boolean {
 
 /** Which tab a pathname belongs to; accepts the public URL or the internal `/fi/...` route. */
 export function activeTab(pathname: string, locale: Locale): Tab | null {
-  const diary = [href(locale, "paivakirja"), `/${locale}/paivakirja`];
+  const diary = [href(locale, "paivakirja"), `/${locale}/paivakirja`, href(locale, "haluan-nahda"), `/${locale}/haluan-nahda`];
   const settings = [href(locale, "asetukset"), `/${locale}/asetukset`];
   const search = [href(locale, "haku"), `/${locale}/haku`];
   if (search.some((base) => within(pathname, base))) return "search";

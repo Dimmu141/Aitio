@@ -1,7 +1,7 @@
 import { isLocale } from "@/i18n/config";
 import { href } from "@/i18n/paths";
 
-const PERSONAL = new Set(["merkitse", "paivakirja", "asetukset", "ilmoita", "yllapito"]);
+const PERSONAL = new Set(["merkitse", "paivakirja", "haluan-nahda", "asetukset", "ilmoita", "yllapito"]);
 
 /**
  * Where to send a request for a personal page without a session cookie, or null to let
