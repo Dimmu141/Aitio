@@ -1,0 +1,46 @@
+import { describe, expect, it } from "vitest";
+import { toCard } from "./cards";
+
+const asOf = new Date("2026-10-20T10:00:00Z");
+const seen = new Date("2026-10-18T03:00:00Z");
+const day = (n: number) => new Date(asOf.getTime() + n * 24 * 60 * 60 * 1000);
+
+function source(performances: Array<{ startsAt: Date; subtitleLangs: string[] }>, subtitleLangs: string[] = []) {
+  return {
+    slug: "lady-t",
+    title: "Lady T",
+    type: "PLAY" as const,
+    typeOverride: null,
+    languages: ["fi"],
+    subtitleLangs,
+    lastSeenAt: seen,
+    premiereDate: null,
+    runEnd: null,
+    theatre: { slug: "kansallisteatteri", name: "Kansallisteatteri", city: "Helsinki" },
+    stage: null,
+    performances: performances.map((performance) => ({ ...performance, lastSeenAt: seen })),
+  };
+}
+
+describe("toCard subtitles", () => {
+  it("counts a subtitled performance within the next two weeks", () => {
+    const card = toCard(source([{ startsAt: day(1), subtitleLangs: [] }, { startsAt: day(3), subtitleLangs: ["fi", "en"] }]), asOf);
+    expect(card.subtitleLangs).toEqual(["fi", "en"]);
+  });
+
+  it("ignores subtitles only after the window or in the past", () => {
+    const card = toCard(
+      source([
+        { startsAt: day(-2), subtitleLangs: ["en"] },
+        { startsAt: day(1), subtitleLangs: [] },
+        { startsAt: day(20), subtitleLangs: ["en"] },
+      ]),
+      asOf,
+    );
+    expect(card.subtitleLangs).toEqual([]);
+  });
+
+  it("keeps production-wide subtitles", () => {
+    expect(toCard(source([{ startsAt: day(1), subtitleLangs: [] }], ["sv"]), asOf).subtitleLangs).toEqual(["sv"]);
+  });
+});

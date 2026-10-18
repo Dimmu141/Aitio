@@ -20,11 +20,10 @@ export interface FilterOptions {
 const TYPE_ORDER = Object.values(ProductionType);
 
 /**
- * Off until Kansallisteatteri's per-performance subtitles are parsed: its rows have an
- * empty subtitle column in every fixture we have, so the filter would silently miss the
- * biggest theatre. Turn on together with Performance-level subtitle data.
+ * On since the live run of 18 Oct 2026 parsed Kansallisteatteri's per-performance
+ * subtitles. A card matches when any performance in the window has the language.
  */
-export const SUBTITLE_FILTER_ENABLED = false;
+export const SUBTITLE_FILTER_ENABLED = true;
 
 /** Only offer choices that match something, so no filter ever leads to an empty page by itself. */
 export function filterOptions(cards: ProductionCard[]): FilterOptions {

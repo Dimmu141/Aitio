@@ -14,6 +14,7 @@ export interface ProductionCard {
   stage: string | null;
   type: ProductionType;
   languages: string[];
+  /** Subtitles at some performance in the next two weeks (or at every one): what the filter matches. */
   subtitleLangs: string[];
   next: Date | null;
   last: Date | null;
