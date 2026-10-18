@@ -220,3 +220,22 @@ Every adapter has fixtures and tests (`src/scrapers/adapters/*.test.ts`); `fixtu
 - **Seven cron jobs now**: the plan-limit question from milestone 4 still stands.
 - **The year review is private.** A shareable version would need public profiles, which is a privacy decision for later.
 - **The Resend sender address** (`EMAIL_FROM`) is the sign-in one; a separate `uutiset@` address would protect sign-in deliverability if the digest ever gets marked as spam.
+
+## Status: launch readiness
+
+The step-by-step launch is in **`LAUNCH.md`**. What the code now has for it:
+
+- **Privacy policy** at `/tietosuoja` (`/sv/dataskydd`, `/en/privacy`), linked from the footer and the sign-in page. It covers articles 13 and 14 of the GDPR, including the performers whose names come from theatre websites. The retention numbers come from the code's own constants (`SESSION_DAYS`, `MAGIC_LINK_MINUTES`, `RATE_LIMIT_RETENTION_DAYS`, `BACKUP_DAYS`), so the text can't drift from what the code does. The controller comes from `PRIVACY_CONTROLLER` and `PRIVACY_EMAIL`.
+- **Email provider: Brevo** (EU), chosen by `BREVO_API_KEY`; Resend still works. `/api/email/events` takes Brevo's webhook (bearer `EMAIL_WEBHOOK_SECRET`): a hard bounce, spam complaint, invalid or blocked address switches that user's digest off.
+- **Daily cleanup** (`/api/cron/cleanup`): expired sessions (with IP and browser), sign-in tokens, and rate-limit rows older than two days (their keys are email and IP addresses). Before this they were kept forever.
+- **Region**: functions run in Frankfurt (`"regions": ["fra1"]`) next to the database, instead of Vercel's default in Washington.
+- **Security headers**: nosniff, frame-ancestors none / X-Frame-Options, Referrer-Policy, Permissions-Policy, HSTS, no `X-Powered-By`.
+- **`pnpm launch:check <env file>`**: validates a production environment (secrets long enough, https site URL, an email provider, privacy contact, a real scraper contact, no dev email log).
+
+### Known gaps
+
+- **Still no live scrape**: step 0 in `LAUNCH.md`.
+- **No full Content-Security-Policy**: Next's inline scripts would need per-request nonces, which would make every static page dynamic. The headers above stop clickjacking and MIME sniffing; XSS protection rests on React escaping.
+- **Brevo and `List-Unsubscribe`**: Brevo's API documentation says it doesn't accept standard headers, so our one-click unsubscribe header might be dropped or replaced. Step 2 of `LAUNCH.md` says how to check.
+- **The privacy policy is not legal advice**; have it read before launch.
+- **No error tracking** beyond Vercel's logs and the scrape alerts.

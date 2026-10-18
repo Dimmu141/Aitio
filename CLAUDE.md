@@ -18,9 +18,9 @@ Read `BRIEF.md` before starting new work. It holds the product decisions, data s
   - Better Auth instead of Auth.js (BRIEF.md section 2 updated), email magic links only, no passwords or social login.
   - Reviews are public by default with a visible opt-out checkbox; ratings and tags always count anonymously.
 - **Milestone 4 is done** (all six adapters, Vercel Cron, monitoring, `/yllapito`; see README.md "Status: milestone 4"). The new fixtures came from Firecrawl (post-JavaScript), so **the first session with network access must run `pnpm fixtures:refresh && pnpm test` and a dry-run per source** before the cron is trusted.
-- **Before launch:** a privacy policy page (it must now also cover the opt-in digest), a decision on the email provider (Resend is US-based), `CRON_SECRET` and `ADMIN_EMAILS` in Vercel, and confirming the plan allows seven cron jobs of up to 300 s.
+- **Launch decisions made:** Brevo (EU) for email, Neon in Frankfurt with Vercel functions in `fra1`, and the Hobby plan, which is enough (100 cron jobs, once a day, 300 s). The privacy policy lives in `src/lib/privacy.ts` and quotes the retention constants; when you change retention, data collected, or a provider, update it and `POLICY_DATE`.
 - **Milestone 5 is done** (year in review, badges, "closing soon" email; see README.md "Status: milestone 5"). Badges are computed on every view, never stored. The digest is opt-in, and its unsubscribe link is signed, needs no sign-in and never acts on GET.
-- **All milestones in BRIEF.md are built.** Next is launch readiness (live scrape, privacy policy, email provider, Vercel limits); ask Dimmu before starting anything new.
+- **All milestones in BRIEF.md are built, and launch readiness is done in code** (see README.md "Status: launch readiness"). What's left is in `LAUNCH.md`, and most of it is Dimmu's (accounts, DNS, env vars, legal review). The live scrape (step 0) is still blocking. Ask Dimmu before starting anything new.
 
 ## Commands
 
@@ -33,6 +33,7 @@ pnpm db:seed:fixtures        # dev only: fixture productions into the database
 pnpm scrape [sourceId] [--dry-run] [--limit N]
 pnpm fixtures:refresh        # re-download the pages the parser tests use
 pnpm moderation [hide|show <entryId>]  # reported reviews
+pnpm launch:check <env file>  # validate a production environment (see LAUNCH.md)
 ```
 
 ## Conventions and gotchas

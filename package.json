@@ -18,7 +18,8 @@
     "fixtures:refresh": "tsx scripts/refresh-fixtures.ts",
     "postinstall": "prisma generate",
     "test:e2e": "playwright test",
-    "moderation": "tsx scripts/moderation.ts"
+    "moderation": "tsx scripts/moderation.ts",
+    "launch:check": "tsx scripts/launch-check.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.1",
