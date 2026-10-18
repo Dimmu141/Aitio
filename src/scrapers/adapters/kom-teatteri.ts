@@ -188,6 +188,11 @@ export function parseDetail(
   const wanted = normaliseTitle(ref.title);
   const ownRows = calendar.filter((row) => normaliseTitle(row.show) === wanted);
   const performances = mergePerformances(pageDates.performances, ownRows);
+  // "OSTA LIPUT" exactly: the link next to it sells interval refreshments.
+  const ticketUrl = $("main a[href]")
+    .filter((_, element) => /^osta liput$/i.test(cleanText($(element).text())))
+    .first()
+    .attr("href");
   const premiereText = decoded.match(/ensi-ilta\s+(\d{1,2})\.(\d{1,2})\.(\d{4})/i);
 
   return rawProductionDetailSchema.parse({
@@ -195,6 +200,7 @@ export function parseDetail(
     title: properTitle($, ownRows.map((row) => row.show)),
     url: ref.url,
     stage: performances.find((performance) => performance.stage)?.stage ?? DEFAULT_STAGE,
+    ticketUrl: ticketUrl && /^https?:\/\//.test(ticketUrl) ? ticketUrl : undefined,
     // The tagline under the title, only to classify ("Konsertissa kuullaan…"), never stored.
     subtitle: cleanText($("main h2, main h3").first().text()) || undefined,
     durationText: cleanText(decoded.match(/kesto\s+(?:on\s+)?([^.]+)/i)?.[1] ?? "") || undefined,

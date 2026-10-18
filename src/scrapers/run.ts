@@ -5,6 +5,7 @@ import { kansallisteatteriAdapter } from "./adapters/kansallisteatteri";
 import { komTeatteriAdapter } from "./adapters/kom-teatteri";
 import { ryhmateatteriAdapter } from "./adapters/ryhmateatteri";
 import { svenskaTeaternAdapter } from "./adapters/svenska-teatern";
+import { HttpError } from "./http";
 import { planProduction, upsertProduction } from "./normalise";
 import type { RawProductionDetail, SourceAdapter } from "./types";
 
@@ -35,6 +36,8 @@ export interface RunResult {
   found: number;
   saved: number;
   failed: Array<{ url: string; error: string }>;
+  /** Listed by the theatre but its page answers 404: their broken link, not our failure. */
+  missing: string[];
   aborted?: string;
 }
 
@@ -56,7 +59,7 @@ export async function runSource(
   options: RunOptions,
 ): Promise<RunResult> {
   const log = options.log ?? console.log;
-  const result: RunResult = { sourceId: adapter.id, found: 0, saved: 0, failed: [] };
+  const result: RunResult = { sourceId: adapter.id, found: 0, saved: 0, failed: [], missing: [] };
 
   const theatre = db ? await db.theatre.findUnique({ where: { sourceId: adapter.id } }) : null;
   if (db && !theatre) throw new Error(`No theatre with sourceId "${adapter.id}". Run the seed first.`);
@@ -89,6 +92,11 @@ export async function runSource(
       try {
         detail = await adapter.fetchProductionDetail(ref);
       } catch (error) {
+        if (error instanceof HttpError && error.status === 404) {
+          result.missing.push(ref.url);
+          log(`  – ${ref.title}: the theatre links to a page that doesn't exist (404)`);
+          continue;
+        }
         const message = describeError(error);
         result.failed.push({ url: ref.url, error: message });
         log(`  ✗ ${ref.title}: ${message}`);
@@ -119,7 +127,8 @@ export async function runSource(
           finishedAt: new Date(),
           itemsFound: result.found,
           itemsChanged: result.saved,
-          errors: result.failed.length ? result.failed : undefined,
+          errors:
+            result.failed.length || result.missing.length ? { failed: result.failed, missing: result.missing } : undefined,
         },
       });
     }
@@ -132,7 +141,7 @@ export async function runSource(
           status: "FAILED",
           finishedAt: new Date(),
           itemsFound: result.found,
-          errors: { message: describeError(error), failed: result.failed },
+          errors: { message: describeError(error), failed: result.failed, missing: result.missing },
         },
       });
     }

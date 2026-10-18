@@ -18,6 +18,9 @@ describe("mapRoleText", () => {
     ["Svensk översättning och dramaturg", ["TRANSLATOR"]],
     ["Koreografia", ["CHOREOGRAPHER"]],
     ["Uppföranderätt", []],
+    // From HKT's live pages, 2026-10-18.
+    ["Oikeuksien valvoja", []],
+    ["Kirjailija", ["WRITER"]],
   ])("%s", (label, expected) => {
     expect(mapRoleText(label).sort()).toEqual([...expected].sort());
   });

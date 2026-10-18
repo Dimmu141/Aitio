@@ -52,6 +52,10 @@ describe("KOM production page", () => {
     });
   });
 
+  it("takes the ticket link, not the interval refreshments next to it", () => {
+    expect(detail.ticketUrl).toBe("https://kom.lippu.fi/webshop/webticket/shop?production=72");
+  });
+
   it("merges the page's dates with the calendar's tickets", () => {
     expect(detail.performances).toHaveLength(15);
     expect(detail.performances[0]).toEqual({ startsAt: new Date("2026-09-29T10:00:00Z"), stage: "KOM-teatteri" });

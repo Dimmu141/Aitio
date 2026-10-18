@@ -100,7 +100,7 @@ export async function upsertProduction(
     runStart: detail.runStart ?? null,
     runEnd: detail.runEnd ?? null,
     durationText: detail.durationText ?? null,
-    ticketUrl: detail.performances.find((performance) => performance.ticketUrl)?.ticketUrl ?? null,
+    ticketUrl: detail.performances.find((performance) => performance.ticketUrl)?.ticketUrl ?? detail.ticketUrl ?? null,
     lastSeenAt: seenAt,
   };
 

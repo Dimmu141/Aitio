@@ -69,6 +69,8 @@ export const rawProductionDetailSchema = z.object({
   stage: z.string().optional(),
   subtitle: z.string().optional(),
   durationText: z.string().optional(),
+  /** The production's own ticket link, for sources whose performance rows have none (KOM). */
+  ticketUrl: z.url().optional(),
   premiereDate: z.date().optional(),
   runStart: z.date().optional(),
   runEnd: z.date().optional(),

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { HttpError } from "./http";
 import { describeError, looksBroken, runSource } from "./run";
 import type { SourceAdapter } from "./types";
 
@@ -34,9 +35,11 @@ describe("runSource (dry run, no database)", () => {
     fetchProductions: async () => [
       { externalId: "a", title: "Ok", url: "https://example.fi/a", isVisiting: false },
       { externalId: "b", title: "Broken", url: "https://example.fi/b", isVisiting: false },
+      { externalId: "c", title: "Dead link", url: "https://example.fi/c", isVisiting: false },
     ],
     fetchProductionDetail: async (ref) => {
       if (ref.externalId === "b") throw new Error("HTTP 500");
+      if (ref.externalId === "c") throw new HttpError(ref.url, 404);
       return {
         ...ref,
         languages: ["fi"],
@@ -52,8 +55,14 @@ describe("runSource (dry run, no database)", () => {
   it("keeps going when one page fails and reports it", async () => {
     const lines: string[] = [];
     const result = await runSource(null, adapter, { dryRun: true, log: (line) => lines.push(line) });
-    expect(result).toMatchObject({ found: 2, saved: 1 });
+    expect(result).toMatchObject({ found: 3, saved: 1 });
     expect(result.failed).toEqual([{ url: "https://example.fi/b", error: "HTTP 500" }]);
+  });
+
+  it("counts a listed page that answers 404 as the theatre's broken link, not a failure", async () => {
+    const result = await runSource(null, adapter, { dryRun: true, log: () => {} });
+    expect(result.missing).toEqual(["https://example.fi/c"]);
+    expect(result.failed.map((failure) => failure.url)).not.toContain("https://example.fi/c");
   });
 
   it("aborts when the source returns nothing", async () => {

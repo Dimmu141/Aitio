@@ -7,7 +7,8 @@ import type { CreditRoleName } from "./types";
  */
 export function mapRoleText(roleText: string): CreditRoleName[] {
   const text = roleText.toLowerCase();
-  if (/uppföranderätt|esitysoikeu|rättigheter|tuottaja|producent/.test(text)) {
+  // Rights agencies ("Oikeuksien valvoja: Agency North") are companies, not people.
+  if (/uppföranderätt|esitysoikeu|oikeuksien|rättigheter|tuottaja|producent/.test(text)) {
     return [];
   }
   const roles = new Set<CreditRoleName>();
@@ -15,7 +16,7 @@ export function mapRoleText(roleText: string): CreditRoleName[] {
   const isAssistant = /assist|apulais/.test(text);
   if (!isAssistant && /ohjaa|ohjaus|\bregi\b|regiss/.test(text)) roles.add("DIRECTOR");
   if (
-    /käsikirjoit|dramatisoin|\bteksti\b|kirjoittaja|\bav\b|^text\b|manus|dramatis|librett|alkuperäisteos|författ|bearbetning/.test(text)
+    /käsikirjoit|dramatisoin|\bteksti\b|kirjoittaja|kirjailija|\bav\b|^text\b|manus|dramatis|librett|alkuperäisteos|författ|bearbetning/.test(text)
   ) {
     roles.add("WRITER");
   }
