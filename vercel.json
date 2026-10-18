@@ -6,6 +6,7 @@
     { "path": "/api/cron/scrape/hkt", "schedule": "20 3 * * *" },
     { "path": "/api/cron/scrape/ryhmateatteri", "schedule": "30 3 * * *" },
     { "path": "/api/cron/scrape/kom-teatteri", "schedule": "40 3 * * *" },
-    { "path": "/api/cron/scrape/espoon-teatteri", "schedule": "50 3 * * *" }
+    { "path": "/api/cron/scrape/espoon-teatteri", "schedule": "50 3 * * *" },
+    { "path": "/api/cron/digest", "schedule": "0 5 * * 4" }
   ]
 }

@@ -3,8 +3,9 @@ import { Notice } from "@/components/Notice";
 import { buttonDanger, buttonPrimary, buttonSecondary, input } from "@/components/ui";
 import { getDictionary } from "@/i18n";
 import { href } from "@/i18n/paths";
-import { deleteAccountAction, signOutAction, updateNameAction } from "@/lib/actions";
+import { deleteAccountAction, digestAction, signOutAction, updateNameAction } from "@/lib/actions";
 import { MAX_NAME_LENGTH } from "@/lib/diary/service";
+import { getDigestOptIn } from "@/lib/engagement/send-digests";
 import { isAdmin } from "@/lib/ops/admin";
 import { requireUser } from "@/lib/session";
 
@@ -16,11 +17,12 @@ export const metadata: Metadata = { robots: { index: false } };
 export default async function SettingsPage({ searchParams }: PageProps<"/[locale]/asetukset">) {
   const [{ locale, t }, query] = await Promise.all([getDictionary(), searchParams]);
   const user = await requireUser(locale, href(locale, "asetukset"));
+  const digest = await getDigestOptIn(user.id);
 
   return (
     <div className="max-w-xl space-y-10">
       <h1 className="border-b-4 border-double border-ink pb-4 text-4xl font-semibold">{t.settings.title}</h1>
-      {query.saved && <Notice>{t.settings.saved}</Notice>}
+      {query.saved === "1" && <Notice>{t.settings.saved}</Notice>}
 
       <form action={updateNameAction} className="space-y-3">
         <input type="hidden" name="locale" value={locale} />
@@ -33,6 +35,24 @@ export default async function SettingsPage({ searchParams }: PageProps<"/[locale
           {t.settings.save}
         </button>
       </form>
+
+      <section id="kooste" aria-labelledby="kooste-title" className="scroll-mt-4 space-y-3">
+        <h2 id="kooste-title" className="text-xl font-semibold">
+          {t.digest.settingsTitle}
+        </h2>
+        {query.saved === "digest" && <Notice>{t.settings.saved}</Notice>}
+        <p>{t.digest.settingsBody}</p>
+        <form action={digestAction} className="space-y-3">
+          <input type="hidden" name="locale" value={locale} />
+          <label className="flex min-h-tap items-center gap-3">
+            <input type="checkbox" name="digest" defaultChecked={digest} className="size-6 shrink-0 accent-accent" />
+            {t.digest.optIn}
+          </label>
+          <button type="submit" className={buttonSecondary}>
+            {t.digest.save}
+          </button>
+        </form>
+      </section>
 
       <section className="space-y-3">
         <h2 className="text-xl font-semibold">{t.settings.email}</h2>

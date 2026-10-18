@@ -4,6 +4,8 @@ export interface EmailMessage {
   to: string;
   subject: string;
   text: string;
+  /** Extra headers, e.g. List-Unsubscribe on the digest. */
+  headers?: Record<string, string>;
 }
 
 /**
@@ -33,6 +35,7 @@ async function sendWithResend(message: EmailMessage, apiKey: string): Promise<vo
       to: message.to,
       subject: message.subject,
       text: message.text,
+      headers: message.headers,
     }),
   });
   if (!response.ok) throw new Error(`Resend answered ${response.status}: ${await response.text()}`);

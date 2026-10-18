@@ -1,8 +1,10 @@
+import Link from "next/link";
 import { FilterBar } from "@/components/FilterBar";
 import { ProductionCard } from "@/components/ProductionCard";
 import { getDictionary } from "@/i18n";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/fi";
+import { href } from "@/i18n/paths";
 import { applyFilters, filterOptions, parseFilters } from "@/lib/catalogue/filters";
 import { getOnStage } from "@/lib/catalogue/queries";
 import { formatDate } from "@/lib/format";
@@ -57,6 +59,11 @@ async function OnStage({
               />
             ))}
           </ul>
+          <p className="pt-2">
+            <Link href={`${href(locale, "asetukset")}#kooste`} className="inline-flex min-h-tap items-center">
+              {t.digest.homeLink}
+            </Link>
+          </p>
         </section>
       )}
 

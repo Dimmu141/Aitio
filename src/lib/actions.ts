@@ -12,6 +12,7 @@ import { CLIENT_IP_HEADERS } from "@/lib/auth-config";
 import { productionTag } from "@/lib/catalogue/tags";
 import { formFields, parseEntryForm } from "@/lib/diary/entry-form";
 import * as diary from "@/lib/diary/service";
+import { setDigest, unsubscribe } from "@/lib/engagement/send-digests";
 import { consume, LIMITS } from "@/lib/rate-limit";
 import { safeNext } from "@/lib/safe-next";
 import { requireUser } from "@/lib/session";
@@ -140,4 +141,21 @@ export async function deleteAccountAction(formData: FormData): Promise<void> {
   await auth.api.signOut({ headers: await headers() });
   for (const slug of await diary.deleteAccount(user.id)) updateTag(productionTag(slug));
   redirect(withQuery(href(locale), { accountDeleted: "1" }));
+}
+
+export async function digestAction(formData: FormData): Promise<void> {
+  const locale = localeOf(formData);
+  const settings = href(locale, "asetukset");
+  const user = await requireUser(locale, settings);
+  // An unticked checkbox sends nothing, which means "off".
+  await setDigest(user.id, text(formData, "digest") === "on", locale);
+  redirect(`${withQuery(settings, { saved: "digest" })}#kooste`);
+}
+
+/** No session needed: the signed link from the email is the proof. */
+export async function unsubscribeAction(formData: FormData): Promise<void> {
+  const locale = localeOf(formData);
+  const page = href(locale, "peru-tilaus");
+  const done = await unsubscribe(text(formData, "u"), text(formData, "s"));
+  redirect(withQuery(page, done ? { done: "1" } : { error: "invalid" }));
 }

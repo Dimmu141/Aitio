@@ -217,7 +217,7 @@ export async function deleteAccount(userId: string): Promise<string[]> {
 export async function exportData(userId: string) {
   const user = await db.user.findUniqueOrThrow({
     where: { id: userId },
-    select: { email: true, name: true, locale: true, createdAt: true },
+    select: { email: true, name: true, locale: true, digestOptIn: true, digestSentAt: true, createdAt: true },
   });
   const entries = await getDiary(userId);
   const reports = await db.report.findMany({

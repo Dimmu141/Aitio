@@ -152,6 +152,9 @@ model User {
   name          String       @default("")
   image         String?
   locale        String       @default("fi")
+  /// Opt-in weekly "closing soon" email; locale above decides its language.
+  digestOptIn   Boolean      @default(false)
+  digestSentAt  DateTime?
   sessions      Session[]
   accounts      Account[]
   diaryEntries  DiaryEntry[]

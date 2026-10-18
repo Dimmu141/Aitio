@@ -1,6 +1,7 @@
 import { cacheLife, cacheTag } from "next/cache";
 import type { CreditRole, ProductionType } from "@/generated/prisma/enums";
 import { db } from "@/lib/db";
+import { cardSelect, toCard } from "./cards";
 import {
   effectiveType,
   isCurrent,
@@ -24,54 +25,6 @@ export const CATALOGUE_TAG = "catalogue";
 function cacheCatalogue(): void {
   cacheLife("hours");
   cacheTag(CATALOGUE_TAG);
-}
-
-const theatreSelect = { select: { slug: true, name: true, city: true } } as const;
-
-const cardSelect = {
-  slug: true,
-  title: true,
-  type: true,
-  typeOverride: true,
-  languages: true,
-  subtitleLangs: true,
-  lastSeenAt: true,
-  premiereDate: true,
-  runEnd: true,
-  theatre: theatreSelect,
-  stage: { select: { name: true } },
-  performances: { select: { startsAt: true, lastSeenAt: true }, orderBy: { startsAt: "asc" } },
-} as const;
-
-interface CardSource {
-  slug: string;
-  title: string;
-  type: ProductionType;
-  typeOverride: ProductionType | null;
-  languages: string[];
-  subtitleLangs: string[];
-  lastSeenAt: Date;
-  premiereDate: Date | null;
-  runEnd: Date | null;
-  theatre: TheatreRef;
-  stage: { name: string } | null;
-  performances: Array<{ startsAt: Date; lastSeenAt: Date }>;
-}
-
-export function toCard(source: CardSource, asOf: Date): ProductionCard {
-  const upcoming = upcomingPerformances(source.performances, source, asOf);
-  const timing = schedule(upcoming, asOf);
-  return {
-    slug: source.slug,
-    title: source.title,
-    theatre: source.theatre,
-    stage: source.stage?.name ?? null,
-    type: effectiveType(source),
-    languages: source.languages,
-    subtitleLangs: source.subtitleLangs,
-    ...timing,
-    year: timing.next ? null : lastYear([source.performances.at(-1)?.startsAt, source.runEnd, source.premiereDate]),
-  };
 }
 
 const byNext = (a: ProductionCard, b: ProductionCard) =>
