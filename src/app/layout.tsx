@@ -1,5 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Atkinson_Hyperlegible, Newsreader } from "next/font/google";
+import { SiteFooter, SiteHeader } from "@/components/SiteHeader";
+import { t } from "@/i18n/fi";
+import { siteUrl } from "@/lib/site";
 import "./globals.css";
 
 const newsreader = Newsreader({
@@ -17,14 +20,24 @@ const atkinson = Atkinson_Hyperlegible({
 });
 
 export const metadata: Metadata = {
-  title: "Aitio",
-  description: "Suomen teatterin päiväkirja: mitä on ohjelmassa, mitä olet nähnyt ja mitä muut ajattelivat.",
+  metadataBase: new URL(siteUrl()),
+  title: { default: `${t.site.name}: ${t.site.tagline}`, template: `%s | ${t.site.name}` },
+  description: t.site.description,
+  openGraph: { siteName: t.site.name, locale: "fi_FI", type: "website" },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#f7f2e8",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="fi" data-theme="light" className={`${newsreader.variable} ${atkinson.variable} h-full`}>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        <SiteHeader />
+        <main className="mx-auto w-full max-w-measure flex-1 px-4 pt-6">{children}</main>
+        <SiteFooter />
+      </body>
     </html>
   );
 }

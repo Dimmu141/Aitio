@@ -13,7 +13,8 @@ Read `BRIEF.md` before starting new work. It holds the product decisions, data s
   3. `pnpm db:migrate --name init` (no migration was committed yet; commit the generated `prisma/migrations` folder)
   4. `pnpm db:seed`
   5. `pnpm scrape --dry-run --limit 3`: the first ever run against the live sites. Fix any parser problems before scraping fully.
-- **Next: milestone 2**, the read-only site (BRIEF.md section 7). Start by proposing the route structure and component list, and wait for Dimmu's OK.
+- **Milestone 2 is in progress**: pages, components and design tokens exist (see README.md). Remaining: sv/en UI, cache purge after scraping, share images, `Credit.roleText`.
+- **Design system**: https://claude.ai/artifact/P8RU9CHVFfvPRLkiQax68J holds the tokens, component rules and the production page specimen. `src/app/globals.css` mirrors its tokens; change both together.
 
 ## Commands
 
