@@ -115,6 +115,8 @@ export const fi = {
     emailSubject: "Kirjaudu Aitioon",
     emailBody: (url: string, minutes: number) =>
       `Hei!\n\nKirjaudu Aitioon avaamalla tämä linkki:\n${url}\n\nLinkki on voimassa ${minutes} minuuttia ja toimii kerran. Jos et pyytänyt linkkiä, voit jättää tämän viestin huomiotta.\n\nAitio`,
+    privacyNote: "Kirjautuessasi ensimmäistä kertaa sinulle luodaan tili. Lue, miten käsittelemme tietoja:",
+    privacyLink: "Tietosuojaseloste",
     signOut: "Kirjaudu ulos",
   },
   log: {
@@ -259,6 +261,7 @@ export const fi = {
   footer: {
     facts:
       "Aitio kokoaa esitystiedot teatterien omilta verkkosivuilta. Liput ostetaan aina teatterin omasta lippukaupasta.",
+    privacy: "Tietosuoja",
   },
   notFound: {
     title: "Sivua ei löytynyt",

@@ -113,6 +113,8 @@ export const en: Dictionary = {
     emailSubject: "Sign in to Aitio",
     emailBody: (url: string, minutes: number) =>
       `Hello!\n\nSign in to Aitio by opening this link:\n${url}\n\nThe link works for ${minutes} minutes and only once. If you didn't ask for it, you can ignore this email.\n\nAitio`,
+    privacyNote: "Signing in for the first time creates an account. Read how we handle data:",
+    privacyLink: "Privacy policy",
     signOut: "Sign out",
   },
   log: {
@@ -257,6 +259,7 @@ export const en: Dictionary = {
   footer: {
     facts:
       "Aitio collects its listings from the theatres' own websites. Tickets are always bought from the theatre's own box office.",
+    privacy: "Privacy",
   },
   notFound: {
     title: "Page not found",

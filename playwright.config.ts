@@ -29,6 +29,7 @@ export default defineConfig({
       DEV_EMAIL_LOG_FILE: EMAIL_LOG,
       REVALIDATE_SECRET: "e2e-revalidate-secret",
       CRON_SECRET: "e2e-cron-secret",
+      EMAIL_WEBHOOK_SECRET: "e2e-webhook-secret",
       ADMIN_EMAILS: ADMIN_EMAIL,
     },
     url: "http://localhost:3000",

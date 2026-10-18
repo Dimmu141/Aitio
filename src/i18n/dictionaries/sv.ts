@@ -113,6 +113,8 @@ export const sv: Dictionary = {
     emailSubject: "Logga in på Aitio",
     emailBody: (url: string, minutes: number) =>
       `Hej!\n\nLogga in på Aitio genom att öppna den här länken:\n${url}\n\nLänken gäller i ${minutes} minuter och fungerar en gång. Om du inte bad om länken kan du strunta i det här meddelandet.\n\nAitio`,
+    privacyNote: "Första gången du loggar in skapas ett konto. Läs hur vi behandlar uppgifter:",
+    privacyLink: "Dataskyddsbeskrivning",
     signOut: "Logga ut",
   },
   log: {
@@ -257,6 +259,7 @@ export const sv: Dictionary = {
   footer: {
     facts:
       "Aitio samlar uppgifterna från teatrarnas egna webbplatser. Biljetter köps alltid i teaterns egen biljettbutik.",
+    privacy: "Dataskydd",
   },
   notFound: {
     title: "Sidan hittades inte",

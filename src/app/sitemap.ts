@@ -21,6 +21,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const { productions, theatres, people } = await getAllSlugs();
   return [
     ...entries(undefined, undefined),
+    ...entries("tietosuoja", undefined),
     ...productions.flatMap(({ slug, updatedAt }) => entries("esitys", slug, updatedAt)),
     ...theatres.flatMap(({ slug, updatedAt }) => entries("teatteri", slug, updatedAt)),
     ...people.flatMap(({ slug }) => entries("henkilo", slug)),

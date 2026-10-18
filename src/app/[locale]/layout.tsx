@@ -44,7 +44,7 @@ export default async function RootLayout({ children }: LayoutProps<"/[locale]">)
         <main id="main" className="mx-auto w-full max-w-3xl flex-1 px-4 py-6">
           {children}
         </main>
-        <SiteFooter t={t} />
+        <SiteFooter locale={locale} t={t} />
       </body>
     </html>
   );

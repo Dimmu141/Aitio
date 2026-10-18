@@ -86,6 +86,9 @@ export default async function SignInPage({ searchParams }: PageProps<"/[locale]/
           {t.auth.send}
         </button>
       </form>
+      <p className="text-base text-ink-muted">
+        {t.auth.privacyNote} <a href={href(locale, "tietosuoja")}>{t.auth.privacyLink}</a>
+      </p>
     </div>
   );
 }
