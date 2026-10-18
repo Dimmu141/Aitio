@@ -14,10 +14,12 @@ export const en: Dictionary = {
     title: "What's on",
     intro: "Performances in the next two weeks.",
     closingSoon: "Last chance",
-    closingSoonIntro: "These close within two weeks.",
+    closingCount: (n: number) => (n === 1 ? "One of these ends within two weeks." : `${n} of these end within two weeks.`),
+    today: "Today",
+    tomorrow: "Tomorrow",
+    byNext: "by next performance",
     empty: "No performances match these choices. Try widening them.",
     count: (n: number) => (n === 1 ? "1 production" : `${n} productions`),
-    closes: (date: string) => `Last performance ${date}`,
   },
   filters: {
     legend: "Narrow down",
@@ -42,6 +44,7 @@ export const en: Dictionary = {
     performances: "Upcoming performances",
     performanceTickets: "Tickets",
     showAllPerformances: (n: number) => `Show all ${n} performances`,
+    at: (time: string) => time,
     directedBy: "directed by",
     remaining: (n: number, last: string) => `${n === 1 ? "1 performance" : `${n} performances`} left · last ${last}`,
     ends: "Ends",
@@ -272,6 +275,8 @@ export const en: Dictionary = {
     facts:
       "Aitio collects its listings from the theatres' own websites. Tickets are always bought from the theatre's own box office.",
     privacy: "Privacy",
+    about: "About Aitio",
+    contact: "Feedback and corrections",
   },
   notFound: {
     title: "Page not found",

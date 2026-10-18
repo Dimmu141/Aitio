@@ -77,6 +77,14 @@ test("the production page has event JSON-LD and outbound ticket links", async ({
   await expect(page.getByRole("link", { name: /^Liput/ }).first()).toHaveAttribute("rel", /noopener/);
 });
 
+test("the about page is linked from the footer in every language", async ({ page }) => {
+  await page.goto("/sv");
+  await page.getByRole("contentinfo").getByRole("link", { name: "Om Aitio" }).click();
+  await expect(page).toHaveURL(/\/sv\/om$/);
+  await expect(page.getByRole("heading", { level: 1, name: "Om Aitio" })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Kansallisteatteri/ })).toHaveAttribute("rel", /noopener/);
+});
+
 test("sitemap, robots and manifest are served", async ({ request }) => {
   const sitemap = await (await request.get("/sitemap.xml")).text();
   expect(sitemap).toContain("/sv/forestallning/nattland-svenska-teatern");

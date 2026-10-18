@@ -29,6 +29,10 @@ const cards = [
 const options = filterOptions(cards);
 
 describe("filterOptions", () => {
+  it("never offers the classifier's don't-know as a type", () => {
+    expect(filterOptions([card({ type: "OTHER" }), card({ type: "PLAY" })]).type).toEqual(["PLAY"]);
+  });
+
   it("lists only values that occur, in a stable order", () => {
     expect(options).toEqual({
       city: ["Espoo", "Helsinki"],

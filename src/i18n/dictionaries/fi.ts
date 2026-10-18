@@ -25,10 +25,12 @@ export const fi = {
     title: "Ohjelmassa",
     intro: "Esitykset seuraavan kahden viikon aikana.",
     closingSoon: "Viimeiset esitykset",
-    closingSoonIntro: "Nämä päättyvät kahden viikon sisällä.",
+    closingCount: (n: number) => (n === 1 ? "Yksi näistä päättyy kahden viikon sisällä." : `${n} näistä päättyy kahden viikon sisällä.`),
+    today: "Tänään",
+    tomorrow: "Huomenna",
+    byNext: "seuraavan esityksen mukaan",
     empty: "Näillä valinnoilla ei löytynyt esityksiä. Kokeile väljempiä valintoja.",
     count: (n: number) => (n === 1 ? "1 esitys ohjelmassa" : `${n} esitystä ohjelmassa`),
-    closes: (date: string) => `Viimeinen esitys ${date}`,
   },
   filters: {
     legend: "Rajaa esityksiä",
@@ -53,6 +55,7 @@ export const fi = {
     performances: "Tulevat esitykset",
     performanceTickets: "Liput",
     showAllPerformances: (n: number) => `Näytä kaikki ${n} esitystä`,
+    at: (time: string) => `klo ${time}`,
     directedBy: "ohjaus",
     remaining: (n: number, last: string) => `${n === 1 ? "1 esitys" : `${n} esitystä`} jäljellä · viimeinen ${last}`,
     ends: "Päättyy",
@@ -274,6 +277,8 @@ export const fi = {
     facts:
       "Aitio kokoaa esitystiedot teatterien omilta verkkosivuilta. Liput ostetaan aina teatterin omasta lippukaupasta.",
     privacy: "Tietosuoja",
+    about: "Tietoa Aitiosta",
+    contact: "Palaute ja korjaukset",
   },
   notFound: {
     title: "Sivua ei löytynyt",

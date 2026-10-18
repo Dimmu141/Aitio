@@ -7,7 +7,8 @@ import type { Dictionary } from "@/i18n/dictionaries/fi";
 import { href } from "@/i18n/paths";
 import { applyFilters, filterOptions, parseFilters } from "@/lib/catalogue/filters";
 import { getOnStage } from "@/lib/catalogue/queries";
-import { formatDate } from "@/lib/format";
+import { formatDayHeading, formatShortDate } from "@/lib/format";
+import { type Day, groupByNextDay } from "@/lib/catalogue/days";
 import { pageMetadata } from "@/lib/metadata";
 
 /**
@@ -35,55 +36,53 @@ async function OnStage({
   const options = filterOptions(cards);
   const filters = parseFilters(params, options);
   const shown = applyFilters(cards, filters);
-  const closing = shown.filter((card) => card.closingSoon);
+  const closing = shown.filter((card) => card.closingSoon).length;
+  const days = groupByNextDay(shown, asOf);
+  const dayName = (day: Day) =>
+    day.relative === "today"
+      ? t.home.today
+      : day.relative === "tomorrow"
+        ? t.home.tomorrow
+        : formatDayHeading(day.sample, locale);
 
   return (
     <div>
       <FilterBar options={options} filters={filters} locale={locale} t={t} />
-
-      {closing.length > 0 && (
-        <section aria-labelledby="closing" className="ai-section">
-          <div className="ai-section__head">
-            <h2 id="closing" className="ai-section__title">
-              <span aria-hidden="true">⏳ </span>
-              {t.home.closingSoon}
-            </h2>
-            <p className="ai-section__aside">{t.home.closingSoonIntro}</p>
-          </div>
-          <ul>
-            {closing.map((card) => (
-              <ProductionCard
-                key={card.slug}
-                card={card}
-                asOf={asOf}
-                locale={locale}
-                t={t}
-                note={card.end ? t.home.closes(formatDate(card.end, locale)) : undefined}
-              />
-            ))}
-          </ul>
-          <p className="pt-2">
-            <Link href={`${href(locale, "asetukset")}#kooste`} className="inline-flex min-h-tap items-center">
-              {t.digest.homeLink}
-            </Link>
-          </p>
-        </section>
-      )}
 
       <section aria-labelledby="all" className="ai-section">
         <div className="ai-section__head">
           <h2 id="all" className="ai-section__title" aria-live="polite">
             {t.home.count(shown.length)}
           </h2>
+          <p className="ai-section__aside">{t.home.byNext}</p>
         </div>
+        {closing > 0 && (
+          <p className="text-meta">
+            <span aria-hidden="true">⏳ </span>
+            {t.home.closingCount(closing)}{" "}
+            <Link href={`${href(locale, "asetukset")}#kooste`} className="inline-flex min-h-tap items-center">
+              {t.digest.homeLink}
+            </Link>
+          </p>
+        )}
         {shown.length === 0 ? (
           <p className="py-6">{t.home.empty}</p>
         ) : (
-          <ul>
-            {shown.map((card) => (
-              <ProductionCard key={card.slug} card={card} asOf={asOf} locale={locale} t={t} />
-            ))}
-          </ul>
+          days.map((day) => (
+            <section key={day.date} aria-labelledby={`day-${day.date}`} className="mt-6">
+              <h3 id={`day-${day.date}`} className="border-b-2 border-ink pb-1 font-sans text-body font-bold">
+                {dayName(day)}
+                {day.relative && (
+                  <span className="font-normal text-ink-muted"> · {formatShortDate(day.sample, locale, asOf)}</span>
+                )}
+              </h3>
+              <ul>
+                {day.cards.map((card) => (
+                  <ProductionCard key={card.slug} card={card} asOf={asOf} locale={locale} t={t} when="time" heading="h4" />
+                ))}
+              </ul>
+            </section>
+          ))
         )}
       </section>
     </div>

@@ -31,6 +31,22 @@ export function formatShortDate(date: Date, locale: Locale, asOf: Date, weekday 
   }).format(date);
 }
 
+/** "18.30": a performance time on a day that's already named by a heading. */
+export function formatTime(date: Date, locale: Locale): string {
+  return new Intl.DateTimeFormat(INTL_LOCALE[locale], { timeZone: TIME_ZONE, hour: "2-digit", minute: "2-digit" }).format(date);
+}
+
+/** "Keskiviikko 21.10.": a day heading, capitalised. */
+export function formatDayHeading(date: Date, locale: Locale): string {
+  const text = new Intl.DateTimeFormat(INTL_LOCALE[locale], {
+    timeZone: TIME_ZONE,
+    weekday: "long",
+    day: "numeric",
+    month: "numeric",
+  }).format(date);
+  return text.charAt(0).toLocaleUpperCase(INTL_LOCALE[locale]) + text.slice(1);
+}
+
 /** "23. lokakuuta 2026". */
 export function formatDate(date: Date, locale: Locale): string {
   return new Intl.DateTimeFormat(INTL_LOCALE[locale], {

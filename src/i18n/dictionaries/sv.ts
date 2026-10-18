@@ -14,10 +14,12 @@ export const sv: Dictionary = {
     title: "På repertoaren",
     intro: "Föreställningar under de kommande två veckorna.",
     closingSoon: "Sista chansen",
-    closingSoonIntro: "De här slutar spelas inom två veckor.",
+    closingCount: (n: number) => (n === 1 ? "En av dessa slutar inom två veckor." : `${n} av dessa slutar inom två veckor.`),
+    today: "I dag",
+    tomorrow: "I morgon",
+    byNext: "efter nästa föreställning",
     empty: "Inga föreställningar med de här valen. Prova bredare val.",
     count: (n: number) => (n === 1 ? "1 föreställning" : `${n} föreställningar`),
-    closes: (date: string) => `Sista föreställningen ${date}`,
   },
   filters: {
     legend: "Avgränsa föreställningar",
@@ -42,6 +44,7 @@ export const sv: Dictionary = {
     performances: "Kommande föreställningar",
     performanceTickets: "Biljetter",
     showAllPerformances: (n: number) => `Visa alla ${n} föreställningar`,
+    at: (time: string) => `kl. ${time}`,
     directedBy: "regi",
     remaining: (n: number, last: string) => `${n === 1 ? "1 föreställning" : `${n} föreställningar`} kvar · sista ${last}`,
     ends: "Slutar",
@@ -272,6 +275,8 @@ export const sv: Dictionary = {
     facts:
       "Aitio samlar uppgifterna från teatrarnas egna webbplatser. Biljetter köps alltid i teaterns egen biljettbutik.",
     privacy: "Dataskydd",
+    about: "Om Aitio",
+    contact: "Respons och rättelser",
   },
   notFound: {
     title: "Sidan hittades inte",

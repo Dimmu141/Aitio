@@ -19,6 +19,7 @@ import { withPlaceholder } from "@/lib/static-params";
 import { formatPerformance, formatShortDate } from "@/lib/format";
 import { productionJsonLd, serializeJsonLd } from "@/lib/jsonld";
 import { pageMetadata } from "@/lib/metadata";
+import { typeLabel } from "@/lib/catalogue/type-label";
 import { absoluteUrl } from "@/lib/site";
 
 /**
@@ -39,7 +40,7 @@ function describe(page: ProductionPage, locale: Locale, t: Dictionary): string {
     : page.year
       ? `${t.production.performedIn(page.year)}.`
       : "";
-  return `${t.types[page.type]} · ${where}. ${when}`.trim();
+  return [typeLabel(page.type, t), `${where}. ${when}`].filter(Boolean).join(" · ").trim();
 }
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/esitys/[slug]">) {
@@ -92,7 +93,8 @@ export default async function ProductionRoute({ params }: PageProps<"/[locale]/e
               <span aria-hidden="true">⏳</span> {t.home.closingSoon}
             </Badge>
           )}
-          <Badge>{page.year ? `${t.types[page.type]} · ${t.production.performedIn(page.year)}` : t.types[page.type]}</Badge>
+          {typeLabel(page.type, t) && <Badge>{typeLabel(page.type, t)}</Badge>}
+          {page.year && <Badge variant="quiet">{t.production.performedIn(page.year)}</Badge>}
           {page.languages.map((code) => (
             <Badge key={code} title={`${t.production.language}: ${t.languages[code] ?? code}`}>
               {code.length === 2 && <span className="ai-badge__code">{code.toUpperCase()}</span>}

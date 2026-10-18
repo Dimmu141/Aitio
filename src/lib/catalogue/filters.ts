@@ -30,7 +30,8 @@ export function filterOptions(cards: ProductionCard[]): FilterOptions {
   const unique = <T,>(values: T[]) => [...new Set(values)];
   return {
     city: unique(cards.map((card) => card.theatre.city)).sort((a, b) => a.localeCompare(b, "fi")),
-    type: unique(cards.map((card) => card.type)).sort((a, b) => TYPE_ORDER.indexOf(a) - TYPE_ORDER.indexOf(b)),
+    // "Muu" is the classifier's don't-know, not a kind of show anyone looks for.
+    type: unique(cards.map((card) => card.type).filter((type) => type !== "OTHER")).sort((a, b) => TYPE_ORDER.indexOf(a) - TYPE_ORDER.indexOf(b)),
     lang: unique(cards.flatMap((card) => card.languages)).sort(),
     subs: SUBTITLE_FILTER_ENABLED ? unique(cards.flatMap((card) => card.subtitleLangs)).sort() : [],
   };
