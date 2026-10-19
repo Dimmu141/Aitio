@@ -10,6 +10,7 @@ import {
   stripGuestMarker,
   weekdaysIn,
   yearFromWeekday,
+  splitPeople,
 } from "./text";
 
 describe("helsinkiToUtc", () => {
@@ -112,5 +113,30 @@ describe("personName", () => {
     ["  ", null],
   ])("%s", (raw, expected) => {
     expect(personName(raw)).toBe(expected);
+  });
+});
+
+// Every case is a person record production held on 19 Oct 2026.
+describe("splitPeople", () => {
+  it.each([
+    ["Max Martin ja ystävät", ["Max Martin"]],
+    ["Anna-Maria Lipponen + Studio Total", ["Anna-Maria Lipponen"]],
+    ["Carl Knif & Kristofer Möller", ["Carl Knif", "Kristofer Möller"]],
+    ["Jonte Ramsten, Ville Virtanen och Birthe Wingren", ["Jonte Ramsten", "Ville Virtanen", "Birthe Wingren"]],
+    ["Eva-Maria Dahlin och Lisa Lindén", ["Eva-Maria Dahlin", "Lisa Lindén"]],
+    ["Kristian Smeds", ["Kristian Smeds"]],
+    ["Pia Ingman m.fl.", ["Pia Ingman"]],
+  ])("%s", (raw, people) => {
+    expect(splitPeople(raw)).toEqual(people);
+  });
+
+  it("refuses role labels stored as names", () => {
+    expect(splitPeople("Grafisk design och logga")).toEqual([]);
+    expect(splitPeople("Koncept och manus")).toEqual([]);
+  });
+
+  it("never makes a person of a group or a company alone", () => {
+    expect(splitPeople("ATR-tuotanto Oy")).toEqual([]);
+    expect(splitPeople("ystävät")).toEqual([]);
   });
 });

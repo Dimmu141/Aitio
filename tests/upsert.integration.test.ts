@@ -134,4 +134,26 @@ describe.skipIf(!url)("upsertProduction (integration)", () => {
     expect(await syncListing(db, theatre.id, ["34985"], new Date())).toBe(0);
     expect((await db.production.findUniqueOrThrow({ where: { slug: "nattland-svenska-teatern" } })).delistedAt).toBeNull();
   });
+  it("splits credit cells into people and never stores a group as a person", async () => {
+    const { productionId } = await upsertProduction(
+      db,
+      theatre,
+      {
+        ...detail,
+        externalId: "split-people",
+        title: "Split people",
+        url: "https://svenskateatern.fi/repertoar/split-people/",
+        credits: [
+          { name: "Max Martin ja ystävät", roleText: "Sävellys", roles: ["COMPOSER"] },
+          { name: "Carl Knif & Kristofer Möller", roleText: "Regi", roles: ["DIRECTOR"] },
+          { name: "Koncept och manus", roleText: "Text", roles: ["WRITER"] },
+        ],
+      },
+      new Date(),
+    );
+    const credits = await db.credit.findMany({ where: { productionId }, include: { person: true } });
+    const names = credits.map((credit) => credit.person.name).sort();
+    expect(names).toEqual(expect.arrayContaining(["Carl Knif", "Kristofer Möller", "Max Martin"]));
+    expect(await db.person.count({ where: { name: { in: ["Max Martin ja ystävät", "Koncept och manus"] } } })).toBe(0);
+  });
 });
