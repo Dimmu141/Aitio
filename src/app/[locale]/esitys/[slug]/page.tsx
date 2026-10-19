@@ -97,13 +97,7 @@ export default async function ProductionRoute({ params }: PageProps<"/[locale]/e
               {t.production.spokenIn[code] ?? t.languages[code] ?? code}
             </Badge>
           ))}
-          {page.subtitleLangs.length > 0 && (
-            <Badge
-              title={`${t.production.subtitles}: ${page.subtitleLangs.map((code) => t.languages[code] ?? code).join(", ")}`}
-            >
-              {subtitleText(page.subtitleLangs, t)}
-            </Badge>
-          )}
+          {subtitleText(page.subtitleLangs, t) && <Badge>{subtitleText(page.subtitleLangs, t)}</Badge>}
         </BadgeRow>
       </header>
 

@@ -71,7 +71,7 @@ export const sv: Dictionary = {
     criticsAside: "länkar till originalen",
     sourceLine: "Uppgifter",
     updated: "uppdaterad",
-    spokenIn: { it: "på italienska", fi: "på finska", sv: "på svenska", en: "på engelska", ru: "på ryska", uk: "på ukrainska", es: "på spanska", ar: "på arabiska", lv: "på lettiska", et: "på estniska", fr: "på franska", de: "på tyska", sign: "på teckenspråk", zxx: "ordlös" },
+    spokenIn: { it: "på italienska", fi: "på finska", sv: "på svenska", en: "på engelska", ru: "på ryska", uk: "på ukrainska", es: "på spanska", ar: "på arabiska", lv: "på lettiska", et: "på estniska", fr: "på franska", de: "på tyska", sign: "på teckenspråk", zxx: "ordlös föreställning" },
     histogramLabel: "Betygsfördelning",
     stars: (value: number) => `${value.toLocaleString("sv-FI")} stjärnor`,
     stage: "Scen",
@@ -114,7 +114,7 @@ export const sv: Dictionary = {
     TALK: "Samtal",
     OTHER: "Övrigt",
   },
-  languages: { it: "italienska", fi: "finska", sv: "svenska", en: "engelska", ru: "ryska", uk: "ukrainska", es: "spanska", ar: "arabiska", lv: "lettiska", et: "estniska", fr: "franska", de: "tyska", sign: "teckenspråk", zxx: "ordlös" },
+  languages: { it: "italienska", fi: "finska", sv: "svenska", en: "engelska", ru: "ryska", uk: "ukrainska", es: "spanska", ar: "arabiska", lv: "lettiska", et: "estniska", fr: "franska", de: "tyska", sign: "teckenspråk", zxx: "ordlös föreställning" },
   theatre: {
     current: "På repertoaren nu",
     upcoming: "Kommande",

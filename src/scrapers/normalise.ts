@@ -121,7 +121,8 @@ export async function upsertProduction(
     type: classification.type,
     typeConfidence: classification.confidence,
     languages: detail.languages,
-    subtitleLangs: detail.subtitleLangs,
+    // "Wordless" in a subtitle field means no subtitles are needed, not a subtitle language.
+    subtitleLangs: detail.subtitleLangs.filter((code) => code !== "zxx"),
     // A premiere is history: once stated it stays, even when the page later stops printing it.
     premiereDate: detail.premiereDate ?? existing?.premiereDate ?? null,
     sourceUpdatedAt: detail.sourceUpdatedAt ?? null,
@@ -147,13 +148,13 @@ export async function upsertProduction(
         startsAt: performance.startsAt,
         stageId: performanceStage?.id ?? null,
         ticketUrl: performance.ticketUrl ?? null,
-        subtitleLangs: performance.subtitleLangs ?? [],
+        subtitleLangs: (performance.subtitleLangs ?? []).filter((code) => code !== "zxx"),
         lastSeenAt: seenAt,
       },
       update: {
         stageId: performanceStage?.id ?? null,
         ticketUrl: performance.ticketUrl ?? null,
-        subtitleLangs: performance.subtitleLangs ?? [],
+        subtitleLangs: (performance.subtitleLangs ?? []).filter((code) => code !== "zxx"),
         lastSeenAt: seenAt,
       },
     });

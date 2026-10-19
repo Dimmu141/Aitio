@@ -82,7 +82,7 @@ export const fi = {
     criticsAside: "linkit alkuperäisiin",
     sourceLine: "Tiedot",
     updated: "päivitetty",
-    spokenIn: { it: "italiaksi", fi: "suomeksi", sv: "ruotsiksi", en: "englanniksi", ru: "venäjäksi", uk: "ukrainaksi", es: "espanjaksi", ar: "arabiaksi", lv: "latviaksi", et: "viroksi", fr: "ranskaksi", de: "saksaksi", sign: "viittomakielellä", zxx: "sanaton" } as Record<string, string>,
+    spokenIn: { it: "italiaksi", fi: "suomeksi", sv: "ruotsiksi", en: "englanniksi", ru: "venäjäksi", uk: "ukrainaksi", es: "espanjaksi", ar: "arabiaksi", lv: "latviaksi", et: "viroksi", fr: "ranskaksi", de: "saksaksi", sign: "viittomakielellä", zxx: "sanaton esitys" } as Record<string, string>,
     histogramLabel: "Arvosanojen jakauma",
     stars: (value: number) => `${value.toLocaleString("fi-FI")} tähteä`,
     stage: "Näyttämö",
@@ -116,7 +116,7 @@ export const fi = {
     OTHER: "Muut tekijät",
   },
   types,
-  languages: { it: "italia", fi: "suomi", sv: "ruotsi", en: "englanti", ru: "venäjä", uk: "ukraina", es: "espanja", ar: "arabia", lv: "latvia", et: "viro", fr: "ranska", de: "saksa", sign: "viittomakieli", zxx: "sanaton" } as Record<string, string>,
+  languages: { it: "italia", fi: "suomi", sv: "ruotsi", en: "englanti", ru: "venäjä", uk: "ukraina", es: "espanja", ar: "arabia", lv: "latvia", et: "viro", fr: "ranska", de: "saksa", sign: "viittomakieli", zxx: "sanaton esitys" } as Record<string, string>,
   theatre: {
     current: "Ohjelmistossa nyt",
     upcoming: "Tulossa",

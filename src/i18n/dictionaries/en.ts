@@ -71,7 +71,7 @@ export const en: Dictionary = {
     criticsAside: "links to the originals",
     sourceLine: "Details",
     updated: "updated",
-    spokenIn: { it: "in Italian", fi: "in Finnish", sv: "in Swedish", en: "in English", ru: "in Russian", uk: "in Ukrainian", es: "in Spanish", ar: "in Arabic", lv: "in Latvian", et: "in Estonian", fr: "in French", de: "in German", sign: "in sign language", zxx: "wordless" },
+    spokenIn: { it: "in Italian", fi: "in Finnish", sv: "in Swedish", en: "in English", ru: "in Russian", uk: "in Ukrainian", es: "in Spanish", ar: "in Arabic", lv: "in Latvian", et: "in Estonian", fr: "in French", de: "in German", sign: "in sign language", zxx: "non-verbal" },
     histogramLabel: "Rating distribution",
     stars: (value: number) => `${value} stars`,
     stage: "Stage",
@@ -114,7 +114,7 @@ export const en: Dictionary = {
     TALK: "Talk",
     OTHER: "Other",
   },
-  languages: { it: "Italian", fi: "Finnish", sv: "Swedish", en: "English", ru: "Russian", uk: "Ukrainian", es: "Spanish", ar: "Arabic", lv: "Latvian", et: "Estonian", fr: "French", de: "German", sign: "sign language", zxx: "wordless" },
+  languages: { it: "Italian", fi: "Finnish", sv: "Swedish", en: "English", ru: "Russian", uk: "Ukrainian", es: "Spanish", ar: "Arabic", lv: "Latvian", et: "Estonian", fr: "French", de: "German", sign: "sign language", zxx: "non-verbal" },
   theatre: {
     current: "On now",
     upcoming: "Coming up",
