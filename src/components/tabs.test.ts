@@ -10,6 +10,8 @@ describe("activeTab", () => {
     ["/paivakirja", "fi", "diary"],
     ["/paivakirja/2026", "fi", "diary"],
     ["/en/diary", "en", "diary"],
+    ["/haluan-nahda", "fi", "diary"],
+    ["/sv/vill-se", "sv", "diary"],
     ["/sv/installningar", "sv", "settings"],
     ["/fi/asetukset", "fi", "settings"],
     ["/haku", "fi", "search"],

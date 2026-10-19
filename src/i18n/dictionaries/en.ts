@@ -39,6 +39,7 @@ export const en: Dictionary = {
     clear: "Clear choices",
   },
   production: {
+    addToCalendar: "Add to calendar",
     durationShort: (minutes: number) => {
       const h = Math.floor(minutes / 60);
       const m = minutes % 60;
@@ -130,6 +131,24 @@ export const en: Dictionary = {
     people: "Artists",
     theatres: "Theatres",
     credits: (n: number) => (n === 1 ? "1 production" : `${n} productions`),
+  },
+  watch: {
+    rate: "You have added a lot of shows today. Please try again tomorrow.",
+    title: "Want to see",
+    add: "Want to see",
+    added: (title: string) => `${title} is now on your list.`,
+    confirm: (title: string) => `Add ${title} to your list?`,
+    confirmButton: "Add to my list",
+    remove: "Remove from list",
+    removed: "Removed from your list.",
+    intro: "Shows you mean to see. Only you can see this list, and a show leaves it when you log it as seen.",
+    playing: "Playing",
+    gone: "No longer playing",
+    empty: "Your list is empty. Add shows from their own page with the “Want to see” button.",
+    digestHint: "Want a reminder before these close?",
+    digestLink: "Turn on the Thursday email in settings",
+    digestOn: "The Thursday email reminds you when one of these is about to close.",
+    link: (n: number) => `Want to see (${n})`,
   },
   auth: {
     title: "Sign in",
@@ -247,9 +266,12 @@ export const en: Dictionary = {
     },
   },
   digest: {
+    subjectSaved: (n: number) => (n === 1 ? "1 show on your list closes soon" : `${n} shows on your list close soon`),
+    savedIntro: "These shows on your list close within two weeks:",
+    othersIntro: "These also close within two weeks:",
     settingsTitle: "Last chances by email",
     settingsBody:
-      "A short email on Thursdays about shows closing within two weeks. Shows you've already seen are left out, and nothing is sent when nothing is closing.",
+      "A short email on Thursdays about shows closing within two weeks. Shows on your “Want to see” list come first, shows you've already seen are left out, and nothing is sent when nothing is closing.",
     optIn: "Send me the Thursday email",
     save: "Save choice",
     homeLink: "Get these by email on Thursdays",

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/fi";
 import { href } from "@/i18n/paths";
@@ -21,6 +22,7 @@ export function ProductionCard({
   when = "date",
   heading = "h3",
   note,
+  children,
 }: {
   card: Card;
   asOf: Date;
@@ -30,6 +32,8 @@ export function ProductionCard({
   when?: "date" | "time";
   heading?: "h3" | "h4";
   note?: string;
+  /** Extra controls under the card, e.g. "Poista listalta" on the watchlist. */
+  children?: ReactNode;
 }) {
   const tone = theatreTone(card.theatre.slug);
   const Title = heading;
@@ -77,6 +81,7 @@ export function ProductionCard({
           </p>
         )}
         {note && <p className="text-meta font-bold">{note}</p>}
+        {children}
       </div>
     </li>
   );

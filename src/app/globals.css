@@ -248,6 +248,13 @@
   .ai-perf__when { display: grid; }
   .ai-perf__date { font-weight: 700; }
   .ai-perf__stage { color: var(--color-ink-muted); font-size: var(--text-meta); line-height: 1.4; }
+  .ai-perf__cal {
+    display: inline-flex;
+    align-items: center;
+    justify-self: start;
+    min-height: var(--spacing-tap);
+    font-size: var(--text-meta);
+  }
   .ai-perf__buy {
     display: inline-flex;
     align-items: center;

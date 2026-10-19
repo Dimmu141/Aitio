@@ -2,6 +2,7 @@ import type { ReportReason } from "@/generated/prisma/enums";
 import { isCurrent } from "@/lib/catalogue/select";
 import { db } from "@/lib/db";
 import type { EntryInput } from "./entry-form";
+import { clearWatched } from "./watchlist";
 
 /** Distinct open reports that hide a review until someone looks at it. */
 export const AUTO_HIDE_REPORTS = 3;
@@ -118,6 +119,7 @@ export async function saveEntry(
     });
   }
   const { tags, ...rest } = data;
+  await clearWatched(userId, productionId);
   return db.diaryEntry.create({
     data: { ...rest, userId, productionId, tags: { connect: tags.connect } },
     select: { id: true },
@@ -253,6 +255,11 @@ export async function exportData(userId: string) {
     select: { entryId: true, reason: true, createdAt: true },
   });
   // Everything stored about the sign-ins except the token itself, which is a credential.
+  const watchlist = await db.watchItem.findMany({
+    where: { userId },
+    select: { createdAt: true, production: { select: { title: true, theatre: { select: { name: true } } } } },
+    orderBy: { createdAt: "desc" },
+  });
   const sessions = await db.session.findMany({
     where: { userId },
     select: { createdAt: true, expiresAt: true, ipAddress: true, userAgent: true },
@@ -270,6 +277,11 @@ export async function exportData(userId: string) {
       isPublic: entry.isPublic,
       isRewatch: entry.isRewatch,
       tags: entry.tags.map((tag) => tag.slug),
+    })),
+    watchlist: watchlist.map((item) => ({
+      production: item.production.title,
+      theatre: item.production.theatre.name,
+      savedAt: item.createdAt.toISOString(),
     })),
     reports,
     sessions,

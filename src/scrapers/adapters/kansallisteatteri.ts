@@ -1,7 +1,7 @@
 import * as cheerio from "cheerio";
 import { politeFetch } from "../http";
 import { mapRoleText } from "../roles";
-import { cleanText, helsinkiToUtc, languageCodes } from "../text";
+import { cleanText, helsinkiToUtc, languageCodes, parseFinnishDate } from "../text";
 import {
   rawProductionDetailSchema,
   rawProductionSchema,
@@ -72,18 +72,23 @@ export function subtitleLanguages(info: string): string[] {
   return languageCodes(sentence.replace(/tekstity\w*/gi, ""));
 }
 
+/** A performance row's start: the datetime attribute carries the date (at 12:00Z), the wall-clock time is in its own field. */
+function rowStart($: cheerio.CheerioAPI, element: Parameters<cheerio.CheerioAPI>[0]): Date | null {
+  const row = $(element);
+  const datetime = row.find(".field--name-field-date time[datetime]").first().attr("datetime");
+  const timeText = cleanText(row.find(".field--name-field-time").first().text());
+  const timeMatch = /(\d{1,2})[:.](\d{2})/.exec(timeText);
+  if (!datetime || !timeMatch) return null;
+  return helsinkiToUtc(datetime.slice(0, 10), `${timeMatch[1].padStart(2, "0")}:${timeMatch[2]}`);
+}
+
 /** Which performances have subtitles: each row carries its own indicator (often not all of them). */
 function parsePerformances($: cheerio.CheerioAPI, subtitleLangs: string[]): RawPerformance[] {
   const performances = new Map<number, RawPerformance>();
   $(".paragraph--type--performance").each((_, element) => {
     const row = $(element);
-    const datetime = row.find(".field--name-field-date time[datetime]").first().attr("datetime");
-    const timeText = cleanText(row.find(".field--name-field-time").first().text());
-    const timeMatch = /(\d{1,2})[:.](\d{2})/.exec(timeText);
-    if (!datetime || !timeMatch) return;
-    // The datetime attribute carries the date (at 12:00Z); the wall-clock time is in a separate field.
-    const date = datetime.slice(0, 10);
-    const startsAt = helsinkiToUtc(date, `${timeMatch[1].padStart(2, "0")}:${timeMatch[2]}`);
+    const startsAt = rowStart($, element);
+    if (!startsAt) return;
     const location = cleanText(row.find(".field--name-field-location").first().text());
     const ticketHref = row.find(".link-column a[href]").first().attr("href");
     performances.set(startsAt.getTime(), {
@@ -94,6 +99,27 @@ function parsePerformances($: cheerio.CheerioAPI, subtitleLangs: string[]): RawP
     });
   });
   return [...performances.values()].sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime());
+}
+
+/**
+ * "Kantaesitys Suurella näyttämöllä 18.11.2026", "Ensi-ilta Taivassalissa 2.9.2026",
+ * "Helsingin ensi-ilta …", "Suomen kantaesitys …": a bold line in the description.
+ * "Kantaesitys oli Lahden kaupunginteatterissa …" is a premiere elsewhere, not this one.
+ */
+const PREMIERE_LINE = /^(?:(?:suomen|helsingin)\s+)?(?:kantaesitys|ensi-ilta)\s+(?!oli\b)\D*?(\d{1,2}\.\d{1,2}\.\d{4})/i;
+
+/**
+ * The premiere as the theatre states it. The bold line stays after the premiere has
+ * passed, so it wins; until then the premiere's own row is marked "Ensi-ilta".
+ */
+function parsePremiere($: cheerio.CheerioAPI): Date | undefined {
+  const stated = $(".field--name-field-content strong")
+    .map((_, element) => PREMIERE_LINE.exec(cleanText($(element).text()))?.[1])
+    .get()
+    .find(Boolean);
+  if (stated) return parseFinnishDate(stated);
+  const row = $(".paragraph--type--performance").filter((_, element) => $(element).find(".premiere").length > 0).get(0);
+  return (row && rowStart($, row)) || undefined;
 }
 
 function parseCredits($: cheerio.CheerioAPI): RawCredit[] {
@@ -147,6 +173,7 @@ export function parseDetail(html: string, ref: Pick<RawProduction, "externalId" 
     stage: stageFromPerformances,
     subtitle: cleanText($(".field--name-field-author-information").first().text()) || undefined,
     durationText,
+    premiereDate: parsePremiere($),
     runStart: performances[0]?.startsAt,
     runEnd: performances.at(-1)?.startsAt,
     languages: ["fi"],

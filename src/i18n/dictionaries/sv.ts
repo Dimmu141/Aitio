@@ -39,6 +39,7 @@ export const sv: Dictionary = {
     clear: "Rensa valen",
   },
   production: {
+    addToCalendar: "Till kalendern",
     durationShort: (minutes: number) => {
       const h = Math.floor(minutes / 60);
       const m = minutes % 60;
@@ -130,6 +131,24 @@ export const sv: Dictionary = {
     people: "Upphovspersoner",
     theatres: "Teatrar",
     credits: (n: number) => (n === 1 ? "1 produktion" : `${n} produktioner`),
+  },
+  watch: {
+    rate: "Du har lagt till många föreställningar i dag. Försök igen i morgon.",
+    title: "Vill se",
+    add: "Vill se",
+    added: (title: string) => `${title} finns nu på din lista.`,
+    confirm: (title: string) => `Lägga till ${title} på din lista?`,
+    confirmButton: "Lägg till på listan",
+    remove: "Ta bort från listan",
+    removed: "Borttagen från listan.",
+    intro: "Föreställningar du tänker se. Bara du ser listan, och en föreställning försvinner från den när du markerar den som sedd.",
+    playing: "På repertoaren",
+    gone: "Spelas inte längre",
+    empty: "Din lista är tom. Lägg till föreställningar från deras egen sida med knappen ”Vill se”.",
+    digestHint: "Vill du bli påmind innan de här slutar?",
+    digestLink: "Beställ torsdagsmejlet i inställningarna",
+    digestOn: "Torsdagsmejlet påminner dig när någon av dessa håller på att sluta.",
+    link: (n: number) => `Vill se (${n})`,
   },
   auth: {
     title: "Logga in",
@@ -247,9 +266,12 @@ export const sv: Dictionary = {
     },
   },
   digest: {
+    subjectSaved: (n: number) => (n === 1 ? "1 föreställning på din lista slutar snart" : `${n} föreställningar på din lista slutar snart`),
+    savedIntro: "De här föreställningarna på din lista slutar inom två veckor:",
+    othersIntro: "Också de här slutar inom två veckor:",
     settingsTitle: "Sista chansen per e-post",
     settingsBody:
-      "Varje torsdag ett kort meddelande om föreställningar som slutar spelas inom två veckor. Sådant du redan sett lämnas bort, och inget meddelande skickas om inget slutar.",
+      "Varje torsdag ett kort meddelande om föreställningar som slutar spelas inom två veckor. Föreställningar på din lista Vill se kommer först, sådant du redan sett lämnas bort, och inget meddelande skickas om inget slutar.",
     optIn: "Jag vill ha meddelandet på torsdagar",
     save: "Spara valet",
     homeLink: "Få de här per e-post på torsdagar",

@@ -148,6 +148,13 @@ describe("Kansallisooppera ballet pages", () => {
     expect(aistit.credits.find((credit) => credit.name === "Hae Ni Kim")?.roles).toEqual(["CHOREOGRAPHER", "DESIGNER"]);
     expect(aistit.performances).toHaveLength(9);
   });
+
+  it("states no premiere date, so none is guessed from the run", () => {
+    // "Milloin" starts the run, but the page never says it opened as a premiere (Dracula's
+    // run this season is a revival); "Ensi-ilta jää … historiaan" is a review quote.
+    expect(hamlet.runStart).toEqual(new Date("2026-10-02T00:00:00Z"));
+    expect(hamlet.premiereDate).toBeUndefined();
+  });
 });
 
 describe("helpers", () => {

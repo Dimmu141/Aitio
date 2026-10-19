@@ -5,15 +5,33 @@ import { formatPerformance, isoDateTime } from "@/lib/format";
 
 const VISIBLE = 3;
 
-function Row({ row, asOf, locale, t }: { row: PerformanceRow; asOf: Date; locale: Locale; t: Dictionary }) {
+interface RowProps {
+  row: PerformanceRow;
+  slug: string;
+  asOf: Date;
+  locale: Locale;
+  t: Dictionary;
+}
+
+/** The .ics file for one performance (src/app/api/calendar). */
+export function calendarHref(slug: string, startsAt: Date, locale: Locale): string {
+  return `/api/calendar?${new URLSearchParams({ show: slug, at: startsAt.toISOString(), lang: locale }).toString()}`;
+}
+
+function Row({ row, slug, asOf, locale, t }: RowProps) {
+  const when = formatPerformance(row.startsAt, locale, asOf);
   const meta = [row.stage, row.subtitleLangs.length > 0 ? subtitleText(row.subtitleLangs, t) : null].filter(Boolean);
   return (
     <li className="ai-perf">
       <span className="ai-perf__when">
         <time dateTime={isoDateTime(row.startsAt)} className="ai-perf__date">
-          {formatPerformance(row.startsAt, locale, asOf)}
+          {when}
         </time>
         {meta.length > 0 && <span className="ai-perf__stage">{meta.join(" · ")}</span>}
+        <a href={calendarHref(slug, row.startsAt, locale)} className="ai-perf__cal" aria-label={`${t.production.addToCalendar}: ${when}`}>
+          <span aria-hidden="true">＋&nbsp;</span>
+          {t.production.addToCalendar}
+        </a>
       </span>
       {row.ticketUrl && (
         <a href={row.ticketUrl} rel="noopener external" className="ai-perf__buy">
@@ -33,11 +51,13 @@ export function subtitleText(codes: string[], t: Dictionary): string {
 /** The next three dates; the rest open in place (no JavaScript needed). */
 export function PerformanceList({
   rows,
+  slug,
   asOf,
   locale,
   t,
 }: {
   rows: PerformanceRow[];
+  slug: string;
   asOf: Date;
   locale: Locale;
   t: Dictionary;
@@ -52,7 +72,7 @@ export function PerformanceList({
       </h2>
       <ul className="ai-perfs">
         {first.map((row) => (
-          <Row key={row.startsAt.toISOString()} row={row} asOf={asOf} locale={locale} t={t} />
+          <Row key={row.startsAt.toISOString()} row={row} slug={slug} asOf={asOf} locale={locale} t={t} />
         ))}
       </ul>
       {rest.length > 0 && (
@@ -63,7 +83,7 @@ export function PerformanceList({
           </summary>
           <ul>
             {rest.map((row) => (
-              <Row key={row.startsAt.toISOString()} row={row} asOf={asOf} locale={locale} t={t} />
+              <Row key={row.startsAt.toISOString()} row={row} slug={slug} asOf={asOf} locale={locale} t={t} />
             ))}
           </ul>
         </details>

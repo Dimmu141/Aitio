@@ -22,7 +22,8 @@ import {
  * page lists every upcoming performance as schema.org Event JSON-LD, with the Opera's own
  * shop link per performance. Facts (stage, run, language, credits) are in the hero's
  * <dl class="production-meta">, the team in <dl class="production-cast"> and the cast in
- * <dl class="production-roles">.
+ * <dl class="production-roles">. No page states a premiere date (checked 18 Oct 2026):
+ * "Milloin" is the run, which for a revival is not a premiere, so premiereDate stays unset.
  */
 const BASE = "https://oopperabaletti.fi";
 export const LIST_URL = `${BASE}/ohjelmisto/`;

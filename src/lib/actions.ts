@@ -15,7 +15,8 @@ import * as diary from "@/lib/diary/service";
 import { setDigest, unsubscribe } from "@/lib/engagement/send-digests";
 import { consume, LIMITS } from "@/lib/rate-limit";
 import { safeNext } from "@/lib/safe-next";
-import { requireUser } from "@/lib/session";
+import { addToWatchlist, removeFromWatchlist } from "@/lib/diary/watchlist";
+import { getCurrentUser, requireUser, signInHref } from "@/lib/session";
 
 function text(formData: FormData, key: string): string {
   const value = formData.get(key);
@@ -158,4 +159,28 @@ export async function unsubscribeAction(formData: FormData): Promise<void> {
   const page = href(locale, "peru-tilaus");
   const done = await unsubscribe(text(formData, "u"), text(formData, "s"));
   redirect(withQuery(page, done ? { done: "1" } : { error: "invalid" }));
+}
+
+/**
+ * "Haluan nähdä" from a show's public (static) page: one tap when signed in. Signed out,
+ * it goes through sign-in to the list page, which asks once more before adding, because
+ * a GET after the sign-in link must not change anything.
+ */
+export async function watchAction(formData: FormData): Promise<void> {
+  const locale = localeOf(formData);
+  const slug = text(formData, "slug");
+  const list = href(locale, "haluan-nahda");
+  const user = await getCurrentUser();
+  if (!user) redirect(signInHref(locale, withQuery(list, { lisaa: slug })));
+  if (!(await consume(`watch:${user.id}`, LIMITS.watchAdds))) redirect(withQuery(list, { error: "rate" }));
+  const added = await addToWatchlist(user.id, slug);
+  redirect(added ? withQuery(list, { lisatty: slug }) : list);
+}
+
+export async function unwatchAction(formData: FormData): Promise<void> {
+  const locale = localeOf(formData);
+  const list = href(locale, "haluan-nahda");
+  const user = await requireUser(locale, list);
+  await removeFromWatchlist(user.id, text(formData, "slug"));
+  redirect(withQuery(list, { poistettu: "1" }));
 }

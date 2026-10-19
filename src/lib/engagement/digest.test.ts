@@ -67,6 +67,26 @@ describe("composeDigest", () => {
   });
 });
 
+describe("composeDigest with a watchlist", () => {
+  const links = { absolute: (path: string) => `https://aitio.fi${path}`, unsubscribeUrl: "https://aitio.fi/peru-tilaus?u=1&s=x" };
+  const items = [card("julia", "2026-10-20T16:00:00Z"), card("lokki", "2026-10-22T16:00:00Z")];
+
+  it("puts the user's saved shows first, under their own heading and subject", () => {
+    const email = composeDigest("fi", items, links, asOf, new Set(["lokki"]));
+    expect(email.subject).toBe("Listaltasi päättyy pian 1 esitys");
+    const text = email.text;
+    expect(text.indexOf("Nämä listallasi")).toBeLessThan(text.indexOf("LOKKI"));
+    expect(text.indexOf("LOKKI")).toBeLessThan(text.indexOf("Myös nämä"));
+    expect(text.indexOf("Myös nämä")).toBeLessThan(text.indexOf("JULIA"));
+  });
+
+  it("drops the second heading when everything closing is on the list", () => {
+    const email = composeDigest("en", items, links, asOf, new Set(["julia", "lokki"]));
+    expect(email.subject).toBe("2 shows on your list close soon");
+    expect(email.text).not.toContain("These also close");
+  });
+});
+
 describe("unsubscribe signature", () => {
   it("accepts its own signature and nothing else", () => {
     const signature = unsubscribeSignature("user-1", "secret");

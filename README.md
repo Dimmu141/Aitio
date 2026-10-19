@@ -253,5 +253,16 @@ After comparing Aitio with foreign listing sites (Official London Theatre, Berli
 
 ### Known gaps
 
-- **Premiere dates** come from HKT, Svenska Teatern, Espoo, KOM, Q, Takomo, Viirus and Zodiak. Kansallisteatteri, the opera and Tanssin talo don't print one we parse yet, so their openings are missing from the strip.
+- **Premiere dates** come from HKT, Svenska Teatern, Espoo, KOM, Q, Takomo, Viirus, Zodiak, Kansallisteatteri (the "Kantaesitys"/"Ensi-ilta" line or the row marked Ensi-ilta) and Tanssin talo (only when its schedule labels a date "Ensi-ilta", which is rare). The opera states none, so its openings are missing from the strip. Once stated, a premiere is kept even when a later scrape no longer prints it (`normalise.ts`), since Tanssin talo's label and the row fallback disappear after the night.
 - **Espoo** prints no running time we parse.
+
+## Status: want to see and calendar (18 Oct 2026)
+
+- **"Haluan nähdä" list** (`/haluan-nahda`, `/sv/vill-se`, `/en/want-to-see`; `WatchItem` in the schema, `src/lib/diary/watchlist.ts`). The button on a show's page is a server-action form, so the static page never reads the session. Signed in, it adds in one tap. Signed out, it goes through sign-in to the list page, which asks once more: a GET after the sign-in link must not change anything. An item leaves the list when the show is logged as seen (`saveEntry`). The list is private, part of the data export, and deleted with the account.
+- **The Thursday email** puts closing shows from the user's list first, with their own subject line. It is still opt-in; the list page suggests it when it's off.
+- **"Kalenteriin"** under every performance: `/api/calendar?show=<slug>&at=<ISO>&lang=fi` returns an `.ics` file (`src/lib/ics.ts`: UTC times, escaping, 75-octet folding). The end time is set only when the theatre states the running time.
+
+### Known gaps
+
+- **No reminder for shows on the list that aren't closing.** The email covers "closing soon" only; "your saved show opens next week" would need its own rule.
+- **The button doesn't know you've already saved the show**, because the page is static. Saving twice is harmless and lands on the list.

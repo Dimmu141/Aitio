@@ -29,6 +29,13 @@ const FIXTURES: Array<{ url: string; file: string; form?: Record<string, string>
   },
   // Subtitles at 9 of its 10 performances.
   { url: "https://www.kansallisteatteri.fi/esitys/lady-t-0", file: "fixtures/kansallisteatteri/production-lady-t.html" },
+  // A preview before the premiere, whose row is marked "Ensi-ilta" (18.11.2026).
+  {
+    url: "https://www.kansallisteatteri.fi/esitys/taru-hohtavasta-helmesta",
+    file: "fixtures/kansallisteatteri/production-taru-hohtavasta-helmesta.html",
+  },
+  // A guest run: "Kantaesitys oli Tampereen Työväen Teatterissa", no premiere of its own.
+  { url: "https://www.kansallisteatteri.fi/esitys/karpaset", file: "fixtures/kansallisteatteri/production-karpaset.html" },
   { url: showsUrl(1), file: "fixtures/svenska-teatern/shows-page-1.json" },
   { url: "https://svenskateatern.fi/repertoar/nattland/", file: "fixtures/svenska-teatern/production-nattland.html" },
   { url: HKT_LIST_URL, file: "fixtures/hkt/list-esitykset.html" },

@@ -18,6 +18,7 @@ describe.skipIf(!url)("upsertProduction (integration)", () => {
     process.env.DATABASE_URL = url;
     db = (await import("@/lib/db")).db;
     await db.report.deleteMany();
+    await db.watchItem.deleteMany();
     await db.diaryEntry.deleteMany();
     await db.user.deleteMany();
     await db.credit.deleteMany();
@@ -61,6 +62,14 @@ describe.skipIf(!url)("upsertProduction (integration)", () => {
     expect(summary.created).toBe(false);
     expect(await db.production.count()).toBe(1);
     expect(await db.performance.count()).toBe(7);
+  });
+
+  it("keeps a stated premiere when a later scrape no longer prints it", async () => {
+    const premiere = new Date("2026-09-12T00:00:00Z");
+    await upsertProduction(db, theatre, { ...detail, premiereDate: premiere }, new Date());
+    await upsertProduction(db, theatre, { ...detail, premiereDate: undefined }, new Date());
+    const saved = await db.production.findUniqueOrThrow({ where: { slug: "nattland-svenska-teatern" } });
+    expect(saved.premiereDate).toEqual(premiere);
   });
 
   it("keeps dropped performances and credits but leaves their lastSeenAt behind", async () => {

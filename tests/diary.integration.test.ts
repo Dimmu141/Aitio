@@ -30,7 +30,7 @@ describe.skipIf(!url)("diary service (integration)", () => {
     process.env.DATABASE_URL = url;
     db = (await import("@/lib/db")).db;
     service = await import("@/lib/diary/service");
-    for (const table of ["report", "diaryEntry", "session", "user", "credit", "criticReview", "performance", "production", "person", "stage", "theatre", "tag"] as const) {
+    for (const table of ["report", "watchItem", "diaryEntry", "session", "user", "credit", "criticReview", "performance", "production", "person", "stage", "theatre", "tag"] as const) {
       await (db[table] as { deleteMany: () => Promise<unknown> }).deleteMany();
     }
     const theatre = await db.theatre.create({
@@ -149,5 +149,25 @@ describe.skipIf(!url)("diary service (integration)", () => {
     const withSession = await service.exportData(users.anna);
     expect(withSession.sessions).toEqual([expect.objectContaining({ ipAddress: "10.0.0.9" })]);
     expect(JSON.stringify(withSession)).not.toContain("secret-token");
+  });
+
+  it("keeps a private want-to-see list, clears an item once logged, and exports it", async () => {
+    const watchlist = await import("@/lib/diary/watchlist");
+    const fia = (await db.user.create({ data: { email: "fia@example.fi", name: "fia" } })).id;
+    const slug = (await db.production.findUniqueOrThrow({ where: { id: productionId }, select: { slug: true } })).slug;
+    expect(await watchlist.addToWatchlist(fia, slug)).toBe(true);
+    expect(await watchlist.addToWatchlist(fia, slug)).toBe(true); // twice is harmless
+    expect(await watchlist.addToWatchlist(fia, "no-such-show")).toBe(false);
+    expect(await watchlist.watchlistCount(fia)).toBe(1);
+    const list = await watchlist.getWatchlist(fia, new Date());
+    expect([...list.playing, ...list.gone].map((card) => card.slug)).toEqual([slug]);
+    expect((await service.exportData(fia)).watchlist).toHaveLength(1);
+
+    await service.saveEntry(fia, productionId, null, { ...input, review: null });
+    expect(await watchlist.isOnWatchlist(fia, slug)).toBe(false);
+
+    await watchlist.addToWatchlist(fia, slug);
+    await watchlist.removeFromWatchlist(fia, slug);
+    expect(await watchlist.watchlistCount(fia)).toBe(0);
   });
 });

@@ -13,6 +13,7 @@ export const LIMITS = {
   magicLinkPerIp: { windowMs: 15 * MINUTE, max: 10 },
   diarySaves: { windowMs: DAY, max: 50 },
   reports: { windowMs: DAY, max: 20 },
+  watchAdds: { windowMs: DAY, max: 100 },
 } satisfies Record<string, Limit>;
 
 export interface WindowState {

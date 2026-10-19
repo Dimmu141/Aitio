@@ -30,24 +30,36 @@ function lastDate(card: ProductionCard, locale: Locale, asOf: Date): string {
   return card.end === card.last ? formatPerformance(card.end, locale, asOf) : formatDate(card.end, locale);
 }
 
-/** Plain text on purpose: readable in every client, nothing to render or block. */
-export function composeDigest(locale: Locale, items: ProductionCard[], links: DigestLinks, asOf: Date): DigestEmail {
+/**
+ * Plain text on purpose: readable in every client, nothing to render or block.
+ * Shows on the user's "Haluan nähdä" list come first, under their own heading.
+ */
+export function composeDigest(
+  locale: Locale,
+  items: ProductionCard[],
+  links: DigestLinks,
+  asOf: Date,
+  watched: ReadonlySet<string> = new Set(),
+): DigestEmail {
   const t = dictionaryFor(locale);
-  const lines = items.map((card) =>
+  const block = (card: ProductionCard) =>
     [
       `${card.title}, ${card.theatre.name}`,
       card.end ? t.digest.lastPerformance(lastDate(card, locale, asOf)) : "",
       links.absolute(href(locale, "esitys", card.slug)),
     ]
       .filter(Boolean)
-      .join("\n"),
-  );
+      .join("\n");
+  const saved = items.filter((card) => watched.has(card.slug));
+  const others = items.filter((card) => !watched.has(card.slug));
+  const sections =
+    saved.length > 0
+      ? [t.digest.savedIntro, ...saved.map(block), ...(others.length > 0 ? [t.digest.othersIntro, ...others.map(block)] : [])]
+      : [t.digest.intro, ...others.map(block)];
   return {
-    subject: t.digest.subject(items.length),
-    text: [
-      t.digest.intro,
-      ...lines,
-      `${t.site.name}\n${t.digest.footer(links.absolute(href(locale, "asetukset")), links.unsubscribeUrl)}`,
-    ].join("\n\n"),
+    subject: saved.length > 0 ? t.digest.subjectSaved(saved.length) : t.digest.subject(items.length),
+    text: [...sections, `${t.site.name}\n${t.digest.footer(links.absolute(href(locale, "asetukset")), links.unsubscribeUrl)}`].join(
+      "\n\n",
+    ),
   };
 }

@@ -87,6 +87,7 @@ model Production {
   credits        Credit[]
   criticReviews  CriticReview[]
   diaryEntries   DiaryEntry[]
+  watchers       WatchItem[]
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 
@@ -161,6 +162,7 @@ model User {
   accounts      Account[]
   diaryEntries  DiaryEntry[]
   reports       Report[]
+  watchlist     WatchItem[]
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
 }
@@ -243,6 +245,18 @@ model DiaryEntry {
 
   @@index([productionId])
   @@index([userId, seenOn])
+}
+
+/// "Haluan nähdä": a show the user means to see. Private; removed when they log it as seen.
+model WatchItem {
+  userId       String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productionId String
+  production   Production @relation(fields: [productionId], references: [id])
+  createdAt    DateTime   @default(now())
+
+  @@id([userId, productionId])
+  @@index([productionId])
 }
 
 enum ReportReason {
