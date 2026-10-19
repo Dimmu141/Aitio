@@ -74,6 +74,7 @@ export const fi = {
     at: (time: string) => `klo ${time}`,
     directedBy: "ohjaus",
     writtenAndDirectedBy: "teksti ja ohjaus",
+    moreCredits: (n: number) => `+ ${n} muuta`,
     remaining: (n: number, last: string) => `${n === 1 ? "1 esitys" : `${n} esitystä`} jäljellä · viimeinen ${last}`,
     ends: "Päättyy",
     moreDates: (n: number) => (n === 1 ? "+ 1 muu esitys" : `+ ${n} muuta esitystä`),

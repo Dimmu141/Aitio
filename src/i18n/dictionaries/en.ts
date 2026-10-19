@@ -63,6 +63,7 @@ export const en: Dictionary = {
     at: (time: string) => time,
     directedBy: "directed by",
     writtenAndDirectedBy: "written and directed by",
+    moreCredits: (n: number) => `+ ${n} more`,
     remaining: (n: number, last: string) => `${n === 1 ? "1 performance" : `${n} performances`} left · last ${last}`,
     ends: "Ends",
     moreDates: (n: number) => (n === 1 ? "+ 1 more performance" : `+ ${n} more performances`),

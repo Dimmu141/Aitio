@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/fi";
 import { href } from "@/i18n/paths";
-import { groupCredits, teamRows } from "@/lib/catalogue/credits";
+import { groupCredits, MINOR_ROWS_SHOWN, teamRows, type TeamRow } from "@/lib/catalogue/credits";
 import type { CreditRow } from "@/lib/catalogue/types";
 import { Section } from "./Section";
 
@@ -33,16 +33,24 @@ export function CreditList({
   t: Dictionary;
 }) {
   const team = teamRows(credits, (role) => t.roles[role], locale === sourceLanguage);
+  // The creative team in full; assistants and technicians after a handful, the rest folded.
+  const minor = team.filter((row) => row.minor);
+  const shown = [...team.filter((row) => !row.minor), ...minor.slice(0, MINOR_ROWS_SHOWN)];
+  const folded = minor.slice(MINOR_ROWS_SHOWN);
+  const rows = (list: TeamRow[]) =>
+    list.map((row) => <Row key={row.person.slug} label={row.roles} person={row.person} locale={locale} />);
   const cast = groupCredits(credits).find((group) => group.role === "CAST");
   if (team.length === 0 && !cast) return null;
   return (
     <Section id="credits" title={t.production.credits}>
-      {team.length > 0 && (
-        <dl>
-          {team.map((row) => (
-            <Row key={row.person.slug} label={row.roles} person={row.person} locale={locale} />
-          ))}
-        </dl>
+      {team.length > 0 && <dl>{rows(shown)}</dl>}
+      {folded.length > 0 && (
+        <details className="group">
+          <summary className="flex min-h-tap cursor-pointer list-none items-center font-bold text-accent group-open:hidden [&::-webkit-details-marker]:hidden">
+            {t.production.moreCredits(folded.length)}
+          </summary>
+          <dl>{rows(folded)}</dl>
+        </details>
       )}
       {cast && (
         <>
