@@ -93,7 +93,6 @@ export default async function ProductionRoute({ params }: PageProps<"/[locale]/e
           {page.year && <Badge variant="quiet">{t.production.performedIn(page.year)}</Badge>}
           {page.languages.map((code) => (
             <Badge key={code} title={`${t.production.language}: ${t.languages[code] ?? code}`}>
-              {code.length === 2 && <span className="ai-badge__code">{code.toUpperCase()}</span>}
               {t.production.spokenIn[code] ?? t.languages[code] ?? code}
             </Badge>
           ))}

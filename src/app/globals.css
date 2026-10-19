@@ -185,7 +185,6 @@
     font: 700 var(--text-label) / var(--text-label--line-height) var(--font-sans);
     letter-spacing: 0.02em;
   }
-  .ai-badge__code { letter-spacing: 0.06em; }
   .ai-badge--urgent { border-color: var(--color-urgent); background: var(--color-urgent); color: var(--color-ink-fixed); }
   .ai-badge--quiet { border-color: var(--color-rule); color: var(--color-ink-muted); }
 
