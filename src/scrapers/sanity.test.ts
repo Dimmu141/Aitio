@@ -1,10 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { roleLooksLikeNames, sanityWarnings, titleKey, type SanityContext } from "./sanity";
-import type { RawProduction, RawProductionDetail } from "./types";
+import type { RawCredit, RawProduction, RawProductionDetail } from "./types";
 
+// Every string below is from the dry run of all sources on 19 Oct 2026.
 const asOf = new Date("2026-10-19T12:00:00Z");
-const context: SanityContext = { sourceId: "kom-teatteri", type: "PLAY", fullSchedule: true, asOf };
+const context: SanityContext = { sourceId: "kom-teatteri", type: "PLAY", asOf };
 const ref: RawProduction = { externalId: "x", title: "POISKATSOJAT", url: "https://example.fi/x/", isVisiting: false };
+
+const director: RawCredit = { name: "Susanna Kuparinen", roleText: "Ohjaus", roles: ["DIRECTOR"] };
+const actor: RawCredit = { name: "Tuuli Paju", roleText: "Näyttämöllä", roles: ["CAST"] };
+const designer: RawCredit = { name: "Saara Ryymin", roleText: "Pukusuunnittelu", roles: ["DESIGNER"] };
 
 function detail(overrides: Partial<RawProductionDetail> = {}): RawProductionDetail {
   return {
@@ -13,8 +18,8 @@ function detail(overrides: Partial<RawProductionDetail> = {}): RawProductionDeta
     url: "https://example.fi/x/",
     languages: ["fi"],
     subtitleLangs: [],
-    credits: [{ name: "Susanna Kuparinen", roleText: "Ohjaus", roles: ["DIRECTOR"] }],
-    performances: [{ startsAt: new Date("2026-09-09T15:30:00Z") }, { startsAt: new Date("2026-10-20T15:30:00Z") }],
+    credits: [director, actor, designer],
+    performances: [{ startsAt: new Date("2026-10-20T15:30:00Z") }],
     criticReviews: [],
     isVisiting: false,
     performancesPartial: false,
@@ -22,51 +27,59 @@ function detail(overrides: Partial<RawProductionDetail> = {}): RawProductionDeta
   };
 }
 
-const rules = (value: RawProductionDetail, ctx = context) => sanityWarnings(ref, value, ctx).map((warning) => warning.rule);
+const rules = (value: RawProductionDetail, ctx = context, listed = ref) =>
+  sanityWarnings(listed, value, ctx).map((warning) => warning.rule);
 
 describe("sanity warnings", () => {
   it("stays quiet on a complete production", () => {
-    expect(rules(detail({ premiereDate: new Date("2026-09-09T00:00:00Z") }))).toEqual([]);
+    expect(rules(detail())).toEqual([]);
   });
 
-  it("flags a recent premiere long before the first stored show (lost early dates)", () => {
-    const lost = detail({ premiereDate: new Date("2026-09-09T00:00:00Z"), performances: [{ startsAt: new Date("2026-10-13T15:30:00Z") }] });
-    expect(rules(lost)).toEqual(["premiere-before-run"]);
-    expect(rules(lost, { ...context, fullSchedule: false })).toEqual([]);
-    expect(rules({ ...lost, premiereDate: new Date("2025-12-06T00:00:00Z") })).toEqual([]); // old premiere
-  });
-
-  it("flags a running play without a director, but not dance", () => {
-    expect(rules(detail({ credits: [] }))).toEqual(["no-director"]);
+  it("flags a running play without cast (KOM) or with only performers (Änglagård)", () => {
+    expect(rules(detail({ credits: [designer] }))).toEqual(["missing-team"]);
+    expect(rules(detail({ credits: [actor, actor] }))).toEqual(["missing-team"]);
     expect(rules(detail({ credits: [] }), { ...context, type: "DANCE" })).toEqual([]);
+    expect(rules(detail({ credits: [designer], performances: [] }))).toEqual([]); // not playing
   });
 
-  it("flags names inside a role and labels stored as people", () => {
+  it("leaves devised work without a director alone (Gob Squad, Collage)", () => {
+    expect(rules(detail({ credits: [actor, designer] }))).toEqual([]);
+  });
+
+  it("flags names inside a role and things stored as people", () => {
     const broken = detail({
       credits: [
-        { name: "Susanna Kuparinen", roleText: "Ohjaus", roles: ["DIRECTOR"] },
+        director,
+        designer,
         { name: "Taavi Hasunen", roleText: "Näyttämöllä Youssef Asad Alkhatib ja", roles: ["CAST"] },
-        { name: "työryhmä", roleText: "Lavastussuunnittelu", roles: ["DESIGNER"] },
+        { name: "Linnea Sjunnesson och Fredrik Fischer", roleText: "Översättning", roles: ["OTHER"] },
+        { name: "Colombine teaterförlag", roleText: "Rättigheter", roles: ["OTHER"] },
       ],
     });
-    expect(rules(broken)).toEqual(["role-looks-like-names", "name-not-a-person"]);
+    expect(rules(broken)).toEqual(["role-looks-like-names", "name-not-a-person", "name-not-a-person"]);
   });
 
-  it("flags no performances and a list title that names another show", () => {
-    expect(rules(detail({ performances: [] }))).toEqual(["no-performances"]);
-    expect(rules(detail({ title: "NAZA" }))).toEqual(["title-mismatch"]);
+  it("flags a list card that names another show, not a shortened title", () => {
+    const listed = (title: string) => ({ ...ref, title });
+    expect(rules(detail({ title: "Hej sommaren!" }), context, listed("Arne Alligator & Djungeltrumman"))).toEqual(["title-mismatch"]);
+    expect(rules(detail({ title: "NAZA" }), context, listed("LUKUREIVIT"))).toEqual(["title-mismatch"]);
+    expect(rules(detail({ title: "Klockriketeatern: Divan" }), context, listed("Divan"))).toEqual([]);
+    expect(rules(detail({ title: "KAJ" }), context, listed("KAJ – karar i arbeit"))).toEqual([]);
+    expect(rules(detail({ title: "Sås & Kopp jubeliumskonsert – encore!" }), context, listed("Sås och Kopp jubeliumskonsert"))).toEqual([]);
   });
 });
 
 describe("helpers", () => {
-  it("tells role labels from names", () => {
-    expect(roleLooksLikeNames("Lavastussuunnittelu ja esitysdramaturgia")).toBe(false);
-    expect(roleLooksLikeNames("Teksti ja ohjaus")).toBe(false);
+  it("tells names from lists of role labels", () => {
     expect(roleLooksLikeNames("Näyttämöllä Youssef Asad Alkhatib ja")).toBe(true);
-    expect(roleLooksLikeNames("Rooleissa Anna Virtanen")).toBe(true);
+    expect(roleLooksLikeNames("Sonja Ahlfors, Joanna Wingren, Willjam Tigerstedt, Vega Adsten, Edit Williams")).toBe(true);
+    expect(roleLooksLikeNames("Regi, Scenografi, Kostym")).toBe(false);
+    expect(roleLooksLikeNames("Koreografi ja ohjaaja, Pukusuunnittelija, Tanssijat")).toBe(false);
+    expect(roleLooksLikeNames("Lavastussuunnittelu ja esitysdramaturgia")).toBe(false);
   });
 
-  it("ignores case, soft hyphens and punctuation in titles", () => {
+  it("ignores case, soft hyphens, punctuation and joining words in titles", () => {
     expect(titleKey("POIS­KAT­SO­JAT!")).toBe(titleKey("Poiskatsojat"));
+    expect(titleKey("Sås & Kopp")).toBe(titleKey("Sås och Kopp"));
   });
 });

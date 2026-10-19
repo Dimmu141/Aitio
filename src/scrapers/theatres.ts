@@ -120,11 +120,7 @@ const PARTIAL_SCHEDULE_SOURCES: ReadonlySet<string> = new Set(["espoon-teatteri"
 /** Whether a theatre's upcoming performances are complete enough to count what's left. */
 export function hasFullSchedule(theatreSlug: string): boolean {
   const theatre = THEATRES.find((candidate) => candidate.slug === theatreSlug);
-  return theatre !== undefined && hasFullScheduleSource(theatre.sourceId);
-}
-
-export function hasFullScheduleSource(sourceId: string): boolean {
-  return !PARTIAL_SCHEDULE_SOURCES.has(sourceId);
+  return theatre !== undefined && !PARTIAL_SCHEDULE_SOURCES.has(theatre.sourceId);
 }
 
 /** Theatres whose pages are in Swedish; every other source writes in Finnish. */

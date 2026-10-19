@@ -15,7 +15,6 @@ import { zodiakAdapter } from "./adapters/zodiak";
 import { HttpError } from "./http";
 import { planProduction, upsertProduction } from "./normalise";
 import { sanityWarnings, type SanityWarning } from "./sanity";
-import { hasFullScheduleSource } from "./theatres";
 import type { RawProductionDetail, SourceAdapter } from "./types";
 
 export const ADAPTERS: Record<string, SourceAdapter> = {
@@ -143,7 +142,6 @@ export async function runSource(
       const warnings = sanityWarnings(ref, detail, {
         sourceId: adapter.id,
         type: classification.type,
-        fullSchedule: hasFullScheduleSource(adapter.id),
         asOf: new Date(),
       });
       result.warnings.push(...warnings);
