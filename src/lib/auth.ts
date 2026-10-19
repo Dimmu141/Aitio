@@ -1,35 +1,42 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
-import { magicLink } from "better-auth/plugins/magic-link";
+import { emailOTP } from "better-auth/plugins/email-otp";
 import { DEFAULT_LOCALE, isLocale } from "@/i18n/config";
 import { dictionaryFor } from "@/i18n/dictionaries";
 import { href } from "@/i18n/paths";
-import { AUTH_COOKIE_PREFIX, CLIENT_IP_HEADERS, MAGIC_LINK_MINUTES, SESSION_DAYS } from "@/lib/auth-config";
+import { AUTH_COOKIE_PREFIX, CLIENT_IP_HEADERS, SESSION_DAYS, SIGN_IN_ATTEMPTS, SIGN_IN_MINUTES } from "@/lib/auth-config";
 import { db } from "@/lib/db";
 import { sendEmail } from "@/lib/email";
+import { safeNext } from "@/lib/safe-next";
+import { sealSignIn } from "@/lib/sign-in-token";
 import { absoluteUrl, SITE_URL } from "@/lib/site";
 
-export { MAGIC_LINK_MINUTES };
+export { SIGN_IN_MINUTES };
+
+/** Set by signInAction for the email callback, which only sees the request headers. */
+export const LOCALE_HEADER = "x-aitio-locale";
+export const NEXT_HEADER = "x-aitio-next";
 
 /**
  * The email links to our own confirmation page, which has a "Kirjaudu sisään" button,
- * instead of straight to the verify endpoint: mail scanners (Outlook Safe Links and
- * friends) open links in incoming mail and would use up the single-use token.
+ * instead of signing in on GET: mail scanners (Outlook Safe Links and friends) open
+ * links in incoming mail and would use up the single-use code.
  */
-export function confirmUrl(locale: string, token: string, verifyUrl: string): string {
+export function confirmUrl(locale: string, token: string, next: string): string {
   const safeLocale = isLocale(locale) ? locale : DEFAULT_LOCALE;
-  const next = new URL(verifyUrl).searchParams.get("callbackURL") ?? href(safeLocale, "paivakirja");
   const url = new URL(absoluteUrl(href(safeLocale, "kirjaudu")));
   url.searchParams.set("token", token);
-  url.searchParams.set("next", next);
+  url.searchParams.set("next", safeNext(next, href(safeLocale, "paivakirja")));
   return url.toString();
 }
+
+const secret = process.env.BETTER_AUTH_SECRET ?? "";
 
 export const auth = betterAuth({
   appName: "Aitio",
   baseURL: process.env.BETTER_AUTH_URL ?? SITE_URL.origin,
-  secret: process.env.BETTER_AUTH_SECRET,
+  secret,
   database: prismaAdapter(db, { provider: "postgresql" }),
   telemetry: { enabled: false },
   rateLimit: { enabled: true, storage: "database" },
@@ -47,17 +54,20 @@ export const auth = betterAuth({
     ipAddress: { ipAddressHeaders: CLIENT_IP_HEADERS },
   },
   plugins: [
-    magicLink({
-      expiresIn: MAGIC_LINK_MINUTES * 60,
-      storeToken: "hashed",
-      sendMagicLink: async ({ email, url, token, metadata }) => {
-        const locale = typeof metadata?.locale === "string" && isLocale(metadata.locale) ? metadata.locale : DEFAULT_LOCALE;
+    // One emailed code, two ways to use it: tap the link (it carries the code, sealed) or
+    // type the six digits, e.g. when the mail app opens links in a browser of its own.
+    emailOTP({
+      otpLength: 6,
+      expiresIn: SIGN_IN_MINUTES * 60,
+      allowedAttempts: SIGN_IN_ATTEMPTS,
+      storeOTP: "hashed",
+      sendVerificationOTP: async ({ email, otp, type }, ctx) => {
+        if (type !== "sign-in") return;
+        const requested = ctx?.headers?.get(LOCALE_HEADER) ?? "";
+        const locale = isLocale(requested) ? requested : DEFAULT_LOCALE;
         const t = dictionaryFor(locale);
-        await sendEmail({
-          to: email,
-          subject: t.auth.emailSubject,
-          text: t.auth.emailBody(confirmUrl(locale, token, url), MAGIC_LINK_MINUTES),
-        });
+        const link = confirmUrl(locale, sealSignIn({ email, otp }, secret), ctx?.headers?.get(NEXT_HEADER) ?? "");
+        await sendEmail({ to: email, subject: t.auth.emailSubject(otp), text: t.auth.emailBody(link, otp, SIGN_IN_MINUTES) });
       },
     }),
     nextCookies(),

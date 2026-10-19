@@ -9,8 +9,10 @@ const MINUTE = 60_000;
 const DAY = 24 * 60 * MINUTE;
 
 export const LIMITS = {
-  magicLinkPerEmail: { windowMs: 15 * MINUTE, max: 3 },
-  magicLinkPerIp: { windowMs: 15 * MINUTE, max: 10 },
+  signInPerEmail: { windowMs: 15 * MINUTE, max: 3 },
+  signInPerIp: { windowMs: 15 * MINUTE, max: 10 },
+  /** Code checks, on top of the per-code attempt limit: guessing needs fresh codes, which are limited above. */
+  signInChecksPerIp: { windowMs: 15 * MINUTE, max: 30 },
   diarySaves: { windowMs: DAY, max: 50 },
   reports: { windowMs: DAY, max: 20 },
   watchAdds: { windowMs: DAY, max: 100 },

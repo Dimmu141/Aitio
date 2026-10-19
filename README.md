@@ -106,7 +106,7 @@ pnpm build && pnpm test:e2e             # smoke tests against the production bui
 
 | Done | Notes |
 |---|---|
-| Sign-in with email links | Better Auth (not Auth.js, see BRIEF.md section 2), magic-link plugin, Prisma adapter, 20-minute links, 90-day sessions, no passwords |
+| Sign-in with an emailed code | Better Auth (not Auth.js, see BRIEF.md section 2), email-OTP plugin (6 digits, hashed, 5 tries; typed, or carried sealed by the emailed link), Prisma adapter, 20-minute codes, 90-day sessions, no passwords |
 | Merkitse nähdyksi | `/merkitse/<slug>`: two taps (preselected date, sticky Tallenna); optional half-star rating, review (500 chars), up to 3 tags, rewatch |
 | Diary | `/paivakirja`: ticket stubs grouped by year, edit and delete |
 | Production page | "Merkitse nähdyksi" + "Osta liput", rating histogram, tag counts, public reviews with a report link; still fully static |
@@ -225,7 +225,7 @@ Every adapter has fixtures and tests (`src/scrapers/adapters/*.test.ts`); `fixtu
 
 The step-by-step launch is in **`LAUNCH.md`**. What the code now has for it:
 
-- **Privacy policy** at `/tietosuoja` (`/sv/dataskydd`, `/en/privacy`), linked from the footer and the sign-in page. It covers articles 13 and 14 of the GDPR, including the performers whose names come from theatre websites. The retention numbers come from the code's own constants (`SESSION_DAYS`, `MAGIC_LINK_MINUTES`, `RATE_LIMIT_RETENTION_DAYS`, `BACKUP_DAYS`), so the text can't drift from what the code does. The controller comes from `PRIVACY_CONTROLLER` and `PRIVACY_EMAIL`.
+- **Privacy policy** at `/tietosuoja` (`/sv/dataskydd`, `/en/privacy`), linked from the footer and the sign-in page. It covers articles 13 and 14 of the GDPR, including the performers whose names come from theatre websites. The retention numbers come from the code's own constants (`SESSION_DAYS`, `SIGN_IN_MINUTES`, `RATE_LIMIT_RETENTION_DAYS`, `BACKUP_DAYS`), so the text can't drift from what the code does. The controller comes from `PRIVACY_CONTROLLER` and `PRIVACY_EMAIL`.
 - **Email provider: Brevo** (EU), chosen by `BREVO_API_KEY`; Resend still works. `/api/email/events` takes Brevo's webhook (bearer `EMAIL_WEBHOOK_SECRET`): a hard bounce, spam complaint, invalid or blocked address switches that user's digest off.
 - **Daily cleanup** (`/api/cron/cleanup`): expired sessions (with IP and browser), sign-in tokens, and rate-limit rows older than two days (their keys are email and IP addresses). Before this they were kept forever.
 - **Region**: functions run in Frankfurt (`"regions": ["fra1"]`) next to the database, instead of Vercel's default in Washington.

@@ -15,7 +15,7 @@ Read `BRIEF.md` before starting new work. It holds the product decisions, data s
   - Past productions are indexed and in the sitemap with an "Esitetty <year>" label, but stay out of "Ohjelmassa".
   - The subtitle filter is on since 18 Oct 2026: Kansallisteatteri per-performance subtitles are parsed from a real fixture. A card matches when any performance in the next two weeks has the language.
 - **Milestone 3 is done** (users and diary, see README.md "Status: milestone 3" and its known gaps). Decisions agreed with Dimmu:
-  - Better Auth instead of Auth.js (BRIEF.md section 2 updated), email magic links only, no passwords or social login.
+  - Better Auth instead of Auth.js (BRIEF.md section 2 updated), email sign-in only, no passwords or social login. Since 19 Oct 2026 one emailed 6-digit code (Better Auth `emailOTP`) can be typed or used through the emailed link, which carries it sealed (`src/lib/sign-in-token.ts`) to a confirm button (mail scanners must not use it up).
   - Reviews are public by default with a visible opt-out checkbox; ratings and tags always count anonymously.
 - **Milestone 4 is done** (all six adapters, Vercel Cron, monitoring, `/yllapito`; see README.md "Status: milestone 4"). Its Firecrawl fixtures were replaced by live server HTML on 18 Oct 2026.
 - **Launch decisions made:** Brevo (EU) for email, Neon in Frankfurt with Vercel functions in `fra1`, and the Hobby plan, which is enough (100 cron jobs, once a day, 300 s). The privacy policy lives in `src/lib/privacy.ts` and quotes the retention constants; when you change retention, data collected, or a provider, update it and `POLICY_DATE`.

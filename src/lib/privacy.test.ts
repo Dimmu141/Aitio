@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { LOCALES } from "@/i18n/config";
-import { MAGIC_LINK_MINUTES, SESSION_DAYS } from "./auth-config";
+import { SIGN_IN_MINUTES, SESSION_DAYS } from "./auth-config";
 import { RATE_LIMIT_RETENTION_DAYS } from "./ops/cleanup";
 import { privacyPolicy } from "./privacy";
 
@@ -17,7 +17,7 @@ describe("privacyPolicy", () => {
     const policy = text(locale);
     expect(policy).toContain(config.controller);
     expect(policy).toContain(config.email);
-    for (const value of [SESSION_DAYS, MAGIC_LINK_MINUTES, RATE_LIMIT_RETENTION_DAYS]) expect(policy).toContain(String(value));
+    for (const value of [SESSION_DAYS, SIGN_IN_MINUTES, RATE_LIMIT_RETENTION_DAYS]) expect(policy).toContain(String(value));
     expect(policy).toContain("Brevo");
     expect(policy).toContain("tietosuoja.fi");
   });
