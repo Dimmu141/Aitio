@@ -3,6 +3,8 @@
  * after `vercel env pull .env.production.local --environment=production`.
  * Errors would break something; warnings are choices worth a second look.
  */
+import { userAgent } from "@/scrapers/agent";
+
 export interface Finding {
   level: "error" | "warning";
   variable: string;
@@ -85,12 +87,14 @@ const people: Check = (env) => {
   return findings;
 };
 
-/** The theatres should be able to reach whoever runs the bot. */
+/** The theatres should be able to reach whoever runs the bot, at the address the site shows. */
 const scraper: Check = (env) => {
-  const agent = env.SCRAPER_USER_AGENT ?? "";
-  if (!agent) return [error("SCRAPER_USER_AGENT", "missing: the scraper must say who it is")];
-  return /example\.|you@/.test(agent) || !/@|https?:\/\//.test(agent)
-    ? [error("SCRAPER_USER_AGENT", "needs a real contact address or URL, not the example one")]
+  const agent = userAgent(env);
+  if (/example\.|you@/.test(agent) || !/@/.test(agent)) {
+    return [error("SCRAPER_USER_AGENT", "needs a real contact address: set PRIVACY_EMAIL, or SCRAPER_USER_AGENT with one")];
+  }
+  return env.PRIVACY_EMAIL && !agent.includes(env.PRIVACY_EMAIL)
+    ? [warning("SCRAPER_USER_AGENT", "names a different address than the site shows (PRIVACY_EMAIL)")]
     : [];
 };
 

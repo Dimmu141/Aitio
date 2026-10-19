@@ -1,8 +1,7 @@
 import robotsParser from "robots-parser";
+import { userAgent } from "./agent";
 
-export const USER_AGENT =
-  process.env.SCRAPER_USER_AGENT ??
-  "AitioBot/0.1 (+https://github.com/; theatre diary project)";
+export const USER_AGENT = userAgent(process.env);
 
 const MIN_INTERVAL_MS = Number(process.env.SCRAPER_MIN_INTERVAL_MS ?? 1000);
 

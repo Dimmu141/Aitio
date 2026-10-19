@@ -26,7 +26,7 @@ function Section({
   theatres: Theatre[];
   t: Dictionary;
 }) {
-  if (section.contact && !email) return null;
+  if (section.contact === "section" && !email) return null;
   return (
     <section aria-labelledby={id} className="ai-section space-y-3">
       <h2 id={id} className="ai-section__title">
@@ -53,7 +53,7 @@ function Section({
           ))}
         </ul>
       )}
-      {section.contact && (
+      {section.contact && email && (
         <p>
           <a href={`mailto:${email}`} className="font-bold">
             {email}
