@@ -1,3 +1,4 @@
+import type { ProductionType } from "@/generated/prisma/enums";
 import { helsinkiDate } from "@/lib/format";
 import { windowEnd } from "./select";
 import type { ProductionCard } from "./types";
@@ -41,15 +42,19 @@ export function groupByNextDay(cards: ProductionCard[], asOf: Date): Day[] {
     .map((day) => ({ ...day, cards: day.cards.sort((a, b) => (a.next?.getTime() ?? 0) - (b.next?.getTime() ?? 0)) }));
 }
 
+/** A premiere is a new staging; a stand-up night or a concert "premiering" is not news here. */
+const PREMIERE_TYPES: ReadonlySet<ProductionType> = new Set(["PLAY", "MUSICAL", "OPERA", "DANCE"]);
+
 /**
- * Productions whose premiere, as the theatre states it, falls between today and the
- * end of the window, earliest first. Only the stated date counts: the first stored
- * performance is just the first one we happened to see.
+ * Plays, musicals, operas and dance pieces whose premiere, as the theatre states it,
+ * falls between today and the end of the window, earliest first. Only the stated date
+ * counts: the first stored performance is just the first one we happened to see.
  */
 export function premieresSoon(cards: ProductionCard[], asOf: Date): ProductionCard[] {
   const today = helsinkiDate(asOf);
   const end = windowEnd(asOf);
   return cards
+    .filter((card) => PREMIERE_TYPES.has(card.type))
     .filter((card) => card.premiere && helsinkiDate(card.premiere) >= today && card.premiere < end)
     .sort((a, b) => (a.premiere?.getTime() ?? 0) - (b.premiere?.getTime() ?? 0));
 }

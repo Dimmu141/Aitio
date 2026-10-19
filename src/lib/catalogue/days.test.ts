@@ -69,4 +69,10 @@ describe("premieresSoon", () => {
     ];
     expect(premieresSoon(cards, asOf).map((c) => c.slug)).toEqual(["today", "later"]);
   });
+
+  it("counts new stagings only, not stand-up or concert nights (Monsterit Stand Up Show)", () => {
+    const night = (slug: string, type: ProductionCard["type"]) => ({ ...withPremiere(slug, "2026-10-20T00:00:00Z"), type });
+    const cards = [night("standup", "STANDUP"), night("concert", "CONCERT"), night("event", "OTHER"), night("dance", "DANCE"), night("opera", "OPERA")];
+    expect(premieresSoon(cards, asOf).map((c) => c.slug)).toEqual(["dance", "opera"]);
+  });
 });
