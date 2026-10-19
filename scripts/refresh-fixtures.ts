@@ -56,6 +56,11 @@ const FIXTURES: Array<{ url: string; file: string; form?: Record<string, string>
   { url: KOM_LIST_URL, file: "fixtures/kom-teatteri/ohjelmisto.html" },
   { url: KOM_CALENDAR_URL, file: "fixtures/kom-teatteri/kalenteri.html" },
   { url: "https://kom-teatteri.fi/ohjelmisto/mysteriobuffo/", file: "fixtures/kom-teatteri/production-mysteriobuffo.html" },
+  { url: "https://kom-teatteri.fi/ohjelmisto/poiskatsojat/", file: "fixtures/kom-teatteri/production-poiskatsojat.html" },
+  {
+    url: "https://kom-teatteri.fi/ohjelmisto/kuinka-tulla-tapio-rautavaaraksi/",
+    file: "fixtures/kom-teatteri/production-kuinka-tulla-tapio-rautavaaraksi.html",
+  },
   { url: ESPOO_AJAX_URL, form: ESPOO_LIST_FORM, file: "fixtures/espoon-teatteri/ohjelmisto-ajax.html" },
   {
     url: "https://espoonteatteri.fi/ohjelmisto/rakastavaisten-kuoro/",
