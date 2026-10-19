@@ -7,6 +7,7 @@ import {
   effectiveType,
   isClosingSoon,
   isCurrent,
+  LISTED_THEATRE,
   knownEnd,
   lifecycle,
   runProgress,
@@ -234,8 +235,8 @@ export async function getTheatre(slug: string): Promise<TheatrePage | null> {
   "use cache";
   cacheCatalogue();
   const asOf = new Date();
-  const row = await db.theatre.findUnique({
-    where: { slug },
+  const row = await db.theatre.findFirst({
+    where: { slug, ...LISTED_THEATRE },
     select: {
       slug: true,
       name: true,
@@ -325,7 +326,7 @@ export async function getSearchIndex(): Promise<{ asOf: Date; index: SearchIndex
         credits: { select: { productionId: true, lastSeenAt: true, production: { select: { lastSeenAt: true } } } },
       },
     }),
-    db.theatre.findMany({ select: { slug: true, name: true, city: true }, orderBy: { name: "asc" } }),
+    db.theatre.findMany({ where: LISTED_THEATRE, select: { slug: true, name: true, city: true }, orderBy: { name: "asc" } }),
   ]);
   return {
     asOf,
@@ -352,7 +353,7 @@ export async function getAllSlugs(): Promise<{
   cacheCatalogue();
   const [productions, theatres, people] = await Promise.all([
     db.production.findMany({ select: { slug: true, lastSeenAt: true }, orderBy: { slug: "asc" } }),
-    db.theatre.findMany({ select: { slug: true, updatedAt: true }, orderBy: { slug: "asc" } }),
+    db.theatre.findMany({ where: LISTED_THEATRE, select: { slug: true, updatedAt: true }, orderBy: { slug: "asc" } }),
     db.person.findMany({ where: { credits: { some: {} } }, select: { slug: true }, orderBy: { slug: "asc" } }),
   ]);
   return {
@@ -360,4 +361,11 @@ export async function getAllSlugs(): Promise<{
     theatres: theatres.map((row) => ({ slug: row.slug, updatedAt: row.updatedAt })),
     people,
   };
+}
+
+/** The theatres Aitio shows, for the about page's source list. */
+export async function getListedTheatres(): Promise<Array<{ slug: string; name: string; website: string }>> {
+  "use cache";
+  cacheCatalogue();
+  return db.theatre.findMany({ where: LISTED_THEATRE, select: { slug: true, name: true, website: true }, orderBy: { name: "asc" } });
 }

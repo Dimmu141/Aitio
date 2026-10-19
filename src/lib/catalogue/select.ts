@@ -1,5 +1,11 @@
 import type { ProductionType } from "@/generated/prisma/enums";
 
+/**
+ * A theatre is shown once its source has delivered something. One added to the seed
+ * whose scraper has not run yet (or never worked) stays out of every list and 404s.
+ */
+export const LISTED_THEATRE = { productions: { some: {} } } as const;
+
 export const WINDOW_DAYS = 14;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
