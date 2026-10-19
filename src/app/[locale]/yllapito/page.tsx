@@ -89,9 +89,9 @@ async function ScrapeHealth({ now }: { now: Date }) {
   );
 }
 
-async function TypeReview() {
+async function TypeReview({ now }: { now: Date }) {
   const { t } = await getDictionary();
-  const rows = await typeReviewQueue();
+  const rows = await typeReviewQueue(now);
   return (
     <section aria-labelledby="tyypit" className="space-y-4">
       <h2 id="tyypit" className="text-section">
@@ -110,6 +110,7 @@ async function TypeReview() {
                 </Link>
                 <span className="block text-base text-ink-muted">
                   {row.theatre} · arvaus {t.types[row.type]} ({Math.round(row.typeConfidence * 100)} %)
+                  {row.next ? ` · seuraava ${formatPerformance(row.next, "fi", now)}` : " · ei tulevia esityksiä"}
                 </span>
               </span>
               <form action={setTypeOverrideAction} className="flex w-full flex-wrap gap-2 sm:w-auto">
@@ -195,7 +196,7 @@ export default async function AdminPage({ searchParams }: PageProps<"/[locale]/y
       <h1 className="border-b-4 border-double border-ink pb-4 text-display">Ylläpito</h1>
       {query.saved && <Notice>Tallennettu.</Notice>}
       <ScrapeHealth now={now} />
-      <TypeReview />
+      <TypeReview now={now} />
       <Moderation />
     </div>
   );
