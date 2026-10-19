@@ -180,3 +180,17 @@ export function splitPeople(raw: string): string[] {
   }
   return names;
 }
+
+/**
+ * Sources that shout ("NÅT ATT GÖRA", "PÄHKINÄNSÄRKIJÄN JOULU") get sentence case. Only
+ * titles with no lowercase letter at all, a space and at least six letters: "KAJ" is a
+ * band's own spelling and "1984" has nothing to case. Proper nouns inside can come out
+ * wrong ("Aja, baja alfons åberg!"), which is what Production.titleOverride is for.
+ */
+export function sentenceCaseShouting(title: string): string {
+  const letters = title.match(/\p{L}/gu) ?? [];
+  if (/\p{Ll}/u.test(title) || letters.length < 6 || !/\s/.test(title.trim())) return title;
+  const lower = title.toLocaleLowerCase("fi");
+  const first = lower.search(/\p{L}/u);
+  return lower.slice(0, first) + lower.charAt(first).toLocaleUpperCase("fi") + lower.slice(first + 1);
+}

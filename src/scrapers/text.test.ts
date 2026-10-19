@@ -10,6 +10,7 @@ import {
   stripGuestMarker,
   weekdaysIn,
   yearFromWeekday,
+  sentenceCaseShouting,
   splitPeople,
 } from "./text";
 
@@ -138,5 +139,19 @@ describe("splitPeople", () => {
   it("never makes a person of a group or a company alone", () => {
     expect(splitPeople("ATR-tuotanto Oy")).toEqual([]);
     expect(splitPeople("ystävät")).toEqual([]);
+  });
+});
+
+describe("sentenceCaseShouting", () => {
+  it.each([
+    ["NÅT ATT GÖRA", "Nåt att göra"],
+    ["PÄHKINÄNSÄRKIJÄN JOULU", "Pähkinänsärkijän joulu"],
+    ["AJA, BAJA ALFONS ÅBERG!", "Aja, baja alfons åberg!"],
+    ["KAJ", "KAJ"],
+    ["1984", "1984"],
+    ["Seitsemän veljestä", "Seitsemän veljestä"],
+    ["Teater Mars: Tre systrar", "Teater Mars: Tre systrar"],
+  ])("%s", (title, cased) => {
+    expect(sentenceCaseShouting(title)).toBe(cased);
   });
 });

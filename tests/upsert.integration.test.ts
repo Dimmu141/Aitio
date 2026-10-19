@@ -156,4 +156,16 @@ describe.skipIf(!url)("upsertProduction (integration)", () => {
     expect(names).toEqual(expect.arrayContaining(["Carl Knif", "Kristofer Möller", "Max Martin"]));
     expect(await db.person.count({ where: { name: { in: ["Max Martin ja ystävät", "Koncept och manus"] } } })).toBe(0);
   });
+  it("sentence-cases a shouting title and keeps an admin's correction through later scrapes", async () => {
+    const { setTitleOverride } = await import("@/lib/ops/catalogue-admin");
+    const shouting = { ...detail, externalId: "aja-baja", title: "AJA, BAJA ALFONS ÅBERG!", url: "https://svenskateatern.fi/repertoar/aja-baja/" };
+    const { productionId } = await upsertProduction(db, theatre, shouting, new Date());
+    expect(await db.production.findUniqueOrThrow({ where: { id: productionId } })).toMatchObject({
+      title: "Aja, baja alfons åberg!",
+      titleCased: true,
+    });
+    await setTitleOverride(productionId, "Aja, baja Alfons Åberg!");
+    await upsertProduction(db, theatre, shouting, new Date());
+    expect((await db.production.findUniqueOrThrow({ where: { id: productionId } })).title).toBe("Aja, baja Alfons Åberg!");
+  });
 });

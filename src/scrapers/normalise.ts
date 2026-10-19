@@ -1,6 +1,6 @@
 import type { PrismaClient } from "@/generated/prisma/client";
 import { classifyProduction, isConductorLabel, isInstrumentLabel } from "./classify";
-import { slugify, splitPeople } from "./text";
+import { sentenceCaseShouting, slugify, splitPeople } from "./text";
 import type { RawCredit, RawProductionDetail } from "./types";
 
 export interface UpsertSummary {
@@ -116,8 +116,11 @@ export async function upsertProduction(
     existing?.slug ??
     (await uniqueProductionSlug(db, `${slugify(detail.title)}-${theatre.slug}`, theatre.id, detail.externalId));
 
+  // An admin's correction wins; otherwise a shouting source title gets sentence case.
+  const cased = sentenceCaseShouting(detail.title);
   const data = {
-    title: detail.title,
+    title: existing?.titleOverride ?? cased,
+    titleCased: cased !== detail.title,
     sourceUrl: detail.url,
     stageId: stage?.id ?? null,
     type: classification.type,

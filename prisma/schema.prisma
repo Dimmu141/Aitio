@@ -66,6 +66,10 @@ model Production {
   id             String          @id @default(cuid())
   slug           String          @unique
   title          String
+  /// Set by an admin when the automatic casing got a name wrong ("Aja, baja Alfons Åberg!"); wins over every scrape.
+  titleOverride  String?
+  /// The source printed the title in capitals and we sentence-cased it: listed for review in /yllapito.
+  titleCased     Boolean         @default(false)
   theatreId      String
   theatre        Theatre         @relation(fields: [theatreId], references: [id])
   stageId        String?
