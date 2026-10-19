@@ -4,6 +4,7 @@ import {
   isClosingSoon,
   isCurrent,
   knownEnd,
+  currentProductionCount,
   lifecycle,
   runProgress,
   schedule,
@@ -180,5 +181,17 @@ describe("known end and closing soon for partial schedules", () => {
 
   it("is not closing soon with nothing left to see", () => {
     expect(isClosingSoon(schedule([], asOf), day(10), false, asOf)).toBe(false);
+  });
+});
+
+describe("currentProductionCount", () => {
+  const seen = new Date("2026-10-18");
+  const older = new Date("2026-09-01");
+  const credit = (productionId: string, lastSeenAt = seen) => ({ productionId, lastSeenAt, production: { lastSeenAt: seen } });
+
+  it("counts productions, not credits, and ignores stale ones", () => {
+    // Writer and director of one show, plus a credit the theatre has since removed.
+    expect(currentProductionCount([credit("a"), credit("a"), credit("b", older)])).toBe(1);
+    expect(currentProductionCount([credit("a"), credit("b")])).toBe(2);
   });
 });

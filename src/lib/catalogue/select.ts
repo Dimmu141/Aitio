@@ -14,6 +14,19 @@ export function isCurrent(row: { lastSeenAt: Date }, production: { lastSeenAt: D
   return row.lastSeenAt.getTime() >= production.lastSeenAt.getTime();
 }
 
+/**
+ * A person's page is indexed (and in the sitemap) from this many productions on. With one
+ * credit the page only repeats the production's credit list: thin, and 800+ of them.
+ */
+export const MIN_PRODUCTIONS_TO_INDEX = 2;
+
+/** Distinct productions a person is currently credited in (stale credits don't count). */
+export function currentProductionCount(
+  credits: Array<{ productionId: string; lastSeenAt: Date; production: { lastSeenAt: Date } }>,
+): number {
+  return new Set(credits.filter((credit) => isCurrent(credit, credit.production)).map((credit) => credit.productionId)).size;
+}
+
 export function effectiveType(production: { type: ProductionType; typeOverride: ProductionType | null }): ProductionType {
   return production.typeOverride ?? production.type;
 }

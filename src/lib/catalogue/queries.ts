@@ -6,6 +6,7 @@ import { cardSelect, toCard } from "./cards";
 import {
   effectiveType,
   isClosingSoon,
+  currentProductionCount,
   isCurrent,
   LISTED_THEATRE,
   knownEnd,
@@ -344,10 +345,8 @@ export async function getSearchIndex(): Promise<{ asOf: Date; index: SearchIndex
     index: {
       productions: productions.map((row) => toCard(row, asOf)),
       people: people.flatMap((person) => {
-        const current = new Set(
-          person.credits.filter((credit) => isCurrent(credit, credit.production)).map((credit) => credit.productionId),
-        );
-        return current.size > 0 ? [{ slug: person.slug, name: person.name, productions: current.size }] : [];
+        const productions = currentProductionCount(person.credits);
+        return productions > 0 ? [{ slug: person.slug, name: person.name, productions }] : [];
       }),
       theatres,
     },
@@ -358,19 +357,27 @@ export async function getSearchIndex(): Promise<{ asOf: Date; index: SearchIndex
 export async function getAllSlugs(): Promise<{
   productions: Array<{ slug: string; updatedAt: Date }>;
   theatres: Array<{ slug: string; updatedAt: Date }>;
-  people: Array<{ slug: string }>;
+  /** `productions` decides whether the page is indexed (MIN_PRODUCTIONS_TO_INDEX). */
+  people: Array<{ slug: string; productions: number }>;
 }> {
   "use cache";
   cacheCatalogue();
   const [productions, theatres, people] = await Promise.all([
     db.production.findMany({ select: { slug: true, lastSeenAt: true }, orderBy: { slug: "asc" } }),
     db.theatre.findMany({ where: LISTED_THEATRE, select: { slug: true, updatedAt: true }, orderBy: { slug: "asc" } }),
-    db.person.findMany({ where: { credits: { some: {} } }, select: { slug: true }, orderBy: { slug: "asc" } }),
+    db.person.findMany({
+      where: { credits: { some: {} } },
+      select: {
+        slug: true,
+        credits: { select: { productionId: true, lastSeenAt: true, production: { select: { lastSeenAt: true } } } },
+      },
+      orderBy: { slug: "asc" },
+    }),
   ]);
   return {
     productions: productions.map((row) => ({ slug: row.slug, updatedAt: row.lastSeenAt })),
     theatres: theatres.map((row) => ({ slug: row.slug, updatedAt: row.updatedAt })),
-    people,
+    people: people.map((person) => ({ slug: person.slug, productions: currentProductionCount(person.credits) })),
   };
 }
 

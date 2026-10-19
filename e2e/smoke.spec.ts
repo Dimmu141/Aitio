@@ -69,6 +69,13 @@ for (const path of ["/esitys/viidakon-villit-naiset-kansallisteatteri", "/sv/tea
   });
 }
 
+test("a person credited in one production is not indexed, but their links are followed", async ({ page }) => {
+  await page.goto("/en/person/anna-maria-lipponen");
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, follow");
+  await page.goto("/");
+  await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
+});
+
 test("the front page names Aitio in its title", async ({ page }) => {
   await page.goto("/");
   await expect(page).toHaveTitle("Aitio – teatteri, tanssi ja ooppera Helsingissä");

@@ -22,6 +22,7 @@ export function pageMetadata({
   title,
   description,
   absoluteTitle = false,
+  noindex = false,
 }: {
   locale: Locale;
   section?: Section;
@@ -30,12 +31,15 @@ export function pageMetadata({
   description: string;
   /** Skip the layout's "%s · Aitio" template (the front page names Aitio itself). */
   absoluteTitle?: boolean;
+  /** Keep a thin page out of search results; its links are still followed. */
+  noindex?: boolean;
 }): Metadata {
   const canonical = href(locale, section, slug);
   const image = { url: shareImagePath(locale, section, slug), ...OG_SIZE, alt: title };
   return {
     title: absoluteTitle ? { absolute: title } : title,
     description,
+    ...(noindex ? { robots: { index: false, follow: true } } : {}),
     alternates: { canonical, languages: { ...alternates(section, slug), "x-default": href("fi", section, slug) } },
     openGraph: {
       type: "website",
