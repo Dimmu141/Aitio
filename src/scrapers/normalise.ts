@@ -138,6 +138,7 @@ export async function upsertProduction(
   let creditCount = 0;
   for (const [index, credit] of detail.credits.entries()) {
     const person = await upsertPerson(db, credit.name);
+    const roleText = credit.roleText.trim() || null;
     for (const role of credit.roles) {
       await db.credit.upsert({
         where: { personId_productionId_role: { personId: person.id, productionId: production.id, role } },
@@ -145,11 +146,12 @@ export async function upsertProduction(
           personId: person.id,
           productionId: production.id,
           role,
+          roleText,
           characterName: credit.characterName ?? null,
           sortOrder: index,
           lastSeenAt: seenAt,
         },
-        update: { characterName: credit.characterName ?? null, sortOrder: index, lastSeenAt: seenAt },
+        update: { roleText, characterName: credit.characterName ?? null, sortOrder: index, lastSeenAt: seenAt },
       });
       creditCount += 1;
     }
@@ -158,8 +160,22 @@ export async function upsertProduction(
   for (const review of detail.criticReviews) {
     await db.criticReview.upsert({
       where: { url: review.url },
-      create: { productionId: production.id, outlet: review.outlet, url: review.url, publishedAt: review.publishedAt ?? null },
-      update: { outlet: review.outlet, ...(review.publishedAt ? { publishedAt: review.publishedAt } : {}) },
+      create: {
+        productionId: production.id,
+        outlet: review.outlet,
+        critic: review.critic ?? null,
+        url: review.url,
+        publishedAt: review.publishedAt ?? null,
+        paywalled: review.paywalled ?? false,
+        feature: review.feature ?? false,
+      },
+      update: {
+        outlet: review.outlet,
+        paywalled: review.paywalled ?? false,
+        feature: review.feature ?? false,
+        ...(review.critic ? { critic: review.critic } : {}),
+        ...(review.publishedAt ? { publishedAt: review.publishedAt } : {}),
+      },
     });
   }
 

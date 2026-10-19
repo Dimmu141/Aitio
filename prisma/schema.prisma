@@ -21,6 +21,8 @@ enum ProductionType {
 enum CreditRole {
   DIRECTOR
   WRITER
+  /// Dramatisation or stage adaptation of someone else's work ("dramatisointi", "bearbetning").
+  ADAPTATION
   COMPOSER
   TRANSLATOR
   CHOREOGRAPHER
@@ -127,6 +129,8 @@ model Credit {
   productionId  String
   production    Production @relation(fields: [productionId], references: [id])
   role          CreditRole
+  /// The source's own label ("Lavastussuunnittelu", "Ohjaus ja dramatisointi"); null when it gave none.
+  roleText      String?
   characterName String?
   sortOrder     Int        @default(0)
   /// Same value as Production.lastSeenAt when the credit is still on the theatre's page.
@@ -141,8 +145,14 @@ model CriticReview {
   productionId String
   production   Production @relation(fields: [productionId], references: [id])
   outlet       String
+  /// The critic's name, when the source gives it.
+  critic       String?
   url          String     @unique
   publishedAt  DateTime?
+  /// The source marks the link as paywalled ("maksumuuri").
+  paywalled    Boolean    @default(false)
+  /// A feature or interview ("Lue juttu"), not a review: shown apart from the critics.
+  feature      Boolean    @default(false)
 
   @@index([productionId])
 }

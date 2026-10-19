@@ -94,6 +94,7 @@ export const sv: Dictionary = {
   roles: {
     DIRECTOR: "Regi",
     WRITER: "Text",
+    ADAPTATION: "Dramatisering",
     COMPOSER: "Musik",
     TRANSLATOR: "Översättning",
     CHOREOGRAPHER: "Koreografi",

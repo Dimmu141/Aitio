@@ -7,6 +7,8 @@ const SKIP_WORDS =
  * Map a free-text role label (Finnish or Swedish) to credit roles.
  * Returns an empty array for roles we deliberately skip (rights holders, producers).
  * One label can map to several roles: "Ohjaus ja käsikirjoitus" → DIRECTOR + WRITER.
+ * Dramatising someone else's work is ADAPTATION, not WRITER: in "Ohjaus ja dramatisointi"
+ * the text is still Aleksis Kivi's.
  */
 export function mapRoleText(roleText: string): CreditRoleName[] {
   const lower = roleText.toLowerCase();
@@ -20,10 +22,11 @@ export function mapRoleText(roleText: string): CreditRoleName[] {
   const isAssistant = /assist|apulais|apuohjaa/.test(text);
   if (!isAssistant && /ohjaa|ohjaus|\bregi\b|regiss|\bdirect/.test(text)) roles.add("DIRECTOR");
   if (
-    /käsikirjoit|dramatisoin|\bteksti\b|kirjoittaja|kirjailija|^näytelmä(?:$|[\s:,])|\bwriter|^av\b|^text\b|\bmanus\b|dramatis|librett|alkuperäis|författ|bearbetning/.test(text)
+    /käsikirjoit|\bteksti\b|kirjoittaja|kirjailija|^näytelmä(?:$|[\s:,])|\bwriter|^av\b|^text\b|\bmanus\b|librett|alkuperäis|författ/.test(text)
   ) {
     roles.add("WRITER");
   }
+  if (/dramatis|bearbetning|\badapt/.test(text)) roles.add("ADAPTATION");
   // A conductor ("Musiikinjohto", "Kapellimestari") leads the music but did not write it.
   // Live musicians ("Livemusiikki", "Muusikot") play the music; they are not its composer either.
   const conducts = /musiikinjoht|kapellimest|dirigent|conduct|livemusiik|muusiko|soittaj/.test(text);

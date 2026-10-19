@@ -8,7 +8,12 @@ describe("mapRoleText", () => {
     ["Regi", ["DIRECTOR"]],
     ["Ohjaajan assistentti", ["OTHER"]],
     ["Författare", ["WRITER"]],
-    ["Textbearbetning", ["WRITER"]],
+    ["Textbearbetning", ["ADAPTATION"]],
+    // Dramatising someone else's work is not writing it (Seitsemän veljestä, 19 Oct 2026).
+    ["Ohjaus ja dramatisointi", ["DIRECTOR", "ADAPTATION"]],
+    ["Dramatisointi", ["ADAPTATION"]],
+    ["Dramatisering och regi", ["DIRECTOR", "ADAPTATION"]],
+    ["Käsikirjoitus ja dramatisointi", ["WRITER", "ADAPTATION"]],
     ["Regissör", ["DIRECTOR"]],
     ["Esitysoikeuksien valvoja", []],
     ["Apulaisohjaaja", ["OTHER"]],
@@ -23,6 +28,12 @@ describe("mapRoleText", () => {
     ["Kirjailija", ["WRITER"]],
   ])("%s", (label, expected) => {
     expect(mapRoleText(label).sort()).toEqual([...expected].sort());
+  });
+});
+
+describe("mapRoleText for arrangements", () => {
+  it("does not read a musical arrangement as a dramatisation", () => {
+    expect(mapRoleText("Musiikin sovitus")).not.toContain("ADAPTATION");
   });
 });
 

@@ -94,6 +94,7 @@ export const en: Dictionary = {
   roles: {
     DIRECTOR: "Director",
     WRITER: "Writer",
+    ADAPTATION: "Adaptation",
     COMPOSER: "Music",
     TRANSLATOR: "Translation",
     CHOREOGRAPHER: "Choreography",

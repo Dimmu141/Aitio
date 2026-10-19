@@ -3,6 +3,7 @@ import { z } from "zod";
 export const CREDIT_ROLES = [
   "DIRECTOR",
   "WRITER",
+  "ADAPTATION",
   "COMPOSER",
   "TRANSLATOR",
   "CHOREOGRAPHER",
@@ -58,6 +59,10 @@ export const rawCriticReviewSchema = z.object({
   critic: z.string().optional(),
   url: z.url(),
   publishedAt: z.date().optional(),
+  /** The source marks the link as paywalled. */
+  paywalled: z.boolean().optional(),
+  /** A feature or interview rather than a review. */
+  feature: z.boolean().optional(),
 });
 export type RawCriticReview = z.infer<typeof rawCriticReviewSchema>;
 

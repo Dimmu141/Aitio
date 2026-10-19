@@ -2,7 +2,7 @@ import type { CreditRole } from "@/generated/prisma/enums";
 import type { CreditRow } from "./types";
 
 /** Programme order: the people who made it first, cast last. */
-const ROLE_ORDER: CreditRole[] = ["DIRECTOR", "WRITER", "TRANSLATOR", "COMPOSER", "CHOREOGRAPHER", "DESIGNER", "OTHER", "CAST"];
+const ROLE_ORDER: CreditRole[] = ["DIRECTOR", "WRITER", "ADAPTATION", "TRANSLATOR", "COMPOSER", "CHOREOGRAPHER", "DESIGNER", "OTHER", "CAST"];
 
 export interface CreditGroup {
   role: CreditRole;

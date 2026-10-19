@@ -105,6 +105,7 @@ export const fi = {
   roles: {
     DIRECTOR: "Ohjaus",
     WRITER: "Teksti",
+    ADAPTATION: "Dramatisointi",
     COMPOSER: "Musiikki",
     TRANSLATOR: "Käännös",
     CHOREOGRAPHER: "Koreografia",
