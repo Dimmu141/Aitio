@@ -1,9 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { groupCredits, posterFoot } from "./credits";
+import { groupCredits, posterFoot, teamRows } from "./credits";
 import type { CreditRow } from "./types";
 
-const credit = (role: CreditRow["role"], slug: string, characterName: string | null = null): CreditRow => ({
+const credit = (
+  role: CreditRow["role"],
+  slug: string,
+  characterName: string | null = null,
+  roleText: string | null = null,
+): CreditRow => ({
   role,
+  roleText,
   person: { slug, name: slug.toUpperCase() },
   characterName,
 });
@@ -42,5 +48,34 @@ describe("posterFoot", () => {
 
   it("is null without either", () => {
     expect(posterFoot([credit("CAST", "c")], labels)).toBeNull();
+  });
+});
+
+describe("teamRows", () => {
+  const roleName = (role: CreditRow["role"]) => ({ DIRECTOR: "Ohjaus", ADAPTATION: "Dramatisointi", DESIGNER: "Suunnittelu", WRITER: "Teksti" })[role as string] ?? role;
+  const seven = [
+    credit("WRITER", "aleksis-kivi"),
+    credit("DIRECTOR", "mika-myllyaho", null, "Ohjaus ja dramatisointi"),
+    credit("ADAPTATION", "mika-myllyaho", null, "Ohjaus ja dramatisointi"),
+    credit("DESIGNER", "katri-rentto", null, "Lavastussuunnittelu"),
+    credit("DESIGNER", "katri-rentto", null, "Pukusuunnittelu"),
+    credit("CAST", "actor", "Juhani"),
+  ];
+
+  it("gives each person one row in the theatre's wording and order", () => {
+    expect(teamRows(seven, roleName, true)).toEqual([
+      { person: { slug: "aleksis-kivi", name: "ALEKSIS-KIVI" }, roles: "Teksti" },
+      { person: { slug: "mika-myllyaho", name: "MIKA-MYLLYAHO" }, roles: "Ohjaus ja dramatisointi" },
+      { person: { slug: "katri-rentto", name: "KATRI-RENTTO" }, roles: "Lavastussuunnittelu, pukusuunnittelu" },
+    ]);
+  });
+
+  it("uses the translated role names on a page in another language", () => {
+    expect(teamRows(seven, roleName, false).map((row) => row.roles)).toEqual(["Teksti", "Ohjaus, dramatisointi", "Suunnittelu"]);
+  });
+
+  it("keeps acronyms as written", () => {
+    const rows = teamRows([credit("DESIGNER", "x", null, "Valosuunnittelu"), credit("DESIGNER", "x", null, "VR-toteutus")], roleName, true);
+    expect(rows[0].roles).toBe("Valosuunnittelu, VR-toteutus");
   });
 });

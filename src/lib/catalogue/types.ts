@@ -46,6 +46,8 @@ export interface PerformanceRow {
 
 export interface CreditRow {
   role: CreditRole;
+  /** The theatre's own label for the role, when it gave one. */
+  roleText: string | null;
   person: { slug: string; name: string };
   characterName: string | null;
 }

@@ -30,8 +30,8 @@ const page: ProductionPage = {
   started: true,
   year: null,
   credits: [
-    { role: "DIRECTOR", person: { slug: "a", name: "Anna" }, characterName: null },
-    { role: "CAST", person: { slug: "b", name: "Bo" }, characterName: "X" },
+    { role: "DIRECTOR", roleText: null, person: { slug: "a", name: "Anna" }, characterName: null },
+    { role: "CAST", roleText: null, person: { slug: "b", name: "Bo" }, characterName: "X" },
   ],
   critics: [],
   blogs: [],

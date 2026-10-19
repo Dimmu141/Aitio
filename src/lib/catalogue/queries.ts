@@ -177,7 +177,12 @@ export async function getProduction(slug: string): Promise<ProductionPage | null
     year: life.year,
     credits: row.credits
       .filter((credit) => isCurrent(credit, row))
-      .map((credit) => ({ role: credit.role, person: credit.person, characterName: credit.characterName })),
+      .map((credit) => ({
+        role: credit.role,
+        roleText: credit.roleText,
+        person: credit.person,
+        characterName: credit.characterName,
+      })),
     ...splitReviews(row.criticReviews),
     ratings: summariseRatings(ratings),
     tags: countTags(row.diaryEntries.flatMap((entry) => entry.tags)),

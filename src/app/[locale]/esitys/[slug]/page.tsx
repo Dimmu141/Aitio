@@ -23,6 +23,7 @@ import { productionJsonLd, serializeJsonLd } from "@/lib/jsonld";
 import { pageMetadata } from "@/lib/metadata";
 import { typeLabel } from "@/lib/catalogue/type-label";
 import { absoluteUrl } from "@/lib/site";
+import { sourceLanguage } from "@/scrapers/theatres";
 
 /**
  * Fully static: a slug the build didn't know waits for its complete render instead of
@@ -146,7 +147,7 @@ export default async function ProductionRoute({ params }: PageProps<"/[locale]/e
       <PerformanceList rows={page.performances} slug={page.slug} asOf={page.asOf} locale={locale} t={t} />
       <AudienceSection ratings={page.ratings} tags={page.tags} reviews={page.reviews} locale={locale} t={t} />
       <CriticLinks critics={page.critics} blogs={page.blogs} locale={locale} t={t} />
-      <CreditList credits={page.credits} locale={locale} t={t} />
+      <CreditList credits={page.credits} sourceLanguage={sourceLanguage(page.theatre.slug)} locale={locale} t={t} />
 
       <p className="ai-source">
         {t.production.sourceLine}:{" "}
