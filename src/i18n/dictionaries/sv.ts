@@ -3,6 +3,7 @@ import type { Dictionary } from "./fi";
 export const sv: Dictionary = {
   site: {
     name: "Aitio",
+    homeTitle: "Aitio – teater, dans och opera i Helsingfors",
     tagline: "Teater, dans och opera i huvudstadsregionen på ett ställe",
     description:
       "Vad som spelas på huvudstadsregionens teatrar, danshus och opera just nu: föreställningar, speldatum, upphovspersoner och länkar till recensioner.",

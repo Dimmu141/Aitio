@@ -14,6 +14,7 @@ const types: Record<ProductionType, string> = {
 export const fi = {
   site: {
     name: "Aitio",
+    homeTitle: "Aitio – teatteri, tanssi ja ooppera Helsingissä",
     tagline: "Helsingin seudun teatteri, tanssi ja ooppera yhdessä paikassa",
     description:
       "Mitä Helsingin seudun teattereissa, tanssitaloissa ja oopperassa on nyt ohjelmassa: esitykset, esityspäivät, tekijät ja linkit arvosteluihin.",

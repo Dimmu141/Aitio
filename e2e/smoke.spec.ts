@@ -57,6 +57,13 @@ test("the language switcher keeps the page, or falls back to the front page with
   await expect(page).toHaveURL(new RegExp(`${target}$`));
 });
 
+test("the front page names Aitio in its title", async ({ page }) => {
+  await page.goto("/");
+  await expect(page).toHaveTitle("Aitio – teatteri, tanssi ja ooppera Helsingissä");
+  await page.goto("/en");
+  await expect(page).toHaveTitle("Aitio – theatre, dance and opera in Helsinki");
+});
+
 test("filters work as a plain form", async ({ page }) => {
   // Works on fixture data and on a real scrape alike: Swedish narrows the list, never to zero.
   const count = async () => Number((await page.getByRole("heading", { level: 2, name: /ohjelmassa$/ }).textContent())?.match(/\d+/)?.[0]);

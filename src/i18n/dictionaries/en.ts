@@ -3,6 +3,7 @@ import type { Dictionary } from "./fi";
 export const en: Dictionary = {
   site: {
     name: "Aitio",
+    homeTitle: "Aitio – theatre, dance and opera in Helsinki",
     tagline: "Helsinki-area theatre, dance and opera in one place",
     description:
       "What's on in Helsinki-area theatres, dance houses and opera: productions, performance dates, creative teams and links to reviews.",

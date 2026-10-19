@@ -21,7 +21,8 @@ export const instant = false;
 
 export async function generateMetadata() {
   const { locale, t } = await getDictionary();
-  return pageMetadata({ locale, title: t.home.title, description: t.site.description });
+  // A page in the layout's own segment doesn't get the title template, so it names Aitio itself.
+  return pageMetadata({ locale, title: t.site.homeTitle, description: t.site.description, absoluteTitle: true });
 }
 
 async function OnStage({

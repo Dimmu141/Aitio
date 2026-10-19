@@ -10,16 +10,19 @@ export function pageMetadata({
   slug,
   title,
   description,
+  absoluteTitle = false,
 }: {
   locale: Locale;
   section?: Section;
   slug?: string;
   title: string;
   description: string;
+  /** Skip the layout's "%s · Aitio" template (the front page names Aitio itself). */
+  absoluteTitle?: boolean;
 }): Metadata {
   const canonical = href(locale, section, slug);
   return {
-    title,
+    title: absoluteTitle ? { absolute: title } : title,
     description,
     alternates: { canonical, languages: { ...alternates(section, slug), "x-default": href("fi", section, slug) } },
     openGraph: {
