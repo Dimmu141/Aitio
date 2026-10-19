@@ -35,6 +35,7 @@ const page: ProductionPage = {
   ],
   critics: [],
   blogs: [],
+  features: [],
   ratings: summariseRatings([]),
   tags: [],
   reviews: [],

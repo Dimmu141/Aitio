@@ -98,6 +98,8 @@ export const fi = {
     criticsIntro: "Linkit arvosteluihin lehdissä ja muissa medioissa.",
     noCritics: "Emme ole vielä löytäneet arvosteluja.",
     blogs: "Blogit",
+    features: "Muuta luettavaa",
+    paywall: "maksumuuri",
     blogsIntro: "Bloggaajien kirjoituksia, joihin teatteri linkittää.",
     credits: "Tekijät",
     source: "Lähde",

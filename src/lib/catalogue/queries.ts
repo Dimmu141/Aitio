@@ -85,6 +85,8 @@ export interface ProductionPage {
   /** Press reviews; blog posts the theatre lists go to `blogs` (see review-kind.ts). */
   critics: ReviewLink[];
   blogs: ReviewLink[];
+  /** Features and interviews the theatre links to: coverage, not reviews. */
+  features: ReviewLink[];
   ratings: RatingSummary;
   tags: Array<{ slug: string; labels: { fi: string; sv: string; en: string }; count: number }>;
   reviews: PublicReview[];
@@ -93,8 +95,10 @@ export interface ProductionPage {
 
 export interface ReviewLink {
   outlet: string;
+  critic: string | null;
   url: string;
   publishedAt: Date | null;
+  paywalled: boolean;
 }
 
 export interface PublicReview {
@@ -200,11 +204,13 @@ export async function getProduction(slug: string): Promise<ProductionPage | null
   };
 }
 
-function splitReviews(rows: ReviewLink[]): { critics: ReviewLink[]; blogs: ReviewLink[] } {
-  const links = rows.map(({ outlet, url, publishedAt }) => ({ outlet, url, publishedAt }));
+function splitReviews(rows: Array<ReviewLink & { feature: boolean }>): Pick<ProductionPage, "critics" | "blogs" | "features"> {
+  const toLink = ({ outlet, critic, url, publishedAt, paywalled }: ReviewLink): ReviewLink => ({ outlet, critic, url, publishedAt, paywalled });
+  const reviews = rows.filter((row) => !row.feature).map(toLink);
   return {
-    critics: links.filter((link) => reviewKind(link.outlet, link.url) === "press"),
-    blogs: links.filter((link) => reviewKind(link.outlet, link.url) === "blog"),
+    critics: reviews.filter((link) => reviewKind(link.outlet, link.url) === "press"),
+    blogs: reviews.filter((link) => reviewKind(link.outlet, link.url) === "blog"),
+    features: rows.filter((row) => row.feature).map(toLink),
   };
 }
 

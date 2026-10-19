@@ -71,7 +71,22 @@ describe("Kansallisteatteri production page", () => {
       outlet: "Kansan Uutiset",
       critic: "Mika Pekkola",
       url: "https://www.ku.fi/artikkeli/5446878-viidakon-villit-naiset-osoittaa-etta-huipulla-voi-olla-yksinaista",
+      paywalled: false,
+      feature: false,
     });
+  });
+
+  it("tells a paywalled review from a feature by the link text", () => {
+    const hs = detail.criticReviews.filter((review) => review.outlet === "Helsingin Sanomat");
+    expect(hs.map(({ critic, paywalled, feature }) => ({ critic, paywalled, feature }))).toEqual([
+      { critic: "Maria Säkö", paywalled: true, feature: false },
+      { critic: "Sanna Kangasniemi", paywalled: false, feature: true },
+    ]);
+    expect(detail.criticReviews.filter((review) => review.feature).map((review) => review.outlet).sort()).toEqual([
+      "Helsingin Sanomat",
+      "MTV Uutiset",
+      "YLE",
+    ]);
   });
 });
 

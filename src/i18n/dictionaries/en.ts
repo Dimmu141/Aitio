@@ -87,6 +87,8 @@ export const en: Dictionary = {
     criticsIntro: "Links to reviews in newspapers and other media.",
     noCritics: "We haven't found any reviews yet.",
     blogs: "Blogs",
+    features: "Further reading",
+    paywall: "paywall",
     blogsIntro: "Blog posts the theatre links to.",
     credits: "Credits",
     source: "Source",

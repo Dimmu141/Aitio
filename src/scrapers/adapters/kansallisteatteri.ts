@@ -178,7 +178,10 @@ function parseReviews($: cheerio.CheerioAPI): RawCriticReview[] {
   const reviews: RawCriticReview[] = [];
   $("article.review--teaser").each((_, element) => {
     const article = $(element);
-    const url = article.find(".field--name-field-review-link a[href]").first().attr("href");
+    const link = article.find(".field--name-field-review-link a[href]").first();
+    const url = link.attr("href");
+    // "Lue arvio hs.fi (maksumuuri)" is a review behind a paywall; "Lue juttu: yle.fi" a feature.
+    const linkText = cleanText(link.text()).toLowerCase();
     const byline = cleanText(article.find(".field--name-field-subtitle").first().text());
     if (!url || !/^https?:\/\//.test(url)) return;
     // Byline format: "Mika Pekkola – Kansan Uutiset"
@@ -187,6 +190,8 @@ function parseReviews($: cheerio.CheerioAPI): RawCriticReview[] {
       url,
       critic: outlet ? critic : undefined,
       outlet: outlet ?? (byline || new URL(url).hostname.replace(/^www\./, "")),
+      paywalled: linkText.includes("maksumuuri"),
+      feature: /^lue (?:juttu|haastattelu)/.test(linkText),
     });
   });
   return reviews;

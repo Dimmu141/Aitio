@@ -87,6 +87,8 @@ export const sv: Dictionary = {
     criticsIntro: "Länkar till recensioner i tidningar och andra medier.",
     noCritics: "Vi har inte hittat några recensioner ännu.",
     blogs: "Bloggar",
+    features: "Mer att läsa",
+    paywall: "betalvägg",
     blogsIntro: "Blogginlägg som teatern länkar till.",
     credits: "Medverkande",
     source: "Källa",
