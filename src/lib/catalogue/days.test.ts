@@ -20,6 +20,7 @@ function card(slug: string, next: string | null): ProductionCard {
     soon: [],
     duration: null,
     premiere: null,
+    phase: "running",
     year: null,
   };
 }

@@ -81,10 +81,59 @@ export function runProgress(
   return Math.round(Math.min(1, Math.max(0, ratio)) * 100);
 }
 
-/** Year label for productions that are no longer playing: last performance, else run end or premiere. */
-export function lastYear(dates: Array<Date | null | undefined>): number | null {
-  const times = dates.filter((date): date is Date => date instanceof Date).map((date) => date.getTime());
-  return times.length > 0 ? new Date(Math.max(...times)).getUTCFullYear() : null;
+/**
+ * Where a production is in its life:
+ * - running: has upcoming performances;
+ * - upcoming ("Tulossa"): still listed, and nothing has been performed yet or more is to come;
+ * - past: its last known date has gone by;
+ * - archive: past for longer than `ARCHIVE_MONTHS`, or delisted before any date was known.
+ */
+export type Phase = "running" | "upcoming" | "past" | "archive";
+
+export const ARCHIVE_MONTHS = 12;
+
+export interface PhaseFacts {
+  next: Date | null;
+  /** Every stored performance, current or not: history counts. */
+  performances: Array<{ startsAt: Date }>;
+  runStart: Date | null;
+  runEnd: Date | null;
+  premiereDate: Date | null;
+  delistedAt: Date | null;
+}
+
+export interface Lifecycle {
+  phase: Phase;
+  /** Something has been performed (or the theatre says the run began): the show can be logged as seen. */
+  started: boolean;
+  /** "Esitetty 2024", for past and archive only. */
+  year: number | null;
+}
+
+function knownDates(facts: PhaseFacts): number[] {
+  return [...facts.performances.map((row) => row.startsAt), facts.runStart, facts.runEnd, facts.premiereDate]
+    .filter((date): date is Date => date instanceof Date)
+    .map((date) => date.getTime());
+}
+
+function archiveCutoff(asOf: Date): number {
+  const cutoff = new Date(asOf);
+  cutoff.setUTCMonth(cutoff.getUTCMonth() - ARCHIVE_MONTHS);
+  return cutoff.getTime();
+}
+
+export function lifecycle(facts: PhaseFacts, asOf: Date): Lifecycle {
+  const dates = knownDates(facts);
+  const now = asOf.getTime();
+  const started = dates.some((time) => time <= now);
+  if (facts.next) return { phase: "running", started, year: null };
+  if (dates.length === 0 || !started) {
+    return { phase: facts.delistedAt ? "archive" : "upcoming", started, year: null };
+  }
+  const last = Math.max(...dates);
+  if (last > now && !facts.delistedAt) return { phase: "upcoming", started, year: null };
+  const year = new Date(Math.min(last, now)).getUTCFullYear();
+  return { phase: last < archiveCutoff(asOf) ? "archive" : "past", started, year };
 }
 
 export interface RatingSummary {

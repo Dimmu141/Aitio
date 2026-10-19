@@ -42,6 +42,7 @@ export function ProductionCard({
   const where = [showTheatre ? card.theatre.name : null, stage].filter(Boolean).join(" · ");
   const type = typeLabel(card.type, t);
   const duration = durationText(card, t);
+  const status = statusText(card, t);
   // Finnish is the default and goes unsaid; anything else is worth knowing before clicking.
   const language = [
     ...card.languages.filter((code) => code !== "fi").map((code) => t.production.spokenIn[code] ?? t.languages[code] ?? code),
@@ -66,10 +67,10 @@ export function ProductionCard({
               {when === "time" ? t.production.at(formatTime(card.next, locale)) : formatPerformance(card.next, locale, asOf)}
             </time>
           )}
-          {!card.next && card.year && t.production.performedIn(card.year)}
+          {!card.next && status}
           {[type, duration].filter(Boolean).map((fact, index) => (
             <span key={index}>
-              {(index > 0 || card.next || card.year) && " · "}
+              {(index > 0 || card.next || status) && " · "}
               {fact}
             </span>
           ))}
@@ -88,6 +89,12 @@ export function ProductionCard({
 }
 
 /** "2 t 30 min, väliaika": the running time in the reader's language. */
+/** For a card without a next date: "Tulossa", or "Esitetty 2024" once it has played. */
+function statusText(card: Card, t: Dictionary): string | null {
+  if (card.phase === "upcoming") return t.production.upcoming;
+  return card.year ? t.production.performedIn(card.year) : null;
+}
+
 function durationText(card: Card, t: Dictionary): string | null {
   if (!card.duration?.minutes) return null;
   const intervals = card.duration.intervals;

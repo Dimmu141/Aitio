@@ -4,7 +4,7 @@ import {
   isClosingSoon,
   isCurrent,
   knownEnd,
-  lastYear,
+  lifecycle,
   runProgress,
   schedule,
   summariseRatings,
@@ -83,10 +83,63 @@ describe("runProgress", () => {
   });
 });
 
-describe("lastYear", () => {
-  it("takes the latest known date", () => {
-    expect(lastYear([new Date("2023-03-01"), null, new Date("2024-01-05")])).toBe(2024);
-    expect(lastYear([null, undefined])).toBeNull();
+describe("lifecycle", () => {
+  const facts = (over: Partial<Parameters<typeof lifecycle>[0]>) => ({
+    next: null,
+    performances: [],
+    runStart: null,
+    runEnd: null,
+    premiereDate: null,
+    delistedAt: null,
+    ...over,
+  });
+
+  it("is running while performances are coming", () => {
+    expect(lifecycle(facts({ next: day(3), performances: [{ startsAt: day(3) }] }), asOf)).toEqual({
+      phase: "running",
+      started: false,
+      year: null,
+    });
+  });
+
+  it("is upcoming when listed without any dates (Seitsemän veljestä, spring 2027)", () => {
+    expect(lifecycle(facts({}), asOf)).toEqual({ phase: "upcoming", started: false, year: null });
+  });
+
+  it("is upcoming before a stated premiere, and cannot be logged yet", () => {
+    expect(lifecycle(facts({ premiereDate: day(120) }), asOf)).toEqual({ phase: "upcoming", started: false, year: null });
+  });
+
+  it("is past only once the last known date has gone by", () => {
+    const ended = facts({ performances: [{ startsAt: day(-40) }, { startsAt: day(-30) }] });
+    expect(lifecycle(ended, asOf)).toEqual({ phase: "past", started: true, year: 2026 });
+  });
+
+  it("counts the theatre's own run dates when no performances were stored", () => {
+    const svenska = facts({ premiereDate: new Date("2025-09-04"), runStart: day(-280), runEnd: day(-150) });
+    expect(lifecycle(svenska, asOf).phase).toBe("past");
+  });
+
+  it("stays upcoming between batches of dates when the run has not ended", () => {
+    expect(lifecycle(facts({ performances: [{ startsAt: day(-5) }], runEnd: day(60) }), asOf)).toEqual({
+      phase: "upcoming",
+      started: true,
+      year: null,
+    });
+  });
+
+  it("archives runs that ended over a year ago", () => {
+    expect(lifecycle(facts({ runStart: new Date("2023-01-17"), runEnd: new Date("2023-03-04") }), asOf)).toEqual({
+      phase: "archive",
+      started: true,
+      year: 2023,
+    });
+  });
+
+  it("archives a delisted production that never had a date, and dates a delisted one by its past", () => {
+    expect(lifecycle(facts({ delistedAt: day(-1) }), asOf).phase).toBe("archive");
+    const cut = facts({ delistedAt: day(-1), performances: [{ startsAt: day(-10) }], runEnd: day(30) });
+    expect(lifecycle(cut, asOf)).toEqual({ phase: "past", started: true, year: 2026 });
   });
 });
 

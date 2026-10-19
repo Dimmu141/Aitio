@@ -3,6 +3,7 @@ import { ExternalLink } from "@/components/ExternalLink";
 import { ProductionCard } from "@/components/ProductionCard";
 import { getDictionary } from "@/i18n";
 import { getAllSlugs, getTheatre } from "@/lib/catalogue/queries";
+import type { ProductionCard as CardData } from "@/lib/catalogue/types";
 import { pageMetadata } from "@/lib/metadata";
 import { theatreTone } from "@/lib/poster";
 import { withPlaceholder } from "@/lib/static-params";
@@ -36,6 +37,14 @@ export default async function TheatreRoute({ params }: PageProps<"/[locale]/teat
   const page = await getTheatre(slug);
   if (!page) notFound();
 
+  const cardList = (cards: CardData[]) => (
+    <ul>
+      {cards.map((card) => (
+        <ProductionCard key={card.slug} card={card} asOf={page.asOf} locale={locale} t={t} showTheatre={false} />
+      ))}
+    </ul>
+  );
+
   return (
     <div className="space-y-10">
       <header className="space-y-2 border-b-4 border-double border-ink pb-4">
@@ -56,11 +65,7 @@ export default async function TheatreRoute({ params }: PageProps<"/[locale]/teat
         {page.current.length === 0 ? (
           <p className="py-4 text-ink-muted">{t.theatre.noCurrent}</p>
         ) : (
-          <ul>
-            {page.current.map((card) => (
-              <ProductionCard key={card.slug} card={card} asOf={page.asOf} locale={locale} t={t} showTheatre={false} />
-            ))}
-          </ul>
+          cardList(page.current)
         )}
       </section>
 
@@ -79,17 +84,29 @@ export default async function TheatreRoute({ params }: PageProps<"/[locale]/teat
         </section>
       )}
 
+      {page.upcoming.length > 0 && (
+        <section aria-labelledby="upcoming">
+          <h2 id="upcoming" className="text-section">
+            {t.theatre.upcoming}
+          </h2>
+          {cardList(page.upcoming)}
+        </section>
+      )}
+
       {page.past.length > 0 && (
         <section aria-labelledby="past">
           <h2 id="past" className="text-section">
             {t.theatre.past}
           </h2>
-          <ul>
-            {page.past.map((card) => (
-              <ProductionCard key={card.slug} card={card} asOf={page.asOf} locale={locale} t={t} showTheatre={false} />
-            ))}
-          </ul>
+          {cardList(page.past)}
         </section>
+      )}
+
+      {page.archive.length > 0 && (
+        <details className="group border-t border-rule pt-4">
+          <summary className="flex min-h-tap cursor-pointer items-center font-bold">{t.theatre.archive(page.archive.length)}</summary>
+          {cardList(page.archive)}
+        </details>
       )}
     </div>
   );

@@ -38,9 +38,11 @@ function describe(page: ProductionPage, locale: Locale, t: Dictionary): string {
   const where = [page.theatre.name, page.stage].filter(Boolean).join(", ");
   const when = page.next
     ? `${t.production.nextPerformance}: ${formatPerformance(page.next, locale, page.asOf)}.`
-    : page.year
-      ? `${t.production.performedIn(page.year)}.`
-      : "";
+    : page.phase === "upcoming"
+      ? `${t.production.upcoming}.`
+      : page.year
+        ? `${t.production.performedIn(page.year)}.`
+        : "";
   return [typeLabel(page.type, t), `${where}. ${when}`].filter(Boolean).join(" · ").trim();
 }
 
@@ -93,6 +95,7 @@ export default async function ProductionRoute({ params }: PageProps<"/[locale]/e
             <Badge variant="urgent">{t.home.closingSoon}</Badge>
           )}
           {typeLabel(page.type, t) && <Badge>{typeLabel(page.type, t)}</Badge>}
+          {page.phase === "upcoming" && <Badge variant="quiet">{t.production.upcoming}</Badge>}
           {page.year && <Badge variant="quiet">{t.production.performedIn(page.year)}</Badge>}
           {page.languages.map((code) => (
             <Badge key={code} title={`${t.production.language}: ${t.languages[code] ?? code}`}>
@@ -125,10 +128,13 @@ export default async function ProductionRoute({ params }: PageProps<"/[locale]/e
       </div>
 
       <div className="ai-actions mt-6 mb-2">
-        <Link href={href(locale, "merkitse", page.slug)} className={buttonPrimary}>
-          <span aria-hidden="true">＋</span> {t.log.button}
-        </Link>
-        {page.next && (
+        {/* Nothing to have seen before the first performance. */}
+        {page.started && (
+          <Link href={href(locale, "merkitse", page.slug)} className={buttonPrimary}>
+            <span aria-hidden="true">＋</span> {t.log.button}
+          </Link>
+        )}
+        {(page.next || page.phase === "upcoming") && (
           <form action={watchAction} className="contents">
             <input type="hidden" name="locale" value={locale} />
             <input type="hidden" name="slug" value={page.slug} />

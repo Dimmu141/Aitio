@@ -19,6 +19,7 @@ function card(overrides: Partial<ProductionCard>): ProductionCard {
     soon: [],
     duration: null,
     premiere: null,
+    phase: "running",
     year: null,
     ...overrides,
   };

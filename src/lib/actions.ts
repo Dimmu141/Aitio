@@ -85,6 +85,7 @@ export async function saveEntryAction(formData: FormData): Promise<void> {
   const asOf = new Date();
   const context = await diary.getLogContext(user.id, slug, asOf);
   if (!context) redirect(href(locale));
+  if (!context.started && !entryId) redirect(href(locale, "esitys", slug));
   const parsed = parseEntryForm(formFields(formData), {
     performances: context.performances,
     tagSlugs: context.tags.map((tag) => tag.slug),

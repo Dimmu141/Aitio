@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/henkilo/
   const { locale, t } = await getDictionary();
   const page = await getPerson(slug);
   if (!page) return {};
-  const titles = [...page.current, ...page.past].slice(0, 4).map((entry) => entry.card.title);
+  const titles = [...page.current, ...page.upcoming, ...page.past].slice(0, 4).map((entry) => entry.card.title);
   return pageMetadata({
     locale,
     section: "henkilo",
@@ -66,6 +66,14 @@ export default async function PersonRoute({ params }: PageProps<"/[locale]/henki
             {t.person.current}
           </h2>
           {list(page.current)}
+        </section>
+      )}
+      {page.upcoming.length > 0 && (
+        <section aria-labelledby="upcoming">
+          <h2 id="upcoming" className="text-section">
+            {t.person.upcoming}
+          </h2>
+          {list(page.upcoming)}
         </section>
       )}
       {page.past.length > 0 && (

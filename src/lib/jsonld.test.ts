@@ -26,6 +26,8 @@ const page: ProductionPage = {
   end: null,
   fullSchedule: true,
   closingSoon: false,
+  phase: "running",
+  started: true,
   year: null,
   credits: [
     { role: "DIRECTOR", person: { slug: "a", name: "Anna" }, characterName: null },

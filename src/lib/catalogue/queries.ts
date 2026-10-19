@@ -8,11 +8,12 @@ import {
   isClosingSoon,
   isCurrent,
   knownEnd,
-  lastYear,
+  lifecycle,
   runProgress,
   schedule,
   summariseRatings,
   upcomingPerformances,
+  type Phase,
   type RatingSummary,
 } from "./select";
 import { reviewKind } from "./review-kind";
@@ -34,6 +35,8 @@ function cacheCatalogue(): void {
 
 const byNext = (a: ProductionCard, b: ProductionCard) =>
   (a.next?.getTime() ?? Infinity) - (b.next?.getTime() ?? Infinity) || a.title.localeCompare(b.title, "fi");
+
+const byTitle = (a: ProductionCard, b: ProductionCard) => a.title.localeCompare(b.title, "fi");
 
 const byYearDesc = (a: ProductionCard, b: ProductionCard) =>
   (b.year ?? 0) - (a.year ?? 0) || a.title.localeCompare(b.title, "fi");
@@ -73,6 +76,9 @@ export interface ProductionPage {
   /** False when the source lists only the next few dates, so "N left" would be wrong. */
   fullSchedule: boolean;
   closingSoon: boolean;
+  phase: Phase;
+  /** Performed at least once, so it can be logged as seen. */
+  started: boolean;
   year: number | null;
   credits: CreditRow[];
   /** Press reviews; blog posts the theatre lists go to `blogs` (see review-kind.ts). */
@@ -137,6 +143,7 @@ export async function getProduction(slug: string): Promise<ProductionPage | null
   const timing = schedule(upcoming, asOf);
   const fullSchedule = hasFullSchedule(row.theatre.slug);
   const end = knownEnd(timing.last, row.runEnd, fullSchedule);
+  const life = lifecycle({ ...row, next: timing.next }, asOf);
   const ratings = row.diaryEntries.flatMap((entry) => (entry.rating === null ? [] : [entry.rating / 2]));
 
   return {
@@ -164,7 +171,9 @@ export async function getProduction(slug: string): Promise<ProductionPage | null
     end,
     fullSchedule,
     closingSoon: isClosingSoon(timing, row.runEnd, fullSchedule, asOf),
-    year: timing.next ? null : lastYear([row.performances.at(-1)?.startsAt, row.runEnd, row.premiereDate]),
+    phase: life.phase,
+    started: life.started,
+    year: life.year,
     credits: row.credits
       .filter((credit) => isCurrent(credit, row))
       .map((credit) => ({ role: credit.role, person: credit.person, characterName: credit.characterName })),
@@ -212,8 +221,14 @@ export interface TheatrePage {
   theatre: TheatreRef & { website: string };
   stages: string[];
   current: ProductionCard[];
+  /** Still listed by the theatre, no dates yet. */
+  upcoming: ProductionCard[];
   past: ProductionCard[];
+  /** Ended over a year ago, or never dated: kept for the diary, out of the main lists. */
+  archive: ProductionCard[];
 }
+
+const inPhase = (phase: Phase) => (card: ProductionCard) => card.phase === phase;
 
 export async function getTheatre(slug: string): Promise<TheatrePage | null> {
   "use cache";
@@ -236,8 +251,10 @@ export async function getTheatre(slug: string): Promise<TheatrePage | null> {
     asOf,
     theatre: { slug: row.slug, name: row.name, city: row.city, website: row.website },
     stages: row.stages.map((stage) => stage.name),
-    current: cards.filter((card) => card.next).sort(byNext),
-    past: cards.filter((card) => !card.next).sort(byYearDesc),
+    current: cards.filter(inPhase("running")).sort(byNext),
+    upcoming: cards.filter(inPhase("upcoming")).sort(byTitle),
+    past: cards.filter(inPhase("past")).sort(byYearDesc),
+    archive: cards.filter(inPhase("archive")).sort(byYearDesc),
   };
 }
 
@@ -252,6 +269,8 @@ export interface PersonPage {
   slug: string;
   name: string;
   current: PersonCredit[];
+  upcoming: PersonCredit[];
+  /** Past and archived: on a person's page their history is the point. */
   past: PersonCredit[];
 }
 
@@ -283,8 +302,11 @@ export async function getPerson(slug: string): Promise<PersonPage | null> {
     asOf,
     slug: row.slug,
     name: row.name,
-    current: all.filter((entry) => entry.card.next).sort((a, b) => byNext(a.card, b.card)),
-    past: all.filter((entry) => !entry.card.next).sort((a, b) => byYearDesc(a.card, b.card)),
+    current: all.filter((entry) => entry.card.phase === "running").sort((a, b) => byNext(a.card, b.card)),
+    upcoming: all.filter((entry) => entry.card.phase === "upcoming").sort((a, b) => byTitle(a.card, b.card)),
+    past: all
+      .filter((entry) => entry.card.phase === "past" || entry.card.phase === "archive")
+      .sort((a, b) => byYearDesc(a.card, b.card)),
   };
 }
 

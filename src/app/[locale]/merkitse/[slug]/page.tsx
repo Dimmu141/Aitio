@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Notice } from "@/components/Notice";
 import { buttonDanger, buttonPrimary, chip, input } from "@/components/ui";
 import { getDictionary } from "@/i18n";
@@ -204,6 +204,8 @@ export default async function LogPage({ params, searchParams }: PageProps<"/[loc
   const context = await getLogContext(user.id, slug, asOf);
   if (!context) notFound();
   const entry = entryParam ? await getOwnEntry(user.id, context.production.id, entryParam) : null;
+  // Before the premiere only an existing entry can be edited (e.g. one logged before the dates were known).
+  if (!context.started && !entry) redirect(href(locale, "esitys", slug));
   const errors = typeof query.error === "string" ? query.error.split(",") : [];
 
   return (
