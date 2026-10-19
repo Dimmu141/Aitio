@@ -128,6 +128,16 @@ describe("lifecycle", () => {
     expect(lifecycle(facts({}), asOf)).toEqual({ phase: "upcoming", started: false, year: null });
   });
 
+  it("archives an undated post the source hasn't edited for weeks (Konstens natt, last edited in August)", () => {
+    expect(lifecycle(facts({ sourceUpdatedAt: day(-60) }), asOf).phase).toBe("archive");
+    expect(lifecycle(facts({ sourceUpdatedAt: day(-50) }), asOf).phase).toBe("archive");
+  });
+
+  it("keeps a recently edited undated post upcoming, and a stale one with a date ahead too", () => {
+    expect(lifecycle(facts({ sourceUpdatedAt: day(-10) }), asOf).phase).toBe("upcoming");
+    expect(lifecycle(facts({ sourceUpdatedAt: day(-90), premiereDate: day(40) }), asOf).phase).toBe("upcoming");
+  });
+
   it("is upcoming before a stated premiere, and cannot be logged yet", () => {
     expect(lifecycle(facts({ premiereDate: day(120) }), asOf)).toEqual({ phase: "upcoming", started: false, year: null });
   });

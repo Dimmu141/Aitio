@@ -102,6 +102,7 @@ export async function upsertProduction(
     subtitleLangs: detail.subtitleLangs,
     // A premiere is history: once stated it stays, even when the page later stops printing it.
     premiereDate: detail.premiereDate ?? existing?.premiereDate ?? null,
+    sourceUpdatedAt: detail.sourceUpdatedAt ?? null,
     runStart: detail.runStart ?? null,
     runEnd: detail.runEnd ?? null,
     durationText: detail.durationText ?? null,

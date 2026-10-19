@@ -78,6 +78,9 @@ model Production {
   languages      String[]
   subtitleLangs  String[]
   premiereDate   DateTime?
+  /// When the source last edited its page, where it says (Svenska Teatern's API): an
+  /// undated post nobody has touched for weeks is an old event, not an upcoming show.
+  sourceUpdatedAt DateTime?
   runStart       DateTime?
   runEnd         DateTime?
   durationText   String?

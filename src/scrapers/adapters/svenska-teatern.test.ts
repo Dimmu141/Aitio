@@ -15,6 +15,8 @@ describe("Svenska Teatern REST list", () => {
       title: "Nattland",
       url: "https://svenskateatern.fi/repertoar/nattland/",
       isVisiting: false,
+      // WordPress "modified" is Helsinki time without an offset.
+      sourceUpdatedAt: new Date("2026-10-08T11:27:00Z"), // 14:27 in Helsinki; minutes are enough
     });
   });
 

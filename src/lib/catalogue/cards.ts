@@ -20,6 +20,7 @@ export const cardSelect = {
   premiereDate: true,
   runStart: true,
   runEnd: true,
+  sourceUpdatedAt: true,
   theatre: theatreSelect,
   stage: { select: { name: true } },
   performances: { select: { startsAt: true, lastSeenAt: true, subtitleLangs: true }, orderBy: { startsAt: "asc" } },
@@ -38,6 +39,7 @@ interface CardSource {
   premiereDate: Date | null;
   runStart: Date | null;
   runEnd: Date | null;
+  sourceUpdatedAt?: Date | null;
   theatre: TheatreRef;
   stage: { name: string } | null;
   performances: Array<{ startsAt: Date; lastSeenAt: Date; subtitleLangs: string[] }>;

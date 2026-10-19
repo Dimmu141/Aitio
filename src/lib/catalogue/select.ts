@@ -111,6 +111,13 @@ export type Phase = "running" | "upcoming" | "past" | "archive";
 
 export const ARCHIVE_MONTHS = 12;
 
+/**
+ * An undated post the source hasn't edited for this long is an old event (Svenska
+ * Teatern's "Konstens natt", last edited in August), not an announced upcoming show,
+ * which gets edited as dates, cast and tickets are added.
+ */
+export const STALE_LISTING_DAYS = 45;
+
 export interface PhaseFacts {
   next: Date | null;
   /** Every stored performance, current or not: history counts. */
@@ -119,6 +126,8 @@ export interface PhaseFacts {
   runEnd: Date | null;
   premiereDate: Date | null;
   delistedAt: Date | null;
+  /** When the source last edited the page, where it says (Svenska Teatern). */
+  sourceUpdatedAt?: Date | null;
 }
 
 export interface Lifecycle {
@@ -154,7 +163,10 @@ export function lifecycle(facts: PhaseFacts, asOf: Date): Lifecycle {
   const started = dates.some((time) => time <= now) || (facts.performances.length > 0 && !premiereAhead);
   if (facts.next) return { phase: "running", started, year: null };
   if (dates.length === 0 || !started) {
-    return { phase: facts.delistedAt ? "archive" : "upcoming", started, year: null };
+    const stale = facts.sourceUpdatedAt != null && now - facts.sourceUpdatedAt.getTime() > STALE_LISTING_DAYS * 86_400_000;
+    // Never dated and gone quiet: archive, not "Tulossa". With a date still ahead it stays upcoming.
+    const archived = facts.delistedAt !== null || (stale && !dates.some((time) => time > now));
+    return { phase: archived ? "archive" : "upcoming", started, year: null };
   }
   const last = Math.max(...dates);
   if (last > now && !facts.delistedAt) return { phase: "upcoming", started, year: null };
