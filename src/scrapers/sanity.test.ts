@@ -55,7 +55,14 @@ describe("sanity warnings", () => {
 
   it("flags only a person that saving would drop, not cells saving already splits or skips", () => {
     const credit = (name: string): RawCredit => ({ name, roleText: "Manus", roles: ["WRITER"] });
-    const handled = ["Linnea Sjunnesson och Fredrik Fischer", "Mats Forss, Jesper Karlsson", "Koncept och manus", "Arbetsgruppen"];
+    const handled = [
+      "Linnea Sjunnesson och Fredrik Fischer",
+      "Mats Forss, Jesper Karlsson",
+      "Koncept och manus",
+      "Arbetsgruppen",
+      "Nordic Drama Corner Oy",
+      "Nuorten Kansallisteatterin esiintyjät",
+    ];
     expect(rules(detail({ credits: [director, actor, designer, ...handled.map(credit)] }))).toEqual([]);
     expect(rules(detail({ credits: [director, actor, designer, credit("Anna Virtanen ja muiden kirjoittama teksti")] }))).toEqual([
       "person-dropped",

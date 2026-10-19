@@ -78,12 +78,15 @@ const suspiciousRoles: Rule = (_ref, detail) =>
  * already handled there. What is left is a person lost with the label, like "Irena Kraus
  * efter boken …" before splitPeople learnt "efter".
  */
+/** Dropped on purpose: "Nordic Drama Corner Oy", "Nuorten Kansallisteatterin esiintyjät". */
+const GROUP_OR_COMPANY = /\s(?:oy|oyj|ab|ltd|esiintyjät|näyttelijät|tanssijat|kuoro|orkesteri|ensemble|medverkande)$/i;
+
 const personDropped: Rule = (_ref, detail) =>
   [
     ...new Set(
       detail.credits
         .map((credit) => credit.name)
-        .filter((name) => splitPeople(name).length === 0 && /^\p{Lu}\p{Ll}+\s\p{Lu}\p{Ll}+/u.test(name)),
+        .filter((name) => splitPeople(name).length === 0 && /^\p{Lu}\p{Ll}+\s\p{Lu}\p{Ll}+/u.test(name) && !GROUP_OR_COMPANY.test(name)),
     ),
   ].map((name) => `Tekijä katoaa tallennettaessa: "${name}"`);
 
