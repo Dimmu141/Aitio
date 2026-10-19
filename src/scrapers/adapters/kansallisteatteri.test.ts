@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { authorCredits, parseDetail, parseList, subtitleLanguages } from "./kansallisteatteri";
+import { authorCredits, parseDetail, parseList, subtitleLanguages, textBlockCredits } from "./kansallisteatteri";
 
 // Fixtures captured from the live site on 2026-10-18. Refresh with `pnpm fixtures:refresh`.
 const fixture = (name: string) => readFileSync(`fixtures/kansallisteatteri/${name}`, "utf8");
@@ -202,5 +202,31 @@ describe("Kansallisteatteri authors", () => {
       isVisiting: false,
     });
     expect(smeds.credits.filter((credit) => credit.name === "Kristian Smeds")).toHaveLength(1);
+  });
+});
+
+describe("Kansallisteatteri guest runs", () => {
+  // Kärpäset has no team list, only a "Työryhmä" text block with bold labels.
+  const karpaset = parseDetail(fixture("production-karpaset.html"), {
+    externalId: "karpaset",
+    url: "https://www.kansallisteatteri.fi/esitys/karpaset",
+    isVisiting: true,
+  });
+
+  it("reads the team from the text block", () => {
+    expect(karpaset.credits.filter((credit) => credit.roles.includes("CAST")).map((credit) => credit.name)).toEqual([
+      "Petra Ahola",
+      "Aimo Räsänen",
+      "Martti Suosalo",
+    ]);
+    expect(karpaset.credits).toContainEqual({ name: "Sirkku Peltola", roleText: "Käsikirjoitus ja ohjaus", roles: ["DIRECTOR", "WRITER"] });
+  });
+
+  it("skips the producing company", () => {
+    expect(karpaset.credits.map((credit) => credit.name)).not.toContain("ATR-tuotanto Oy");
+  });
+
+  it("splits names on commas and 'ja'", () => {
+    expect(textBlockCredits("<p><strong>Rooleissa</strong> A Aa, B Bb ja C Cc</p>").map((credit) => credit.name)).toEqual(["A Aa", "B Bb", "C Cc"]);
   });
 });
