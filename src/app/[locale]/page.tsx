@@ -5,10 +5,10 @@ import { getDictionary } from "@/i18n";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/fi";
 import { href } from "@/i18n/paths";
-import { applyFilters, filterOptions, parseFilters } from "@/lib/catalogue/filters";
+import { applyFilters, filterOptions, parseFilters, effectiveWhen } from "@/lib/catalogue/filters";
 import { getOnStage } from "@/lib/catalogue/queries";
 import { formatDayHeading, formatShortDate } from "@/lib/format";
-import { type Day, groupByNextDay, premieresSoon } from "@/lib/catalogue/days";
+import { type Day, groupByDay, premieresSoon } from "@/lib/catalogue/days";
 import type { ProductionCard as Card } from "@/lib/catalogue/types";
 import { pageMetadata } from "@/lib/metadata";
 
@@ -37,10 +37,11 @@ async function OnStage({
   const [{ asOf, cards }, params] = await Promise.all([getOnStage(), searchParams]);
   const options = filterOptions(cards, asOf);
   const filters = parseFilters(params, options);
-  const shown = applyFilters(cards, filters, asOf);
-  const premieres = premieresSoon(shown, asOf);
+  const shown = applyFilters(cards, { ...filters, when: effectiveWhen(filters, options) }, asOf);
+  // The openings strip keeps its two weeks whatever range the list shows.
+  const premieres = premieresSoon(applyFilters(cards, { ...filters, when: undefined }, asOf), asOf);
   const closing = shown.filter((card) => card.closingSoon).length;
-  const days = groupByNextDay(shown, asOf);
+  const days = groupByDay(shown, asOf);
   const dayName = (day: Day) =>
     day.relative === "today"
       ? t.home.today
@@ -60,7 +61,7 @@ async function OnStage({
           <h2 id="all" className="ai-section__title" aria-live="polite">
             {t.home.count(shown.length)}
           </h2>
-          <p className="ai-section__aside">{t.home.byNext}</p>
+          <p className="ai-section__aside">{t.home.byDay}</p>
         </div>
         {closing > 0 && (
           <p className="text-meta">

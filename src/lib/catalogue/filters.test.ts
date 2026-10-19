@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyFilters, filterOptions, filterQuery, hasFilters, parseFilters, SUBTITLE_FILTER_ENABLED } from "./filters";
+import { applyFilters, effectiveWhen, filterOptions, filterQuery, hasFilters, parseFilters, SUBTITLE_FILTER_ENABLED } from "./filters";
 import type { ProductionCard } from "./types";
 
 function card(overrides: Partial<ProductionCard>): ProductionCard {
@@ -83,8 +83,20 @@ describe("time chips", () => {
   const list = [daily, friday];
 
   it("offers only the chips that match something", () => {
-    expect(filterOptions(list, asOf).when).toEqual(["today", "tomorrow", "weekend", "week"]);
-    expect(filterOptions([friday], asOf).when).toEqual(["weekend", "week"]);
+    expect(filterOptions(list, asOf).when).toEqual(["soon", "today", "tomorrow", "weekend", "week", "all"]);
+    // Monday: "soon" runs to Sunday, so Friday's show is in it.
+    expect(filterOptions([friday], asOf).when).toEqual(["soon", "weekend", "week", "all"]);
+  });
+
+  it("defaults to the next few days, or to the whole window when they are empty", () => {
+    expect(effectiveWhen({}, filterOptions(list, asOf))).toBe("soon");
+    const later = card({ slug: "later", soon: [at("2026-10-29T16:00:00Z")] });
+    expect(effectiveWhen({}, filterOptions([later], asOf))).toBe("all");
+    expect(effectiveWhen({ when: "today" }, filterOptions(list, asOf))).toBe("today");
+  });
+
+  it("keeps only the performances on the chosen days", () => {
+    expect(applyFilters([daily], { when: "tomorrow" }, asOf)[0].soon).toEqual([at("2026-10-20T16:00:00Z")]);
   });
 
   it("moves each card to its first performance on those days", () => {

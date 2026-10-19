@@ -86,12 +86,12 @@ test("the front page names Aitio in its title", async ({ page }) => {
 test("filters work as a plain form", async ({ page }) => {
   // Works on fixture data and on a real scrape alike: Swedish narrows the list, never to zero.
   const count = async () => Number((await page.getByRole("heading", { level: 2, name: /ohjelmassa$/ }).textContent())?.match(/\d+/)?.[0]);
-  await page.goto("/");
+  await page.goto("/?when=all");
   const all = await count();
   await page.getByText("Rajaa esityksiä").click();
   await page.getByRole("group", { name: "Esityskieli" }).getByText("ruotsi").click();
   await page.getByRole("button", { name: "Näytä esitykset" }).click();
-  await expect(page).toHaveURL(/lang=sv/);
+  await expect(page).toHaveURL(/when=all.*lang=sv/);
   const swedish = await count();
   expect(swedish).toBeGreaterThan(0);
   expect(swedish).toBeLessThan(all);
@@ -100,7 +100,8 @@ test("filters work as a plain form", async ({ page }) => {
 test("time chips are one-tap links that keep the other choices", async ({ page }) => {
   await page.goto("/?lang=sv");
   const chips = page.getByRole("navigation", { name: "Milloin" });
-  await expect(chips.getByRole("link", { name: "2 viikkoa" })).toHaveAttribute("aria-current", "true");
+  // The default range is the next few days, or two weeks when nothing plays sooner.
+  await expect(chips.locator('[aria-current="true"]')).toHaveText(/^(Lähipäivät|2 viikkoa)$/);
   const week = chips.getByRole("link", { name: "7 päivää" });
   // A chip is only offered when something plays then; fixture dates may not cover the week.
   test.skip((await week.count()) === 0, "nothing plays within seven days in this data");

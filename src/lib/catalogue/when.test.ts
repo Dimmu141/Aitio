@@ -27,6 +27,21 @@ describe("whenDates", () => {
   });
 });
 
+describe("whenDates soon, the front page's default", () => {
+  it.each([
+    ["2026-10-19T09:00:00Z", 7], // Monday: on to Sunday, early-week stages are often dark
+    ["2026-10-21T09:00:00Z", 5], // Wednesday: to Sunday
+    ["2026-10-22T09:00:00Z", 2], // Thursday: today and tomorrow
+    ["2026-10-25T09:00:00Z", 2], // Sunday
+  ])("on %s covers %i days", (asOf, days) => {
+    expect(whenDates("soon", at(asOf)).size).toBe(days);
+  });
+
+  it("all covers the whole two-week window", () => {
+    expect(whenDates("all", at("2026-10-19T09:00:00Z")).size).toBe(15);
+  });
+});
+
 describe("firstOn", () => {
   it("picks the first performance on a covered date", () => {
     const performances = [at("2026-10-19T16:00:00Z"), at("2026-10-23T16:00:00Z"), at("2026-10-24T11:00:00Z")];

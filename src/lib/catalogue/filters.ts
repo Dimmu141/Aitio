@@ -1,6 +1,7 @@
 import { ProductionType } from "@/generated/prisma/enums";
+import { helsinkiDate } from "@/lib/format";
 import type { ProductionCard } from "./types";
-import { firstOn, WHEN, type When, whenDates } from "./when";
+import { DEFAULT_WHEN, firstOn, WHEN, type When, whenDates } from "./when";
 
 export interface Filters {
   city?: string;
@@ -84,9 +85,14 @@ export function parseFilters(params: SearchParams, options: FilterOptions): Filt
   return filters;
 }
 
+/** The time range in force: the chosen one, else "soon", else (nothing soon) the whole window. */
+export function effectiveWhen(filters: Filters, options: FilterOptions): When {
+  return filters.when ?? (options.when.includes(DEFAULT_WHEN) ? DEFAULT_WHEN : "all");
+}
+
 /**
- * Cards matching every choice. With a time chip, a card's `next` becomes its first
- * performance on those days, so "Tomorrow" lists a daily show under tomorrow.
+ * Cards matching every choice. With a time range, a card keeps only its performances on
+ * those days (`soon`), and its `next` becomes the first of them.
  */
 export function applyFilters(cards: ProductionCard[], filters: Filters, asOf: Date): ProductionCard[] {
   const dates = filters.when ? whenDates(filters.when, asOf) : null;
@@ -99,7 +105,7 @@ export function applyFilters(cards: ProductionCard[], filters: Filters, asOf: Da
     if (!matches) return [];
     if (!dates) return [card];
     const next = firstOn(card.soon, dates);
-    return next ? [{ ...card, next }] : [];
+    return next ? [{ ...card, next, soon: card.soon.filter((startsAt) => dates.has(helsinkiDate(startsAt))) }] : [];
   });
 }
 
