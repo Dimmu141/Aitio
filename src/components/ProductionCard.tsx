@@ -41,6 +41,10 @@ export function ProductionCard({
   // KOM's only stage is called "KOM-teatteri": don't print the name twice.
   const stage = card.stage === card.theatre.name ? null : card.stage;
   const where = [showTheatre ? card.theatre.name : null, stage].filter(Boolean).join(" · ");
+  // The edge colour means the theatre (pairs of houses share one), so its name carries it too.
+  const swatch = showTheatre && (
+    <span aria-hidden="true" className={`ai-poster--${tone.name} mr-2 inline-block size-3 rounded-sm`} />
+  );
   const type = typeLabel(card.type, t);
   const duration = durationText(card, t);
   const status = statusText(card, t);
@@ -61,7 +65,12 @@ export function ProductionCard({
             {card.title}
           </Link>
         </Title>
-        {where && <p>{where}</p>}
+        {where && (
+          <p>
+            {swatch}
+            {where}
+          </p>
+        )}
         <p className="text-meta text-ink-muted">
           {card.next && (
             <time dateTime={isoDateTime(card.next)} className="font-bold text-ink">
