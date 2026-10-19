@@ -71,9 +71,12 @@ const suspiciousRoles: Rule = (_ref, detail) =>
     (roleText) => `Rooli näyttää nimiltä: "${roleText}"`,
   );
 
-/** Two people in one name ("A och B"), a label ("Koncept och manus") or a group ("Arbetsgruppen"). */
+/**
+ * Two people in one name ("A och B", "Mats Forss, Jesper Karlsson"), a label ("Koncept och
+ * manus") or a group ("Arbetsgruppen").
+ */
 const notAPerson: Rule = (_ref, detail) =>
-  [...new Set(detail.credits.map((credit) => credit.name).filter((name) => personName(name) !== name))].map(
+  [...new Set(detail.credits.map((credit) => credit.name).filter((name) => personName(name) !== name || name.includes(",")))].map(
     (name) => `Ei henkilön nimi: "${name}"`,
   );
 

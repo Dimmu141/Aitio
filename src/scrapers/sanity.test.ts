@@ -54,9 +54,10 @@ describe("sanity warnings", () => {
         { name: "Taavi Hasunen", roleText: "Näyttämöllä Youssef Asad Alkhatib ja", roles: ["CAST"] },
         { name: "Linnea Sjunnesson och Fredrik Fischer", roleText: "Översättning", roles: ["OTHER"] },
         { name: "Colombine teaterförlag", roleText: "Rättigheter", roles: ["OTHER"] },
+        { name: "Mats Forss, Jesper Karlsson", roleText: "Ljusdesign", roles: ["DESIGNER"] },
       ],
     });
-    expect(rules(broken)).toEqual(["role-looks-like-names", "name-not-a-person", "name-not-a-person"]);
+    expect(rules(broken)).toEqual(["role-looks-like-names", "name-not-a-person", "name-not-a-person", "name-not-a-person"]);
   });
 
   it("flags a list card that names another show, not a shortened title", () => {
