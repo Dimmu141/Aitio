@@ -120,6 +120,8 @@ export const sv: Dictionary = {
     stages: "Scener",
     website: "Teaterns webbplats",
     noCurrent: "Inga föreställningar på repertoaren just nu.",
+    between: (name: string, city: string) =>
+      `${name}, ${city}: speldagar, upphovspersoner och tidigare produktioner. Den nya repertoaren syns här så snart teatern publicerar den.`,
   },
   person: {
     current: "På repertoaren nu",

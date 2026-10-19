@@ -2,7 +2,8 @@ import { notFound } from "next/navigation";
 import { ExternalLink } from "@/components/ExternalLink";
 import { ProductionCard } from "@/components/ProductionCard";
 import { getDictionary } from "@/i18n";
-import { getAllSlugs, getTheatre } from "@/lib/catalogue/queries";
+import { getAllSlugs, getTheatre, type TheatrePage } from "@/lib/catalogue/queries";
+import type { Dictionary } from "@/i18n/dictionaries/fi";
 import type { ProductionCard as CardData } from "@/lib/catalogue/types";
 import { pageMetadata } from "@/lib/metadata";
 import { theatreTone } from "@/lib/poster";
@@ -21,14 +22,22 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/teatteri
   const { locale, t } = await getDictionary();
   const page = await getTheatre(slug);
   if (!page) return {};
-  const titles = page.current.slice(0, 4).map((card) => card.title);
   return pageMetadata({
     locale,
     section: "teatteri",
     slug,
     title: page.theatre.name,
-    description: `${page.theatre.name}, ${page.theatre.city}. ${t.theatre.current}: ${titles.join(", ") || "–"}.`,
+    description: describe(page, t),
   });
+}
+
+/** "Name, City. Ohjelmistossa nyt: A, B.", else what is coming, else a plain sentence between seasons. */
+function describe(page: TheatrePage, t: Dictionary): string {
+  const { name, city } = page.theatre;
+  const titles = (cards: CardData[]) => cards.slice(0, 4).map((card) => card.title).join(", ");
+  if (page.current.length > 0) return `${name}, ${city}. ${t.theatre.current}: ${titles(page.current)}.`;
+  if (page.upcoming.length > 0) return `${name}, ${city}. ${t.theatre.upcoming}: ${titles(page.upcoming)}.`;
+  return t.theatre.between(name, city);
 }
 
 export default async function TheatreRoute({ params }: PageProps<"/[locale]/teatteri/[slug]">) {

@@ -122,6 +122,8 @@ export const fi = {
     stages: "Näyttämöt",
     website: "Teatterin verkkosivut",
     noCurrent: "Ei esityksiä ohjelmistossa juuri nyt.",
+    between: (name: string, city: string) =>
+      `${name}, ${city}: esityspäivät, tekijät ja aiemmat produktiot. Uusi ohjelmisto näkyy täällä heti, kun teatteri julkaisee sen.`,
   },
   person: {
     current: "Ohjelmistossa nyt",

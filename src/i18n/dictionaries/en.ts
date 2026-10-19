@@ -120,6 +120,8 @@ export const en: Dictionary = {
     stages: "Stages",
     website: "Theatre website",
     noCurrent: "Nothing on right now.",
+    between: (name: string, city: string) =>
+      `${name}, ${city}: dates, credits and earlier productions. The new programme appears here as soon as the theatre publishes it.`,
   },
   person: {
     current: "On now",
