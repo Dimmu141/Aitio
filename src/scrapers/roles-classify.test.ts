@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { classifyProduction } from "./classify";
+import { classifyProduction, isConductorLabel, isInstrumentLabel } from "./classify";
 import { mapRoleText } from "./roles";
 
 describe("mapRoleText", () => {
@@ -121,6 +121,35 @@ describe("classifyProduction", () => {
     });
     // Next to Normal has a director, a writer and a composer: a musical, left for review.
     expect(classifyProduction({ title: "Next to Normal", hasDirector: true, hasWriter: true, hasComposer: true, castCount: 0 }).confidence).toBeLessThan(0.6);
+  });
+
+  // Svenska Teatern's own pages, 19 Oct 2026 (second review).
+  it("reads a conductor next to a director as a musical (Mary Poppins)", () => {
+    expect(classifyProduction({ title: "Mary Poppins", hasDirector: true, hasConductor: true, castCount: 12 }).type).toBe("MUSICAL");
+  });
+
+  it("reads 'Musikalen …' in the subtitle as a musical (Next to Normal)", () => {
+    const next = classifyProduction({ title: "Next to Normal", subtitle: "Musikalen som inte lämnar någon oberörd", hasDirector: true, castCount: 0 });
+    expect(next.type).toBe("MUSICAL");
+  });
+
+  it("reads a band credited player by player as a concert (Georg Malmstén & HumppAvanti!)", () => {
+    const malmsten = { title: "Georg Malmstén & HumppAvanti!", hasDirector: true, hasConductor: true, musicianCount: 12, castCount: 1 };
+    expect(classifyProduction(malmsten).type).toBe("CONCERT");
+  });
+
+  it("tells instruments and conductors apart from other labels", () => {
+    expect(["Violin", "Trummor", "Kontrabas", "Piano"].every(isInstrumentLabel)).toBe(true);
+    expect(isInstrumentLabel("Pianon virittäjä")).toBe(false);
+    expect(["Kapellmästare", "Arrangemang och musikalisk ledning", "Kapellimestari"].every(isConductorLabel)).toBe(true);
+    expect(isConductorLabel("Regi")).toBe(false);
+  });
+
+  it("knows a guided tour is not a performance (Topelius och teatern, stage 'Rundvandring')", () => {
+    expect(classifyProduction({ title: "Topelius och teatern", stage: "Rundvandring", hasDirector: false, castCount: 1 })).toEqual({
+      type: "OTHER",
+      confidence: 0.8,
+    });
   });
 
   it("treats a directed production with a cast as a play", () => {

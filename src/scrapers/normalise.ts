@@ -1,5 +1,5 @@
 import type { PrismaClient } from "@/generated/prisma/client";
-import { classifyProduction } from "./classify";
+import { classifyProduction, isConductorLabel, isInstrumentLabel } from "./classify";
 import { slugify, splitPeople } from "./text";
 import type { RawCredit, RawProductionDetail } from "./types";
 
@@ -23,6 +23,8 @@ export function planProduction(detail: RawProductionDetail) {
     hasChoreographer: detail.credits.some((credit) => credit.roles.includes("CHOREOGRAPHER")),
     hasWriter: detail.credits.some((credit) => credit.roles.includes("WRITER") || credit.roles.includes("ADAPTATION")),
     hasComposer: detail.credits.some((credit) => credit.roles.includes("COMPOSER")),
+    hasConductor: detail.credits.some((credit) => isConductorLabel(credit.roleText)),
+    musicianCount: detail.credits.filter((credit) => isInstrumentLabel(credit.roleText)).length,
     castCount: detail.credits.filter((credit) => credit.roles.includes("CAST")).length,
   });
   return { detail, classification };
