@@ -123,7 +123,10 @@ export interface PhaseFacts {
 
 export interface Lifecycle {
   phase: Phase;
-  /** Something has been performed (or the theatre says the run began): the show can be logged as seen. */
+  /**
+   * Can be logged as seen: something has been performed, or performances exist and no
+   * stated premiere lies ahead (a show running since before our first scrape).
+   */
   started: boolean;
   /** "Esitetty 2024", for past and archive only. */
   year: number | null;
@@ -144,7 +147,11 @@ function archiveCutoff(asOf: Date): number {
 export function lifecycle(facts: PhaseFacts, asOf: Date): Lifecycle {
   const dates = knownDates(facts);
   const now = asOf.getTime();
-  const started = dates.some((time) => time <= now);
+  // Our history starts with the first scrape, so a running show's first stored date can
+  // be tomorrow. It counts as started unless the theatre states a premiere still ahead;
+  // with nothing performed and nothing scheduled it has not started either.
+  const premiereAhead = facts.premiereDate !== null && facts.premiereDate.getTime() > now;
+  const started = dates.some((time) => time <= now) || (facts.performances.length > 0 && !premiereAhead);
   if (facts.next) return { phase: "running", started, year: null };
   if (dates.length === 0 || !started) {
     return { phase: facts.delistedAt ? "archive" : "upcoming", started, year: null };

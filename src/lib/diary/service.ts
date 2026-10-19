@@ -36,7 +36,7 @@ export async function getLogContext(userId: string | null, slug: string, asOf: D
     },
   });
   if (!production) return null;
-  const [tags, earlier, user, firstPast] = await Promise.all([
+  const [tags, earlier, user, first] = await Promise.all([
     db.tag.findMany({ orderBy: { sortOrder: "asc" } }),
     userId
       ? db.diaryEntry.findMany({
@@ -46,9 +46,10 @@ export async function getLogContext(userId: string | null, slug: string, asOf: D
         })
       : [],
     userId ? db.user.findUniqueOrThrow({ where: { id: userId }, select: { name: true } }) : { name: "" },
-    db.performance.findFirst({ where: { productionId: production.id, startsAt: { lte: asOf } }, select: { startsAt: true } }),
+    // The earliest is enough for `started`: past means performed, future still counts unless a premiere is ahead.
+    db.performance.findFirst({ where: { productionId: production.id }, select: { startsAt: true }, orderBy: { startsAt: "asc" } }),
   ]);
-  const { started } = lifecycle({ ...production, next: null, performances: firstPast ? [firstPast] : [] }, asOf);
+  const { started } = lifecycle({ ...production, next: null, performances: first ? [first] : [] }, asOf);
   return {
     production: {
       id: production.id,

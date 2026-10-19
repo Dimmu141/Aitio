@@ -98,9 +98,30 @@ describe("lifecycle", () => {
   it("is running while performances are coming", () => {
     expect(lifecycle(facts({ next: day(3), performances: [{ startsAt: day(3) }] }), asOf)).toEqual({
       phase: "running",
-      started: false,
+      started: true,
       year: null,
     });
+  });
+
+  // The seen button (19 Oct 2026 second review): Orvot and Viidakon villit naiset run with
+  // no stated premiere and only future dates stored; Seitsemän veljestä has nothing yet.
+  it("can be logged when it runs, even if every stored date is still ahead and no premiere is stated", () => {
+    const orvot = lifecycle(facts({ next: day(1), performances: [{ startsAt: day(1) }, { startsAt: day(8) }] }), asOf);
+    expect(orvot).toMatchObject({ phase: "running", started: true });
+  });
+
+  it("cannot be logged before a stated premiere, even with previews scheduled", () => {
+    const taru = facts({ next: day(3), performances: [{ startsAt: day(3) }], premiereDate: day(30) });
+    expect(lifecycle(taru, asOf).started).toBe(false);
+  });
+
+  it("can be logged once a preview before the premiere has been performed", () => {
+    const preview = facts({ next: day(3), performances: [{ startsAt: day(-1) }, { startsAt: day(3) }], premiereDate: day(30) });
+    expect(lifecycle(preview, asOf).started).toBe(true);
+  });
+
+  it("cannot be logged without any performance (Tulossa)", () => {
+    expect(lifecycle(facts({}), asOf).started).toBe(false);
   });
 
   it("is upcoming when listed without any dates (Seitsemän veljestä, spring 2027)", () => {
