@@ -1,14 +1,16 @@
 "use server";
 
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { updateTag } from "next/cache";
 import { z } from "zod";
 import { ReportReason } from "@/generated/prisma/enums";
 import { DEFAULT_LOCALE, isLocale, type Locale } from "@/i18n/config";
 import { href } from "@/i18n/paths";
-import { auth } from "@/lib/auth";
-import { CLIENT_IP_HEADERS } from "@/lib/auth-config";
+import { auth, LOCALE_HEADER, NEXT_HEADER } from "@/lib/auth";
+import { CLIENT_IP_HEADERS, SIGN_IN_EMAIL_COOKIE, SIGN_IN_MINUTES } from "@/lib/auth-config";
+import { openSignIn } from "@/lib/sign-in-token";
+import { DRAFT_COOKIE, DRAFT_MINUTES, sealDraft } from "@/lib/diary/draft";
 import { productionTag } from "@/lib/catalogue/tags";
 import { formFields, parseEntryForm } from "@/lib/diary/entry-form";
 import * as diary from "@/lib/diary/service";
@@ -53,20 +55,60 @@ export async function signInAction(formData: FormData): Promise<void> {
   // per-email limit applies there.
   const ip = await clientIp();
   const allowed =
-    (await consume(`magic:email:${email.data}`, LIMITS.magicLinkPerEmail)) &&
-    (ip === null || (await consume(`magic:ip:${ip}`, LIMITS.magicLinkPerIp)));
+    (await consume(`signin:email:${email.data}`, LIMITS.signInPerEmail)) &&
+    (ip === null || (await consume(`signin:ip:${ip}`, LIMITS.signInPerIp)));
   if (!allowed) redirect(withQuery(signIn, { error: "rate", next }));
 
+  // The email callback only sees headers: tell it the language and where to return.
+  const forwarded = new Headers(await headers());
+  forwarded.set(LOCALE_HEADER, locale);
+  forwarded.set(NEXT_HEADER, next);
   try {
-    await auth.api.signInMagicLink({
-      body: { email: email.data, callbackURL: next, newUserCallbackURL: next, errorCallbackURL: signIn, metadata: { locale } },
-      headers: await headers(),
-    });
+    await auth.api.sendVerificationOTP({ body: { email: email.data, type: "sign-in" }, headers: forwarded });
   } catch (error) {
-    console.error("Sending the sign-in link failed", error);
+    console.error("Sending the sign-in code failed", error);
     redirect(withQuery(signIn, { error: "send", next }));
   }
+  (await cookies()).set(SIGN_IN_EMAIL_COOKIE, email.data, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: SIGN_IN_MINUTES * 60,
+  });
   redirect(withQuery(signIn, { sent: "1", next }));
+}
+
+/**
+ * Sign in with the emailed code: typed on the "check your email" page (the address comes
+ * from the cookie set when it was sent), or carried, sealed, by the link in the email.
+ */
+export async function verifyCodeAction(formData: FormData): Promise<void> {
+  const locale = localeOf(formData);
+  const signIn = href(locale, "kirjaudu");
+  const next = safeNext(text(formData, "next"), href(locale, "paivakirja"));
+  const fromLink = text(formData, "token");
+  const jar = await cookies();
+  const claim = fromLink
+    ? openSignIn(fromLink, process.env.BETTER_AUTH_SECRET ?? "")
+    : { email: jar.get(SIGN_IN_EMAIL_COOKIE)?.value ?? "", otp: text(formData, "code").replace(/\D/g, "") };
+  const retry = fromLink ? withQuery(signIn, { error: "link", next }) : withQuery(signIn, { sent: "1", error: "code", next });
+  if (!claim?.email || claim.otp.length !== 6) redirect(retry);
+
+  const ip = await clientIp();
+  if (ip !== null && !(await consume(`signin:check:${ip}`, LIMITS.signInChecksPerIp))) {
+    redirect(withQuery(signIn, { error: "rate", next }));
+  }
+  let signedIn = false;
+  try {
+    await auth.api.signInEmailOTP({ body: { email: claim.email, otp: claim.otp }, headers: await headers() });
+    signedIn = true;
+  } catch {
+    // Wrong, expired, used up or tried too often: the same answer for all of them.
+  }
+  if (!signedIn) redirect(retry);
+  jar.delete(SIGN_IN_EMAIL_COOKIE);
+  redirect(next);
 }
 
 export async function signOutAction(formData: FormData): Promise<void> {
@@ -80,23 +122,37 @@ export async function saveEntryAction(formData: FormData): Promise<void> {
   const entryId = text(formData, "entryId") || null;
   const logPath = href(locale, "merkitse", slug);
   const back: Record<string, string> = entryId ? { entry: entryId } : {};
-  const user = await requireUser(locale, logPath);
+  // Signed out, a new entry is kept as a draft while the visitor signs in (see draft.ts).
+  const user = entryId ? await requireUser(locale, logPath) : await getCurrentUser();
 
   const asOf = new Date();
-  const context = await diary.getLogContext(user.id, slug, asOf);
+  const context = await diary.getLogContext(user?.id ?? null, slug, asOf);
   if (!context) redirect(href(locale));
+  if (!context.started && !entryId) redirect(href(locale, "esitys", slug));
   const parsed = parseEntryForm(formFields(formData), {
     performances: context.performances,
     tagSlugs: context.tags.map((tag) => tag.slug),
     asOf,
   });
   if (!parsed.ok) redirect(withQuery(logPath, { ...back, error: parsed.errors.join(",") }));
+  const jar = await cookies();
+  if (!user) {
+    jar.set(DRAFT_COOKIE, sealDraft(slug, parsed.value, process.env.BETTER_AUTH_SECRET ?? ""), {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: DRAFT_MINUTES * 60,
+    });
+    redirect(signInHref(locale, withQuery(logPath, { draft: "1" })));
+  }
   if (!entryId && !(await consume(`diary:${user.id}`, LIMITS.diarySaves))) {
     redirect(withQuery(logPath, { error: "rate" }));
   }
 
   const saved = await diary.saveEntry(user.id, context.production.id, entryId, parsed.value);
   if (!saved) redirect(logPath);
+  if (!entryId) jar.delete(DRAFT_COOKIE);
   updateTag(productionTag(slug));
   redirect(withQuery(href(locale, "paivakirja"), { saved: saved.id }));
 }

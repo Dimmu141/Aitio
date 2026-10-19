@@ -27,7 +27,7 @@ Languages: Finnish (default), Swedish and English. Content (play titles, credits
 - Zod for validating every scraped record before it touches the database
 - Vitest for tests
 - next-intl (or equivalent) for fi / sv / en
-- Auth: email magic links. ~~Auth.js~~ **Better Auth** (changed 18 Oct 2026, Dimmu's decision: Auth.js moved to security-fix-only maintenance under the Better Auth team in Sept 2025 and next-auth v5 never left beta)
+- Auth: email sign-in, a 6-digit code typed or used through the emailed link (magic links until 19 Oct 2026). ~~Auth.js~~ **Better Auth** (changed 18 Oct 2026, Dimmu's decision: Auth.js moved to security-fix-only maintenance under the Better Auth team in Sept 2025 and next-auth v5 never left beta)
 
 ## 3. Data model (starting point, improve it if you see problems)
 

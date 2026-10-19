@@ -2,7 +2,7 @@ import { getDictionary } from "@/i18n";
 import { type AboutSection, aboutPage } from "@/lib/about";
 import { pageMetadata } from "@/lib/metadata";
 import { privacyConfig } from "@/lib/privacy";
-import { THEATRES } from "@/scrapers/theatres";
+import { getListedTheatres } from "@/lib/catalogue/queries";
 import type { Dictionary } from "@/i18n/dictionaries/fi";
 
 export async function generateMetadata() {
@@ -11,8 +11,22 @@ export async function generateMetadata() {
   return pageMetadata({ locale, section: "tietoa", title: about.title, description: about.intro });
 }
 
-function Section({ id, section, email, t }: { id: string; section: AboutSection; email: string; t: Dictionary }) {
-  if (section.contact && !email) return null;
+type Theatre = Awaited<ReturnType<typeof getListedTheatres>>[number];
+
+function Section({
+  id,
+  section,
+  email,
+  theatres,
+  t,
+}: {
+  id: string;
+  section: AboutSection;
+  email: string;
+  theatres: Theatre[];
+  t: Dictionary;
+}) {
+  if (section.contact === "section" && !email) return null;
   return (
     <section aria-labelledby={id} className="ai-section space-y-3">
       <h2 id={id} className="ai-section__title">
@@ -23,7 +37,7 @@ function Section({ id, section, email, t }: { id: string; section: AboutSection;
       ))}
       {section.theatres && (
         <ul>
-          {THEATRES.map((theatre) => (
+          {theatres.map((theatre) => (
             <li key={theatre.slug} className="ai-critic">
               <a href={theatre.website} rel="noopener external">
                 <span>
@@ -39,7 +53,7 @@ function Section({ id, section, email, t }: { id: string; section: AboutSection;
           ))}
         </ul>
       )}
-      {section.contact && (
+      {section.contact && email && (
         <p>
           <a href={`mailto:${email}`} className="font-bold">
             {email}
@@ -50,9 +64,9 @@ function Section({ id, section, email, t }: { id: string; section: AboutSection;
   );
 }
 
-/** Static: the text only changes with a deploy. */
+/** Static: the text changes with a deploy, the theatre list with the catalogue. */
 export default async function AboutPage() {
-  const { locale, t } = await getDictionary();
+  const [{ locale, t }, theatres] = await Promise.all([getDictionary(), getListedTheatres()]);
   const about = aboutPage(locale);
   const { email } = privacyConfig();
   return (
@@ -62,7 +76,7 @@ export default async function AboutPage() {
         <p className="text-ink-muted">{about.intro}</p>
       </header>
       {about.sections.map((section, index) => (
-        <Section key={section.heading} id={`about-${index}`} section={section} email={email} t={t} />
+        <Section key={section.heading} id={`about-${index}`} section={section} email={email} theatres={theatres} t={t} />
       ))}
     </article>
   );

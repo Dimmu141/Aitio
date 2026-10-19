@@ -23,6 +23,7 @@ function card(slug: string, last: string | null, closingSoon = true): Production
     soon: [],
     duration: null,
     premiere: null,
+    phase: "running",
     year: null,
   };
 }

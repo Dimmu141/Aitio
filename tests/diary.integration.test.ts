@@ -72,6 +72,25 @@ describe.skipIf(!url)("diary service (integration)", () => {
     expect((await service.getDiary(users.anna))[0].review).toBe("Stark kväll.");
   });
 
+  it("knows whether a production can be logged yet", async () => {
+    const asOf = new Date();
+    const { slug } = await db.production.findUniqueOrThrow({ where: { id: productionId } });
+    expect((await service.getLogContext(users.anna, slug, asOf))?.started).toBe(true);
+    const { id: theatreId } = await db.theatre.findUniqueOrThrow({ where: { slug: "svenska-teatern" } });
+    await db.production.create({
+      data: {
+        slug: "kommande",
+        title: "Kommande",
+        theatreId,
+        externalId: "kommande",
+        sourceUrl: "https://svenskateatern.fi/repertoar/kommande/",
+        premiereDate: new Date(asOf.getTime() + 90 * 86_400_000),
+        lastSeenAt: asOf,
+      },
+    });
+    expect((await service.getLogContext(users.anna, "kommande", asOf))?.started).toBe(false);
+  });
+
   it("replaces tags on edit", async () => {
     const [entry] = await service.getDiary(users.anna);
     await service.saveEntry(users.anna, productionId, entry.id, { ...input, tagSlugs: ["funny"] });

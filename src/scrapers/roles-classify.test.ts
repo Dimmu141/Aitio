@@ -8,7 +8,12 @@ describe("mapRoleText", () => {
     ["Regi", ["DIRECTOR"]],
     ["Ohjaajan assistentti", ["OTHER"]],
     ["Författare", ["WRITER"]],
-    ["Textbearbetning", ["WRITER"]],
+    ["Textbearbetning", ["ADAPTATION"]],
+    // Dramatising someone else's work is not writing it (Seitsemän veljestä, 19 Oct 2026).
+    ["Ohjaus ja dramatisointi", ["DIRECTOR", "ADAPTATION"]],
+    ["Dramatisointi", ["ADAPTATION"]],
+    ["Dramatisering och regi", ["DIRECTOR", "ADAPTATION"]],
+    ["Käsikirjoitus ja dramatisointi", ["WRITER", "ADAPTATION"]],
     ["Regissör", ["DIRECTOR"]],
     ["Esitysoikeuksien valvoja", []],
     ["Apulaisohjaaja", ["OTHER"]],
@@ -23,6 +28,12 @@ describe("mapRoleText", () => {
     ["Kirjailija", ["WRITER"]],
   ])("%s", (label, expected) => {
     expect(mapRoleText(label).sort()).toEqual([...expected].sort());
+  });
+});
+
+describe("mapRoleText for arrangements", () => {
+  it("does not read a musical arrangement as a dramatisation", () => {
+    expect(mapRoleText("Musiikin sovitus")).not.toContain("ADAPTATION");
   });
 });
 
@@ -87,6 +98,31 @@ describe("classifyProduction", () => {
     expect(classifyProduction({ ...base, title: "Samtal om nedskärningar" }).type).toBe("TALK");
   });
 
+  // The productions the 19 Oct review found without a genre.
+  it.each([
+    ["Litteraturfestivalen Gränslöst – Mellanrum", "TALK"],
+    ["Ballader och oförskämdheter", "CONCERT"],
+    ["Sånger från bottenvåningen", "CONCERT"],
+    ["Humorlandskampen", "STANDUP"],
+  ] as const)("reads %s as %s", (title, type) => {
+    expect(classifyProduction({ ...base, title }).type).toBe(type);
+  });
+
+  it("knows confidently that open houses and job ads are not performances", () => {
+    for (const title of ["Konstens natt 2026", "Kostymprovning under sportlovet", "Familjelördag 22 november", "Blaue Frau anställer"]) {
+      expect(classifyProduction({ ...base, title })).toEqual({ type: "OTHER", confidence: 0.8 });
+    }
+  });
+
+  it("treats a script and a director without a composer as a play, cast list or not", () => {
+    expect(classifyProduction({ title: "Fröken Julie", hasDirector: true, hasWriter: true, castCount: 0 })).toEqual({
+      type: "PLAY",
+      confidence: 0.65,
+    });
+    // Next to Normal has a director, a writer and a composer: a musical, left for review.
+    expect(classifyProduction({ title: "Next to Normal", hasDirector: true, hasWriter: true, hasComposer: true, castCount: 0 }).confidence).toBeLessThan(0.6);
+  });
+
   it("treats a directed production with a cast as a play", () => {
     const result = classifyProduction({ title: "Nattland", hasDirector: true, castCount: 8 });
     expect(result).toEqual({ type: "PLAY", confidence: 0.7 });
@@ -110,6 +146,6 @@ describe("classifyProduction", () => {
   });
 
   it("falls back to OTHER with low confidence", () => {
-    expect(classifyProduction({ ...base, title: "Konstens natt 2026" })).toEqual({ type: "OTHER", confidence: 0.2 });
+    expect(classifyProduction({ ...base, title: "Haapajärven Elvis" })).toEqual({ type: "OTHER", confidence: 0.2 });
   });
 });

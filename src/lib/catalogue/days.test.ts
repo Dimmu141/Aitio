@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { groupByNextDay, premieresSoon } from "./days";
+import { groupByDay, premieresSoon } from "./days";
 import type { ProductionCard } from "./types";
 
 function card(slug: string, next: string | null): ProductionCard {
@@ -17,9 +17,10 @@ function card(slug: string, next: string | null): ProductionCard {
     end: date,
     onSoon: true,
     closingSoon: false,
-    soon: [],
+    soon: date ? [date] : [],
     duration: null,
     premiere: null,
+    phase: "running",
     year: null,
   };
 }
@@ -27,9 +28,9 @@ function card(slug: string, next: string | null): ProductionCard {
 // Sunday 18 Oct 2026, 23:30 in Helsinki (UTC+3).
 const asOf = new Date("2026-10-18T20:30:00Z");
 
-describe("groupByNextDay", () => {
+describe("groupByDay", () => {
   it("groups by the Helsinki day, in date and time order", () => {
-    const days = groupByNextDay(
+    const days = groupByDay(
       [
         card("late-today", "2026-10-18T20:45:00Z"),
         card("tue", "2026-10-20T15:30:00Z"),
@@ -47,11 +48,20 @@ describe("groupByNextDay", () => {
 
   it("puts a show after midnight UTC on the right Helsinki day", () => {
     // 22:30 UTC on the 19th is already the 20th in Helsinki.
-    expect(groupByNextDay([card("night", "2026-10-19T22:30:00Z")], asOf)[0].date).toBe("2026-10-20");
+    expect(groupByDay([card("night", "2026-10-19T22:30:00Z")], asOf)[0].date).toBe("2026-10-20");
   });
 
   it("leaves out productions with nothing upcoming", () => {
-    expect(groupByNextDay([card("past", null)], asOf)).toEqual([]);
+    expect(groupByDay([card("past", null)], asOf)).toEqual([]);
+  });
+
+  it("lists a show on every day it plays, each at its own time", () => {
+    const twoNights = { ...card("two-nights", "2026-10-19T15:30:00Z"), soon: [new Date("2026-10-19T15:30:00Z"), new Date("2026-10-20T16:00:00Z")] };
+    const days = groupByDay([twoNights], asOf);
+    expect(days.map((day) => [day.date, day.cards.map((c) => c.next?.toISOString())])).toEqual([
+      ["2026-10-19", ["2026-10-19T15:30:00.000Z"]],
+      ["2026-10-20", ["2026-10-20T16:00:00.000Z"]],
+    ]);
   });
 });
 
@@ -67,5 +77,11 @@ describe("premieresSoon", () => {
       withPremiere("unknown", null),
     ];
     expect(premieresSoon(cards, asOf).map((c) => c.slug)).toEqual(["today", "later"]);
+  });
+
+  it("counts new stagings only, not stand-up or concert nights (Monsterit Stand Up Show)", () => {
+    const night = (slug: string, type: ProductionCard["type"]) => ({ ...withPremiere(slug, "2026-10-20T00:00:00Z"), type });
+    const cards = [night("standup", "STANDUP"), night("concert", "CONCERT"), night("event", "OTHER"), night("dance", "DANCE"), night("opera", "OPERA")];
+    expect(premieresSoon(cards, asOf).map((c) => c.slug)).toEqual(["dance", "opera"]);
   });
 });

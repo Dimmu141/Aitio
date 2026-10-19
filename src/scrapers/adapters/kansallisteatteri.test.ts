@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { parseDetail, parseList, subtitleLanguages } from "./kansallisteatteri";
+import { authorCredits, parseDetail, parseList, subtitleLanguages, textBlockCredits } from "./kansallisteatteri";
 
 // Fixtures captured from the live site on 2026-10-18. Refresh with `pnpm fixtures:refresh`.
 const fixture = (name: string) => readFileSync(`fixtures/kansallisteatteri/${name}`, "utf8");
@@ -71,7 +71,22 @@ describe("Kansallisteatteri production page", () => {
       outlet: "Kansan Uutiset",
       critic: "Mika Pekkola",
       url: "https://www.ku.fi/artikkeli/5446878-viidakon-villit-naiset-osoittaa-etta-huipulla-voi-olla-yksinaista",
+      paywalled: false,
+      feature: false,
     });
+  });
+
+  it("tells a paywalled review from a feature by the link text", () => {
+    const hs = detail.criticReviews.filter((review) => review.outlet === "Helsingin Sanomat");
+    expect(hs.map(({ critic, paywalled, feature }) => ({ critic, paywalled, feature }))).toEqual([
+      { critic: "Maria Säkö", paywalled: true, feature: false },
+      { critic: "Sanna Kangasniemi", paywalled: false, feature: true },
+    ]);
+    expect(detail.criticReviews.filter((review) => review.feature).map((review) => review.outlet).sort()).toEqual([
+      "Helsingin Sanomat",
+      "MTV Uutiset",
+      "YLE",
+    ]);
   });
 });
 
@@ -145,5 +160,73 @@ describe("Kansallisteatteri premiere", () => {
   it("leaves it unset for a premiere elsewhere", () => {
     // "Kantaesitys oli Tampereen Työväen Teatterissa 23.1.2025."
     expect(detail("karpaset", "production-karpaset.html").premiereDate).toBeUndefined();
+  });
+});
+
+describe("Kansallisteatteri authors", () => {
+  // Captured 2026-10-19: no dates yet, premieres spring 2027.
+  const detail = parseDetail(fixture("production-seitseman-veljesta.html"), {
+    externalId: "seitseman-veljesta",
+    url: "https://www.kansallisteatteri.fi/esitys/seitseman-veljesta",
+    isVisiting: false,
+  });
+
+  it("credits the original author and the dramatisation separately", () => {
+    expect(detail.credits[0]).toEqual({ name: "Aleksis Kivi", roleText: "", roles: ["WRITER"] });
+    expect(detail.credits).toContainEqual({
+      name: "Mika Myllyaho",
+      roleText: "Ohjaus ja dramatisointi",
+      roles: ["DIRECTOR", "ADAPTATION"],
+    });
+    expect(detail.credits.filter((credit) => credit.roles.includes("WRITER")).map((credit) => credit.name)).toEqual([
+      "Aleksis Kivi",
+    ]);
+  });
+
+  it("reads bare names and labelled lines, and skips prose", () => {
+    expect(authorCredits("Sirkku Peltola ja Juha Jokela")).toEqual([
+      { name: "Sirkku Peltola", roleText: "", roles: ["WRITER"] },
+      { name: "Juha Jokela", roleText: "", roles: ["WRITER"] },
+    ]);
+    expect(authorCredits("Perustuu Aili Somersalon teokseen Mestaritontun seikkailut<br />\n<br />\nDramatisointi Minna Leino")).toEqual([
+      { name: "Minna Leino", roleText: "Dramatisointi", roles: ["ADAPTATION"] },
+    ]);
+    expect(authorCredits("Kantaesitys Suurella näyttämöllä")).toEqual([]);
+    expect(authorCredits("Valo Ahonen")).toEqual([{ name: "Valo Ahonen", roleText: "", roles: ["WRITER"] }]);
+  });
+
+  it("does not repeat an author the team list already credits for the text", () => {
+    const smeds = parseDetail(fixture("production-viidakon-villit-naiset.html"), {
+      externalId: "viidakon-villit-naiset",
+      url: "https://www.kansallisteatteri.fi/esitys/viidakon-villit-naiset",
+      isVisiting: false,
+    });
+    expect(smeds.credits.filter((credit) => credit.name === "Kristian Smeds")).toHaveLength(1);
+  });
+});
+
+describe("Kansallisteatteri guest runs", () => {
+  // Kärpäset has no team list, only a "Työryhmä" text block with bold labels.
+  const karpaset = parseDetail(fixture("production-karpaset.html"), {
+    externalId: "karpaset",
+    url: "https://www.kansallisteatteri.fi/esitys/karpaset",
+    isVisiting: true,
+  });
+
+  it("reads the team from the text block", () => {
+    expect(karpaset.credits.filter((credit) => credit.roles.includes("CAST")).map((credit) => credit.name)).toEqual([
+      "Petra Ahola",
+      "Aimo Räsänen",
+      "Martti Suosalo",
+    ]);
+    expect(karpaset.credits).toContainEqual({ name: "Sirkku Peltola", roleText: "Käsikirjoitus ja ohjaus", roles: ["DIRECTOR", "WRITER"] });
+  });
+
+  it("skips the producing company", () => {
+    expect(karpaset.credits.map((credit) => credit.name)).not.toContain("ATR-tuotanto Oy");
+  });
+
+  it("splits names on commas and 'ja'", () => {
+    expect(textBlockCredits("<p><strong>Rooleissa</strong> A Aa, B Bb ja C Cc</p>").map((credit) => credit.name)).toEqual(["A Aa", "B Bb", "C Cc"]);
   });
 });

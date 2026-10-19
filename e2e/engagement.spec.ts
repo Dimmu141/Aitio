@@ -2,7 +2,7 @@ import "dotenv/config";
 import { Client } from "pg";
 import { unsubscribeSignature } from "../src/lib/engagement/unsubscribe";
 import { expect, test } from "./fixtures";
-import { signIn, uniqueEmail } from "./helpers";
+import { signIn, signInFromLog, uniqueEmail } from "./helpers";
 
 async function userId(email: string): Promise<string> {
   const client = new Client({ connectionString: process.env.DATABASE_URL });
@@ -18,7 +18,7 @@ async function userId(email: string): Promise<string> {
 
 test("the diary shows badges and links to the year in review", async ({ page }) => {
   await page.goto("/merkitse/nattland-svenska-teatern");
-  await signIn(page, uniqueEmail("year"));
+  await signInFromLog(page, uniqueEmail("year"));
   await page.getByRole("radio", { name: "4 / 5 tähteä" }).check({ force: true });
   await page.getByRole("button", { name: "Tallenna" }).click();
   await page.goto("/merkitse/viidakon-villit-naiset-kansallisteatteri");

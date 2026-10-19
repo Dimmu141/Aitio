@@ -54,7 +54,30 @@ describe.skipIf(!url)("upsertProduction (integration)", () => {
     expect(saved.stage?.name).toBe("AMOS-scenen");
     expect(saved.type).toBe("PLAY");
     expect(saved.performances).toHaveLength(7);
-    expect(saved.credits.find((credit) => credit.role === "DIRECTOR")?.person.name).toBe("Anna-Maria Lipponen");
+    const director = saved.credits.find((credit) => credit.role === "DIRECTOR");
+    expect(director?.person.name).toBe("Anna-Maria Lipponen");
+    // The source's own label is kept for display; the enum is for filtering.
+    expect(director?.roleText).toBe(detail.credits.find((credit) => credit.roles.includes("DIRECTOR"))?.roleText);
+  });
+
+  it("stores the critic, paywall and feature flags of a review link", async () => {
+    const { productionId } = await upsertProduction(
+      db,
+      theatre,
+      {
+        ...detail,
+        criticReviews: [
+          { outlet: "Hufvudstadsbladet", critic: "Jan-Erik Andelin", url: "https://www.hbl.fi/a/1", paywalled: true },
+          { outlet: "Yle", url: "https://svenska.yle.fi/a/2", feature: true },
+        ],
+      },
+      new Date(),
+    );
+    const reviews = await db.criticReview.findMany({ where: { productionId }, orderBy: { outlet: "asc" } });
+    expect(reviews.map(({ outlet, critic, paywalled, feature }) => ({ outlet, critic, paywalled, feature }))).toEqual([
+      { outlet: "Hufvudstadsbladet", critic: "Jan-Erik Andelin", paywalled: true, feature: false },
+      { outlet: "Yle", critic: null, paywalled: false, feature: true },
+    ]);
   });
 
   it("is idempotent: a second run updates instead of duplicating", async () => {

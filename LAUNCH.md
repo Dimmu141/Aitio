@@ -123,8 +123,8 @@ to `main` deploy production.
 | `CRON_SECRET`, `REVALIDATE_SECRET`, `EMAIL_WEBHOOK_SECRET` | `openssl rand -base64 32` each |
 | `BREVO_API_KEY`, `EMAIL_FROM` | from step 2 |
 | `ADMIN_EMAILS` | your address |
-| `PRIVACY_CONTROLLER`, `PRIVACY_EMAIL` | **you decide**: your name (a private person can be the controller) and a contact address you read |
-| `SCRAPER_USER_AGENT` | e.g. `AitioBot/1.0 (+https://aitio.fi/tietosuoja; tietosuoja@aitio.fi)` |
+| `PRIVACY_CONTROLLER`, `PRIVACY_EMAIL` | **you decide**: your name (a private person can be the controller) and a contact address you read. `PRIVACY_EMAIL` is the one contact everywhere: privacy policy, about page (also for theatres), footer and the crawler's User-Agent |
+| `SCRAPER_USER_AGENT` | optional since 19 Oct 2026: without it the crawler sends `AitioBot/1.0 (+<SITE_URL>/tietoa; <PRIVACY_EMAIL>)`. If you keep the one set in Vercel, make sure it names `PRIVACY_EMAIL` (`launch:check` warns otherwise) |
 
 **Check:**
 

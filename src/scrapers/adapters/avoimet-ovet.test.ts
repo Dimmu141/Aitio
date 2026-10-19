@@ -85,7 +85,7 @@ describe("Avoimet Ovet production page", () => {
       ["Ella Pyhältö", ["CAST"]],
       ["Heikki Kujanpää", ["CAST"]],
       ["Minna Lindgren", ["WRITER"]],
-      ["Hanna Kirjavainen", ["DIRECTOR", "WRITER"]],
+      ["Hanna Kirjavainen", ["DIRECTOR", "ADAPTATION"]],
       ["Suvi Saari", ["DESIGNER"]],
       ["Saija Raskulla", ["DESIGNER"]],
       ["Janne Saarinen", ["DESIGNER"]],

@@ -4,8 +4,8 @@ import { Notice } from "@/components/Notice";
 import { buttonPrimary, input } from "@/components/ui";
 import { getDictionary } from "@/i18n";
 import { href } from "@/i18n/paths";
-import { signInAction } from "@/lib/actions";
-import { MAGIC_LINK_MINUTES } from "@/lib/auth";
+import { signInAction, verifyCodeAction } from "@/lib/actions";
+import { SIGN_IN_MINUTES } from "@/lib/auth";
 import { safeNext } from "@/lib/safe-next";
 import { getCurrentUser } from "@/lib/session";
 
@@ -29,16 +29,15 @@ export default async function SignInPage({ searchParams }: PageProps<"/[locale]/
 
   if (token) {
     // Step two, from the email: a button rather than an automatic sign-in, so that mail
-    // scanners following the link can't use up the token.
+    // scanners following the link can't use up the code it carries.
     return (
       <div className="max-w-xl space-y-5">
         <h1 className="text-display">{t.auth.confirmTitle}</h1>
         <p>{t.auth.confirmBody}</p>
-        <form method="get" action="/api/auth/magic-link/verify">
+        <form action={verifyCodeAction}>
           <input type="hidden" name="token" value={token} />
-          <input type="hidden" name="callbackURL" value={next} />
-          <input type="hidden" name="newUserCallbackURL" value={next} />
-          <input type="hidden" name="errorCallbackURL" value={href(locale, "kirjaudu")} />
+          <input type="hidden" name="next" value={next} />
+          <input type="hidden" name="locale" value={locale} />
           <button type="submit" className={`${buttonPrimary} w-full sm:w-auto`}>
             {t.auth.confirm}
           </button>
@@ -50,10 +49,33 @@ export default async function SignInPage({ searchParams }: PageProps<"/[locale]/
   if (await getCurrentUser()) redirect(next);
 
   if (param(params, "sent")) {
+    // Typing the code keeps the sign-in in this browser, even when the mail app opens
+    // links in one of its own.
     return (
       <div className="max-w-xl space-y-5">
         <h1 className="text-display">{t.auth.sentTitle}</h1>
-        <p className="text-lg">{t.auth.sentBody(MAGIC_LINK_MINUTES)}</p>
+        {error === "code" && <Notice tone="error">{t.auth.errors.code}</Notice>}
+        <p className="text-lg">{t.auth.sentBody(SIGN_IN_MINUTES)}</p>
+        <form action={verifyCodeAction} className="space-y-4">
+          <input type="hidden" name="locale" value={locale} />
+          <input type="hidden" name="next" value={next} />
+          <label className="block space-y-1">
+            <span className="font-semibold">{t.auth.code}</span>
+            <input
+              type="text"
+              name="code"
+              required
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              pattern="[0-9 ]{6,7}"
+              maxLength={7}
+              className={`${input} max-w-[10ch] text-center text-2xl tracking-[0.3em]`}
+            />
+          </label>
+          <button type="submit" className={`${buttonPrimary} w-full sm:w-auto`}>
+            {t.auth.confirm}
+          </button>
+        </form>
         <p>
           <a href={`${href(locale, "kirjaudu")}?next=${encodeURIComponent(next)}`} className="inline-flex min-h-tap items-center">
             {t.auth.sendAgain}
@@ -74,6 +96,8 @@ export default async function SignInPage({ searchParams }: PageProps<"/[locale]/
     <div className="max-w-xl space-y-5">
       <h1 className="text-display">{t.auth.title}</h1>
       {message && <Notice tone="error">{message}</Notice>}
+      {/* From "Merkitse nähdyksi" signed out: the entry is in the draft cookie. */}
+      {next.includes("draft=1") && <Notice>{t.auth.draftKept}</Notice>}
       <p className="text-lg">{t.auth.intro}</p>
       <form action={signInAction} className="space-y-4">
         <input type="hidden" name="locale" value={locale} />

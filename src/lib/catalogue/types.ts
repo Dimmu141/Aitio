@@ -1,5 +1,6 @@
 import type { CreditRole, ProductionType } from "@/generated/prisma/enums";
 import type { Duration } from "./duration";
+import type { Phase } from "./select";
 
 export interface TheatreRef {
   slug: string;
@@ -29,7 +30,9 @@ export interface ProductionCard {
   end: Date | null;
   onSoon: boolean;
   closingSoon: boolean;
-  /** For productions no longer playing: "Esitetty 2024". */
+  /** Running, upcoming ("Tulossa"), past or archive; see `lifecycle`. */
+  phase: Phase;
+  /** For past and archived productions: "Esitetty 2024". */
   year: number | null;
 }
 
@@ -43,6 +46,8 @@ export interface PerformanceRow {
 
 export interface CreditRow {
   role: CreditRole;
+  /** The theatre's own label for the role, when it gave one. */
+  roleText: string | null;
   person: { slug: string; name: string };
   characterName: string | null;
 }

@@ -1,5 +1,5 @@
 import type { Locale } from "@/i18n/config";
-import { MAGIC_LINK_MINUTES, SESSION_DAYS } from "@/lib/auth-config";
+import { DRAFT_MINUTES, SESSION_DAYS, SIGN_IN_MINUTES } from "@/lib/auth-config";
 import { RATE_LIMIT_RETENTION_DAYS } from "@/lib/ops/cleanup";
 
 /**
@@ -7,7 +7,7 @@ import { RATE_LIMIT_RETENTION_DAYS } from "@/lib/ops/cleanup";
  * constants, so changing one changes the policy. Bump POLICY_DATE when the meaning
  * changes, and have a person who knows data protection read it before launch.
  */
-export const POLICY_DATE = new Date("2026-10-18T00:00:00Z");
+export const POLICY_DATE = new Date("2026-10-19T00:00:00Z");
 
 /** The database provider's restore window: deleted data lives on in backups this long. */
 export const BACKUP_DAYS = 7;
@@ -92,7 +92,7 @@ function fi(config: PrivacyConfig, updated: string): Policy {
         heading: "Mitä tietoja käsittelemme ja miksi",
         blocks: [
           [
-            "Sähköpostiosoite: kirjautumislinkkien lähettäminen ja tilisi tunnistaminen. Peruste: palvelun tarjoaminen sinulle (tietosuoja-asetuksen 6.1 b artikla, sopimus).",
+            "Sähköpostiosoite: kirjautumiskoodien lähettäminen ja tilisi tunnistaminen. Peruste: palvelun tarjoaminen sinulle (tietosuoja-asetuksen 6.1 b artikla, sopimus).",
             "Nimi tai nimimerkki, jos annat sen: näytetään julkisten arvioidesi yhteydessä. Peruste: palvelu (6.1 b).",
             "Päiväkirja: näkemäsi esitykset, päivämäärät, arvosanat, tunnisteet ja kirjoittamasi arviot. Peruste: palvelu (6.1 b). Julkiseksi jättämäsi arvio näkyy esityksen sivulla nimesi kanssa. Arvosanat ja tunnisteet näkyvät muille vain yhteenlaskettuina, ilman nimeä.",
             "Haluan nähdä -lista: esitykset, jotka olet tallentanut nähtäväksi, ja milloin tallensit ne. Peruste: palvelu (6.1 b). Lista näkyy vain sinulle, ja esitys poistuu siltä, kun merkitset sen nähdyksi. Jos tilaat viikkoviestin, listasi esitykset nostetaan siinä ensimmäisiksi.",
@@ -106,7 +106,7 @@ function fi(config: PrivacyConfig, updated: string): Policy {
       {
         heading: "Evästeet",
         blocks: [
-          "Käytämme vain kirjautumiseen välttämättömiä evästeitä (nimet alkavat aitio.). Niitä ei tarvitse hyväksyä erikseen. Emme käytä analytiikka-, mainos- tai seurantaevästeitä, ja fontit ladataan Aition omalta palvelimelta.",
+          `Käytämme vain kirjautumiseen välttämättömiä evästeitä (nimet alkavat aitio.), yksi niistä muistaa sähköpostiosoitteesi koodin kirjoittamisen ajan, enintään ${SIGN_IN_MINUTES} minuuttia, ja toinen säilyttää ennen kirjautumista täytetyn merkinnän salattuna enintään ${DRAFT_MINUTES} minuuttia. Niitä ei tarvitse hyväksyä erikseen. Emme käytä analytiikka-, mainos- tai seurantaevästeitä, ja fontit ladataan Aition omalta palvelimelta.`,
         ],
       },
       {
@@ -121,7 +121,7 @@ function fi(config: PrivacyConfig, updated: string): Policy {
           [
             "Tilin tiedot, päiväkirja, Haluan nähdä -lista ja arviot: kunnes poistat tilin. Poisto asetuksista poistaa kaiken heti, myös julkiset arviot.",
             `Kirjautumisistunnot: enintään ${SESSION_DAYS} päivää, ja vanhentuneet poistetaan päivittäin.`,
-            `Kirjautumislinkit: voimassa ${MAGIC_LINK_MINUTES} minuuttia, ja vanhentuneet poistetaan päivittäin.`,
+            `Kirjautumiskoodit (ja niitä kantavat linkit): voimassa ${SIGN_IN_MINUTES} minuuttia, ja vanhentuneet poistetaan päivittäin. Koodista tallennetaan vain tiiviste.`,
             `Käyttörajoitusten tiedot: enintään ${RATE_LIMIT_RETENTION_DAYS} vuorokautta.`,
             `Tietokannan varmuuskopiot: poistetut tiedot häviävät niistä viimeistään ${BACKUP_DAYS} päivässä.`,
             "Palvelimen lokit: palveluntarjoajan lyhyen säilytysajan, enintään muutaman vuorokauden.",
@@ -159,7 +159,7 @@ function sv(config: PrivacyConfig, updated: string): Policy {
         heading: "Vilka uppgifter vi behandlar och varför",
         blocks: [
           [
-            "E-postadress: för att skicka inloggningslänkar och känna igen ditt konto. Grund: att tillhandahålla tjänsten åt dig (dataskyddsförordningen artikel 6.1 b, avtal).",
+            "E-postadress: för att skicka inloggningskoder och känna igen ditt konto. Grund: att tillhandahålla tjänsten åt dig (dataskyddsförordningen artikel 6.1 b, avtal).",
             "Namn eller signatur, om du anger det: visas med dina offentliga recensioner. Grund: tjänsten (6.1 b).",
             "Dagboken: föreställningar du sett, datum, betyg, taggar och recensioner du skrivit. Grund: tjänsten (6.1 b). En recension du låter vara offentlig syns på föreställningens sida med ditt namn. Betyg och taggar syns för andra bara sammanräknade, utan namn.",
             "Listan Vill se: föreställningar du sparat för att se dem, och när du sparade dem. Grund: tjänsten (6.1 b). Bara du ser listan, och en föreställning försvinner från den när du markerar den som sedd. Om du beställt veckomejlet kommer föreställningarna på din lista först i det.",
@@ -173,7 +173,7 @@ function sv(config: PrivacyConfig, updated: string): Policy {
       {
         heading: "Kakor",
         blocks: [
-          "Vi använder bara kakor som behövs för inloggningen (namnen börjar med aitio.). De behöver inte godkännas separat. Vi använder inga kakor för analys, reklam eller spårning, och typsnitten laddas från Aitios egen server.",
+          `Vi använder bara kakor som behövs för inloggningen (namnen börjar med aitio.); en av dem minns din e-postadress medan du skriver in koden, högst ${SIGN_IN_MINUTES} minuter, och en annan håller en anteckning du fyllt i före inloggningen, krypterad, högst ${DRAFT_MINUTES} minuter. De behöver inte godkännas separat. Vi använder inga kakor för analys, reklam eller spårning, och typsnitten laddas från Aitios egen server.`,
         ],
       },
       {
@@ -188,7 +188,7 @@ function sv(config: PrivacyConfig, updated: string): Policy {
           [
             "Kontot, dagboken, listan Vill se och recensionerna: tills du tar bort kontot. Borttagningen i inställningarna tar bort allt direkt, också offentliga recensioner.",
             `Inloggningssessioner: högst ${SESSION_DAYS} dagar, och utgångna tas bort dagligen.`,
-            `Inloggningslänkar: gäller i ${MAGIC_LINK_MINUTES} minuter, och utgångna tas bort dagligen.`,
+            `Inloggningskoder (och länkarna som bär dem): gäller i ${SIGN_IN_MINUTES} minuter, och utgångna tas bort dagligen. Av koden sparas bara en hash.`,
             `Uppgifter för begränsningen av antalet försök: högst ${RATE_LIMIT_RETENTION_DAYS} dygn.`,
             `Säkerhetskopior av databasen: borttagna uppgifter försvinner ur dem inom ${BACKUP_DAYS} dagar.`,
             "Serverloggar: tjänsteleverantörens korta lagringstid, högst några dygn.",
@@ -226,7 +226,7 @@ function en(config: PrivacyConfig, updated: string): Policy {
         heading: "What we process and why",
         blocks: [
           [
-            "Email address: to send sign-in links and recognise your account. Basis: providing the service you asked for (GDPR Article 6(1)(b), contract).",
+            "Email address: to send sign-in codes and recognise your account. Basis: providing the service you asked for (GDPR Article 6(1)(b), contract).",
             "Name or nickname, if you give one: shown with your public reviews. Basis: the service (6(1)(b)).",
             "Your diary: shows you saw, dates, ratings, tags and the reviews you write. Basis: the service (6(1)(b)). A review you leave public appears on the show's page with your name. Ratings and tags are only shown to others as totals, without names.",
             "Your “Want to see” list: shows you saved to see, and when you saved them. Basis: the service (6(1)(b)). Only you can see the list, and a show leaves it when you log it as seen. If you get the weekly email, shows on your list come first in it.",
@@ -240,7 +240,7 @@ function en(config: PrivacyConfig, updated: string): Policy {
       {
         heading: "Cookies",
         blocks: [
-          "We only use cookies needed for signing in (their names start with aitio.). They don't need separate consent. We use no analytics, advertising or tracking cookies, and fonts are served from Aitio's own server.",
+          `We only use cookies needed for signing in (their names start with aitio.); one remembers your email address while you type the code, for ${SIGN_IN_MINUTES} minutes at most, and another keeps an entry you filled in before signing in, encrypted, for ${DRAFT_MINUTES} minutes at most. They don't need separate consent. We use no analytics, advertising or tracking cookies, and fonts are served from Aitio's own server.`,
         ],
       },
       {
@@ -255,7 +255,7 @@ function en(config: PrivacyConfig, updated: string): Policy {
           [
             "Account, diary, “Want to see” list and reviews: until you delete your account. Deleting it in the settings removes everything at once, public reviews included.",
             `Sign-in sessions: at most ${SESSION_DAYS} days; expired ones are deleted daily.`,
-            `Sign-in links: valid for ${MAGIC_LINK_MINUTES} minutes; expired ones are deleted daily.`,
+            `Sign-in codes (and the links that carry them): valid for ${SIGN_IN_MINUTES} minutes; expired ones are deleted daily. Only a hash of the code is stored.`,
             `Rate-limiting data: at most ${RATE_LIMIT_RETENTION_DAYS} days.`,
             `Database backups: deleted data is gone from them within ${BACKUP_DAYS} days.`,
             "Server logs: the hosting provider's short retention, a few days at most.",

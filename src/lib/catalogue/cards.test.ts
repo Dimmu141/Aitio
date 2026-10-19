@@ -17,7 +17,8 @@ function source(performances: Array<{ startsAt: Date; subtitleLangs: string[] }>
     lastSeenAt: seen,
     delistedAt: null as Date | null,
     premiereDate: null,
-    runEnd: null,
+    runStart: null as Date | null,
+    runEnd: null as Date | null,
     theatre: { slug: "kansallisteatteri", name: "Kansallisteatteri", city: "Helsinki" },
     stage: null,
     performances: performances.map((performance) => ({ ...performance, lastSeenAt: seen })),
@@ -56,6 +57,6 @@ describe("toCard for a delisted production", () => {
   it("keeps the performances within the window and reads the running time", () => {
     const card = toCard(source([{ startsAt: day(1), subtitleLangs: [] }, { startsAt: day(20), subtitleLangs: [] }]), asOf);
     expect(card.soon).toEqual([day(1)]);
-    expect(card.duration).toEqual({ minutes: 150, intervals: 1 });
+    expect(card.duration).toEqual({ minutes: 150, intervals: 1, estimate: false });
   });
 });

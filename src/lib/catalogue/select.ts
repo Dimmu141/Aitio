@@ -1,11 +1,30 @@
 import type { ProductionType } from "@/generated/prisma/enums";
 
+/**
+ * A theatre is shown once its source has delivered something. One added to the seed
+ * whose scraper has not run yet (or never worked) stays out of every list and 404s.
+ */
+export const LISTED_THEATRE = { productions: { some: {} } } as const;
+
 export const WINDOW_DAYS = 14;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 /** Rows seen in the production's latest scrape; older ones vanished from the theatre's page. */
 export function isCurrent(row: { lastSeenAt: Date }, production: { lastSeenAt: Date }): boolean {
   return row.lastSeenAt.getTime() >= production.lastSeenAt.getTime();
+}
+
+/**
+ * A person's page is indexed (and in the sitemap) from this many productions on. With one
+ * credit the page only repeats the production's credit list: thin, and 800+ of them.
+ */
+export const MIN_PRODUCTIONS_TO_INDEX = 2;
+
+/** Distinct productions a person is currently credited in (stale credits don't count). */
+export function currentProductionCount(
+  credits: Array<{ productionId: string; lastSeenAt: Date; production: { lastSeenAt: Date } }>,
+): number {
+  return new Set(credits.filter((credit) => isCurrent(credit, credit.production)).map((credit) => credit.productionId)).size;
 }
 
 export function effectiveType(production: { type: ProductionType; typeOverride: ProductionType | null }): ProductionType {
@@ -81,10 +100,59 @@ export function runProgress(
   return Math.round(Math.min(1, Math.max(0, ratio)) * 100);
 }
 
-/** Year label for productions that are no longer playing: last performance, else run end or premiere. */
-export function lastYear(dates: Array<Date | null | undefined>): number | null {
-  const times = dates.filter((date): date is Date => date instanceof Date).map((date) => date.getTime());
-  return times.length > 0 ? new Date(Math.max(...times)).getUTCFullYear() : null;
+/**
+ * Where a production is in its life:
+ * - running: has upcoming performances;
+ * - upcoming ("Tulossa"): still listed, and nothing has been performed yet or more is to come;
+ * - past: its last known date has gone by;
+ * - archive: past for longer than `ARCHIVE_MONTHS`, or delisted before any date was known.
+ */
+export type Phase = "running" | "upcoming" | "past" | "archive";
+
+export const ARCHIVE_MONTHS = 12;
+
+export interface PhaseFacts {
+  next: Date | null;
+  /** Every stored performance, current or not: history counts. */
+  performances: Array<{ startsAt: Date }>;
+  runStart: Date | null;
+  runEnd: Date | null;
+  premiereDate: Date | null;
+  delistedAt: Date | null;
+}
+
+export interface Lifecycle {
+  phase: Phase;
+  /** Something has been performed (or the theatre says the run began): the show can be logged as seen. */
+  started: boolean;
+  /** "Esitetty 2024", for past and archive only. */
+  year: number | null;
+}
+
+function knownDates(facts: PhaseFacts): number[] {
+  return [...facts.performances.map((row) => row.startsAt), facts.runStart, facts.runEnd, facts.premiereDate]
+    .filter((date): date is Date => date instanceof Date)
+    .map((date) => date.getTime());
+}
+
+function archiveCutoff(asOf: Date): number {
+  const cutoff = new Date(asOf);
+  cutoff.setUTCMonth(cutoff.getUTCMonth() - ARCHIVE_MONTHS);
+  return cutoff.getTime();
+}
+
+export function lifecycle(facts: PhaseFacts, asOf: Date): Lifecycle {
+  const dates = knownDates(facts);
+  const now = asOf.getTime();
+  const started = dates.some((time) => time <= now);
+  if (facts.next) return { phase: "running", started, year: null };
+  if (dates.length === 0 || !started) {
+    return { phase: facts.delistedAt ? "archive" : "upcoming", started, year: null };
+  }
+  const last = Math.max(...dates);
+  if (last > now && !facts.delistedAt) return { phase: "upcoming", started, year: null };
+  const year = new Date(Math.min(last, now)).getUTCFullYear();
+  return { phase: last < archiveCutoff(asOf) ? "archive" : "past", started, year };
 }
 
 export interface RatingSummary {

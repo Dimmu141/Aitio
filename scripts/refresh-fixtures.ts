@@ -36,6 +36,11 @@ const FIXTURES: Array<{ url: string; file: string; form?: Record<string, string>
   },
   // A guest run: "Kantaesitys oli Tampereen Työväen Teatterissa", no premiere of its own.
   { url: "https://www.kansallisteatteri.fi/esitys/karpaset", file: "fixtures/kansallisteatteri/production-karpaset.html" },
+  // No dates yet (spring 2027); "Ohjaus ja dramatisointi" and the original author, Aleksis Kivi.
+  {
+    url: "https://www.kansallisteatteri.fi/esitys/seitseman-veljesta",
+    file: "fixtures/kansallisteatteri/production-seitseman-veljesta.html",
+  },
   { url: showsUrl(1), file: "fixtures/svenska-teatern/shows-page-1.json" },
   { url: "https://svenskateatern.fi/repertoar/nattland/", file: "fixtures/svenska-teatern/production-nattland.html" },
   { url: HKT_LIST_URL, file: "fixtures/hkt/list-esitykset.html" },

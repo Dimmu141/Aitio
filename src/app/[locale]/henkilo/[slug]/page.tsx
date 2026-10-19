@@ -3,6 +3,7 @@ import { ProductionCard } from "@/components/ProductionCard";
 import { getDictionary } from "@/i18n";
 import type { Dictionary } from "@/i18n/dictionaries/fi";
 import { getAllSlugs, getPerson, type PersonCredit } from "@/lib/catalogue/queries";
+import { MIN_PRODUCTIONS_TO_INDEX } from "@/lib/catalogue/select";
 import { pageMetadata } from "@/lib/metadata";
 import { withPlaceholder } from "@/lib/static-params";
 
@@ -26,13 +27,15 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/henkilo/
   const { locale, t } = await getDictionary();
   const page = await getPerson(slug);
   if (!page) return {};
-  const titles = [...page.current, ...page.past].slice(0, 4).map((entry) => entry.card.title);
+  const all = [...page.current, ...page.upcoming, ...page.past];
+  const titles = all.slice(0, 4).map((entry) => entry.card.title);
   return pageMetadata({
     locale,
     section: "henkilo",
     slug,
     title: page.name,
     description: `${page.name}: ${titles.join(", ")}. ${t.site.tagline}.`,
+    noindex: all.length < MIN_PRODUCTIONS_TO_INDEX,
   });
 }
 
@@ -66,6 +69,14 @@ export default async function PersonRoute({ params }: PageProps<"/[locale]/henki
             {t.person.current}
           </h2>
           {list(page.current)}
+        </section>
+      )}
+      {page.upcoming.length > 0 && (
+        <section aria-labelledby="upcoming">
+          <h2 id="upcoming" className="text-section">
+            {t.person.upcoming}
+          </h2>
+          {list(page.upcoming)}
         </section>
       )}
       {page.past.length > 0 && (

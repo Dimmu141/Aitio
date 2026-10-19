@@ -1,6 +1,6 @@
 import type { ProductionType } from "@/generated/prisma/enums";
 import { db } from "@/lib/db";
-import { effectiveType, isCurrent } from "@/lib/catalogue/select";
+import { effectiveType, isCurrent, LISTED_THEATRE } from "@/lib/catalogue/select";
 import { helsinkiDate } from "@/lib/format";
 
 /** One diary entry with the production facts the year review and badges need. */
@@ -79,5 +79,5 @@ export function diaryYears(entries: Array<{ seenOn: string }>): number[] {
 
 /** For the "every theatre" badge: the theatres Aitio covers, not a hard-coded six. */
 export function theatreCount(): Promise<number> {
-  return db.theatre.count();
+  return db.theatre.count({ where: LISTED_THEATRE });
 }

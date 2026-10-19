@@ -122,3 +122,12 @@ export function hasFullSchedule(theatreSlug: string): boolean {
   const theatre = THEATRES.find((candidate) => candidate.slug === theatreSlug);
   return theatre !== undefined && !PARTIAL_SCHEDULE_SOURCES.has(theatre.sourceId);
 }
+
+/** Theatres whose pages are in Swedish; every other source writes in Finnish. */
+const SWEDISH_SOURCES: ReadonlySet<string> = new Set(["svenska-teatern", "viirus"]);
+
+/** The language a theatre's own labels ("Lavastussuunnittelu", "Scenografi") are written in. */
+export function sourceLanguage(theatreSlug: string): "fi" | "sv" {
+  const theatre = THEATRES.find((candidate) => candidate.slug === theatreSlug);
+  return theatre && SWEDISH_SOURCES.has(theatre.sourceId) ? "sv" : "fi";
+}

@@ -53,6 +53,13 @@ describe("checkLaunchEnv", () => {
     ]);
   });
 
+  it("builds the User-Agent from the site's contact address when none is set", () => {
+    expect(checkLaunchEnv({ ...ready, SCRAPER_USER_AGENT: undefined })).toEqual([]);
+    expect(variables({ ...ready, SCRAPER_USER_AGENT: "AitioBot/1.0 (+https://aitio.fi/bot; muu@aitio.fi)" }, "warning")).toEqual([
+      "SCRAPER_USER_AGENT",
+    ]);
+  });
+
   it("checks admin addresses", () => {
     expect(variables({ ...ready, ADMIN_EMAILS: "dimmu@example.fi, nope" }, "error")).toEqual(["ADMIN_EMAILS"]);
   });

@@ -7,7 +7,7 @@ import { db } from "@/lib/db";
  * An item goes away when the user logs the show as seen (saveEntry) or removes it.
  */
 export interface Watchlist {
-  /** Still playing, soonest first. */
+  /** Still playing, soonest first, then those still waiting for dates. */
   playing: ProductionCard[];
   /** No upcoming performances any more, most recently saved first. */
   gone: ProductionCard[];
@@ -50,10 +50,11 @@ export async function getWatchlist(userId: string, asOf: Date): Promise<Watchlis
   });
   const cards = items.map((item) => toCard(item.production, asOf));
   return {
+    // Not-yet-dated productions stay on the list, after the dated ones.
     playing: cards
-      .filter((card) => card.next)
-      .sort((a, b) => (a.next?.getTime() ?? 0) - (b.next?.getTime() ?? 0)),
-    gone: cards.filter((card) => !card.next),
+      .filter((card) => card.phase === "running" || card.phase === "upcoming")
+      .sort((a, b) => (a.next?.getTime() ?? Number.MAX_SAFE_INTEGER) - (b.next?.getTime() ?? Number.MAX_SAFE_INTEGER)),
+    gone: cards.filter((card) => card.phase === "past" || card.phase === "archive"),
   };
 }
 

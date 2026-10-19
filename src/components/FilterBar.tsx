@@ -2,7 +2,8 @@ import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/fi";
 import { href } from "@/i18n/paths";
 import { buttonPrimary, chip, chipLink } from "@/components/ui";
-import { ENGLISH_FRIENDLY, type FilterOptions, type Filters, filterQuery, hasFilters } from "@/lib/catalogue/filters";
+import { effectiveWhen, ENGLISH_FRIENDLY, type FilterOptions, type Filters, filterQuery, hasFilters } from "@/lib/catalogue/filters";
+import { DEFAULT_WHEN } from "@/lib/catalogue/when";
 
 /** The choices inside the panel; the time chips sit outside it, one tap each. */
 const PANEL_KEYS = ["city", "type", "lang", "subs"] as const satisfies ReadonlyArray<keyof Filters>;
@@ -101,19 +102,18 @@ export function WhenChips({
   t: Dictionary;
 }) {
   if (options.when.length === 0) return null;
-  const choices = [
-    { value: undefined, label: t.filters.whenAll },
-    ...options.when.map((value) => ({ value, label: t.filters.whenLabels[value] })),
-  ];
+  const current = effectiveWhen(filters, options);
+  // The default range needs no query string, so the plain front-page URL stays the default.
+  const choices = options.when.map((value) => ({ value, query: value === DEFAULT_WHEN ? undefined : value, label: t.filters.whenLabels[value] }));
   return (
     <nav aria-label={t.filters.when}>
       <ul className="flex flex-wrap gap-2">
         {choices.map((choice) => (
-          <li key={choice.value ?? "all"}>
+          <li key={choice.value}>
             <a
-              href={`${href(locale)}${filterQuery(filters, { when: choice.value })}`}
+              href={`${href(locale)}${filterQuery(filters, { when: choice.query })}`}
               className={chipLink}
-              aria-current={filters.when === choice.value ? "true" : undefined}
+              aria-current={current === choice.value ? "true" : undefined}
             >
               {choice.label}
             </a>

@@ -1,7 +1,7 @@
 import type { ProductionType } from "@/generated/prisma/enums";
 import { hasFullSchedule } from "@/scrapers/theatres";
 import { parseDuration } from "./duration";
-import { effectiveType, isClosingSoon, knownEnd, lastYear, schedule, upcomingPerformances, windowEnd } from "./select";
+import { effectiveType, isClosingSoon, knownEnd, lifecycle, schedule, upcomingPerformances, windowEnd } from "./select";
 import type { ProductionCard, TheatreRef } from "./types";
 
 /** The select and mapping behind every production list; kept free of next/cache for scripts and tests. */
@@ -18,6 +18,7 @@ export const cardSelect = {
   lastSeenAt: true,
   delistedAt: true,
   premiereDate: true,
+  runStart: true,
   runEnd: true,
   theatre: theatreSelect,
   stage: { select: { name: true } },
@@ -35,6 +36,7 @@ interface CardSource {
   lastSeenAt: Date;
   delistedAt: Date | null;
   premiereDate: Date | null;
+  runStart: Date | null;
   runEnd: Date | null;
   theatre: TheatreRef;
   stage: { name: string } | null;
@@ -51,6 +53,7 @@ export function toCard(source: CardSource, asOf: Date): ProductionCard {
   const timing = schedule(upcoming, asOf);
   const soon = upcoming.filter((performance) => performance.startsAt < windowEnd(asOf));
   const fullSchedule = hasFullSchedule(source.theatre.slug);
+  const life = lifecycle({ ...source, next: timing.next }, asOf);
   return {
     slug: source.slug,
     title: source.title,
@@ -65,6 +68,7 @@ export function toCard(source: CardSource, asOf: Date): ProductionCard {
     premiere: source.premiereDate,
     end: knownEnd(timing.last, source.runEnd, fullSchedule),
     closingSoon: isClosingSoon(timing, source.runEnd, fullSchedule, asOf),
-    year: timing.next ? null : lastYear([source.performances.at(-1)?.startsAt, source.runEnd, source.premiereDate]),
+    phase: life.phase,
+    year: life.year,
   };
 }

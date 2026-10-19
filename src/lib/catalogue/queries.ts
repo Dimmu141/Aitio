@@ -6,13 +6,16 @@ import { cardSelect, toCard } from "./cards";
 import {
   effectiveType,
   isClosingSoon,
+  currentProductionCount,
   isCurrent,
+  LISTED_THEATRE,
   knownEnd,
-  lastYear,
+  lifecycle,
   runProgress,
   schedule,
   summariseRatings,
   upcomingPerformances,
+  type Phase,
   type RatingSummary,
 } from "./select";
 import { reviewKind } from "./review-kind";
@@ -34,6 +37,8 @@ function cacheCatalogue(): void {
 
 const byNext = (a: ProductionCard, b: ProductionCard) =>
   (a.next?.getTime() ?? Infinity) - (b.next?.getTime() ?? Infinity) || a.title.localeCompare(b.title, "fi");
+
+const byTitle = (a: ProductionCard, b: ProductionCard) => a.title.localeCompare(b.title, "fi");
 
 const byYearDesc = (a: ProductionCard, b: ProductionCard) =>
   (b.year ?? 0) - (a.year ?? 0) || a.title.localeCompare(b.title, "fi");
@@ -73,11 +78,16 @@ export interface ProductionPage {
   /** False when the source lists only the next few dates, so "N left" would be wrong. */
   fullSchedule: boolean;
   closingSoon: boolean;
+  phase: Phase;
+  /** Performed at least once, so it can be logged as seen. */
+  started: boolean;
   year: number | null;
   credits: CreditRow[];
   /** Press reviews; blog posts the theatre lists go to `blogs` (see review-kind.ts). */
   critics: ReviewLink[];
   blogs: ReviewLink[];
+  /** Features and interviews the theatre links to: coverage, not reviews. */
+  features: ReviewLink[];
   ratings: RatingSummary;
   tags: Array<{ slug: string; labels: { fi: string; sv: string; en: string }; count: number }>;
   reviews: PublicReview[];
@@ -86,8 +96,10 @@ export interface ProductionPage {
 
 export interface ReviewLink {
   outlet: string;
+  critic: string | null;
   url: string;
   publishedAt: Date | null;
+  paywalled: boolean;
 }
 
 export interface PublicReview {
@@ -137,6 +149,7 @@ export async function getProduction(slug: string): Promise<ProductionPage | null
   const timing = schedule(upcoming, asOf);
   const fullSchedule = hasFullSchedule(row.theatre.slug);
   const end = knownEnd(timing.last, row.runEnd, fullSchedule);
+  const life = lifecycle({ ...row, next: timing.next }, asOf);
   const ratings = row.diaryEntries.flatMap((entry) => (entry.rating === null ? [] : [entry.rating / 2]));
 
   return {
@@ -164,10 +177,17 @@ export async function getProduction(slug: string): Promise<ProductionPage | null
     end,
     fullSchedule,
     closingSoon: isClosingSoon(timing, row.runEnd, fullSchedule, asOf),
-    year: timing.next ? null : lastYear([row.performances.at(-1)?.startsAt, row.runEnd, row.premiereDate]),
+    phase: life.phase,
+    started: life.started,
+    year: life.year,
     credits: row.credits
       .filter((credit) => isCurrent(credit, row))
-      .map((credit) => ({ role: credit.role, person: credit.person, characterName: credit.characterName })),
+      .map((credit) => ({
+        role: credit.role,
+        roleText: credit.roleText,
+        person: credit.person,
+        characterName: credit.characterName,
+      })),
     ...splitReviews(row.criticReviews),
     ratings: summariseRatings(ratings),
     tags: countTags(row.diaryEntries.flatMap((entry) => entry.tags)),
@@ -185,11 +205,13 @@ export async function getProduction(slug: string): Promise<ProductionPage | null
   };
 }
 
-function splitReviews(rows: ReviewLink[]): { critics: ReviewLink[]; blogs: ReviewLink[] } {
-  const links = rows.map(({ outlet, url, publishedAt }) => ({ outlet, url, publishedAt }));
+function splitReviews(rows: Array<ReviewLink & { feature: boolean }>): Pick<ProductionPage, "critics" | "blogs" | "features"> {
+  const toLink = ({ outlet, critic, url, publishedAt, paywalled }: ReviewLink): ReviewLink => ({ outlet, critic, url, publishedAt, paywalled });
+  const reviews = rows.filter((row) => !row.feature).map(toLink);
   return {
-    critics: links.filter((link) => reviewKind(link.outlet, link.url) === "press"),
-    blogs: links.filter((link) => reviewKind(link.outlet, link.url) === "blog"),
+    critics: reviews.filter((link) => reviewKind(link.outlet, link.url) === "press"),
+    blogs: reviews.filter((link) => reviewKind(link.outlet, link.url) === "blog"),
+    features: rows.filter((row) => row.feature).map(toLink),
   };
 }
 
@@ -212,15 +234,21 @@ export interface TheatrePage {
   theatre: TheatreRef & { website: string };
   stages: string[];
   current: ProductionCard[];
+  /** Still listed by the theatre, no dates yet. */
+  upcoming: ProductionCard[];
   past: ProductionCard[];
+  /** Ended over a year ago, or never dated: kept for the diary, out of the main lists. */
+  archive: ProductionCard[];
 }
+
+const inPhase = (phase: Phase) => (card: ProductionCard) => card.phase === phase;
 
 export async function getTheatre(slug: string): Promise<TheatrePage | null> {
   "use cache";
   cacheCatalogue();
   const asOf = new Date();
-  const row = await db.theatre.findUnique({
-    where: { slug },
+  const row = await db.theatre.findFirst({
+    where: { slug, ...LISTED_THEATRE },
     select: {
       slug: true,
       name: true,
@@ -236,8 +264,10 @@ export async function getTheatre(slug: string): Promise<TheatrePage | null> {
     asOf,
     theatre: { slug: row.slug, name: row.name, city: row.city, website: row.website },
     stages: row.stages.map((stage) => stage.name),
-    current: cards.filter((card) => card.next).sort(byNext),
-    past: cards.filter((card) => !card.next).sort(byYearDesc),
+    current: cards.filter(inPhase("running")).sort(byNext),
+    upcoming: cards.filter(inPhase("upcoming")).sort(byTitle),
+    past: cards.filter(inPhase("past")).sort(byYearDesc),
+    archive: cards.filter(inPhase("archive")).sort(byYearDesc),
   };
 }
 
@@ -252,6 +282,8 @@ export interface PersonPage {
   slug: string;
   name: string;
   current: PersonCredit[];
+  upcoming: PersonCredit[];
+  /** Past and archived: on a person's page their history is the point. */
   past: PersonCredit[];
 }
 
@@ -283,8 +315,11 @@ export async function getPerson(slug: string): Promise<PersonPage | null> {
     asOf,
     slug: row.slug,
     name: row.name,
-    current: all.filter((entry) => entry.card.next).sort((a, b) => byNext(a.card, b.card)),
-    past: all.filter((entry) => !entry.card.next).sort((a, b) => byYearDesc(a.card, b.card)),
+    current: all.filter((entry) => entry.card.phase === "running").sort((a, b) => byNext(a.card, b.card)),
+    upcoming: all.filter((entry) => entry.card.phase === "upcoming").sort((a, b) => byTitle(a.card, b.card)),
+    past: all
+      .filter((entry) => entry.card.phase === "past" || entry.card.phase === "archive")
+      .sort((a, b) => byYearDesc(a.card, b.card)),
   };
 }
 
@@ -303,17 +338,15 @@ export async function getSearchIndex(): Promise<{ asOf: Date; index: SearchIndex
         credits: { select: { productionId: true, lastSeenAt: true, production: { select: { lastSeenAt: true } } } },
       },
     }),
-    db.theatre.findMany({ select: { slug: true, name: true, city: true }, orderBy: { name: "asc" } }),
+    db.theatre.findMany({ where: LISTED_THEATRE, select: { slug: true, name: true, city: true }, orderBy: { name: "asc" } }),
   ]);
   return {
     asOf,
     index: {
       productions: productions.map((row) => toCard(row, asOf)),
       people: people.flatMap((person) => {
-        const current = new Set(
-          person.credits.filter((credit) => isCurrent(credit, credit.production)).map((credit) => credit.productionId),
-        );
-        return current.size > 0 ? [{ slug: person.slug, name: person.name, productions: current.size }] : [];
+        const productions = currentProductionCount(person.credits);
+        return productions > 0 ? [{ slug: person.slug, name: person.name, productions }] : [];
       }),
       theatres,
     },
@@ -324,18 +357,33 @@ export async function getSearchIndex(): Promise<{ asOf: Date; index: SearchIndex
 export async function getAllSlugs(): Promise<{
   productions: Array<{ slug: string; updatedAt: Date }>;
   theatres: Array<{ slug: string; updatedAt: Date }>;
-  people: Array<{ slug: string }>;
+  /** `productions` decides whether the page is indexed (MIN_PRODUCTIONS_TO_INDEX). */
+  people: Array<{ slug: string; productions: number }>;
 }> {
   "use cache";
   cacheCatalogue();
   const [productions, theatres, people] = await Promise.all([
     db.production.findMany({ select: { slug: true, lastSeenAt: true }, orderBy: { slug: "asc" } }),
-    db.theatre.findMany({ select: { slug: true, updatedAt: true }, orderBy: { slug: "asc" } }),
-    db.person.findMany({ where: { credits: { some: {} } }, select: { slug: true }, orderBy: { slug: "asc" } }),
+    db.theatre.findMany({ where: LISTED_THEATRE, select: { slug: true, updatedAt: true }, orderBy: { slug: "asc" } }),
+    db.person.findMany({
+      where: { credits: { some: {} } },
+      select: {
+        slug: true,
+        credits: { select: { productionId: true, lastSeenAt: true, production: { select: { lastSeenAt: true } } } },
+      },
+      orderBy: { slug: "asc" },
+    }),
   ]);
   return {
     productions: productions.map((row) => ({ slug: row.slug, updatedAt: row.lastSeenAt })),
     theatres: theatres.map((row) => ({ slug: row.slug, updatedAt: row.updatedAt })),
-    people,
+    people: people.map((person) => ({ slug: person.slug, productions: currentProductionCount(person.credits) })),
   };
+}
+
+/** The theatres Aitio shows, for the about page's source list. */
+export async function getListedTheatres(): Promise<Array<{ slug: string; name: string; website: string }>> {
+  "use cache";
+  cacheCatalogue();
+  return db.theatre.findMany({ where: LISTED_THEATRE, select: { slug: true, name: true, website: true }, orderBy: { name: "asc" } });
 }

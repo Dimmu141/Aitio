@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { LOCALES, type Section } from "@/i18n/config";
 import { alternates } from "@/i18n/paths";
 import { getAllSlugs } from "@/lib/catalogue/queries";
+import { MIN_PRODUCTIONS_TO_INDEX } from "@/lib/catalogue/select";
 import { absoluteUrl } from "@/lib/site";
 
 type Entry = MetadataRoute.Sitemap[number];
@@ -25,6 +26,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...entries("tietoa", undefined),
     ...productions.flatMap(({ slug, updatedAt }) => entries("esitys", slug, updatedAt)),
     ...theatres.flatMap(({ slug, updatedAt }) => entries("teatteri", slug, updatedAt)),
-    ...people.flatMap(({ slug }) => entries("henkilo", slug)),
+    ...people
+      .filter(({ productions }) => productions >= MIN_PRODUCTIONS_TO_INDEX)
+      .flatMap(({ slug }) => entries("henkilo", slug)),
   ];
 }

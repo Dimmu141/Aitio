@@ -1,7 +1,7 @@
 import * as cheerio from "cheerio";
 import { politeFetch } from "../http";
 import { mapRoleText } from "../roles";
-import { cleanText, helsinkiToUtc, languageCodes, parseFinnishDate } from "../text";
+import { cleanText, helsinkiToUtc, languageCodes, parseFinnishDate, personName } from "../text";
 import {
   rawProductionDetailSchema,
   rawProductionSchema,
@@ -122,7 +122,77 @@ function parsePremiere($: cheerio.CheerioAPI): Date | undefined {
   return (row && rowStart($, row)) || undefined;
 }
 
+const MAX_NAME_WORDS = 4;
+
+/** "Aleksis Kivi", "Sirkku Peltola ja Juha Jokela": names only, no prose. */
+function namesOnly(text: string): string[] | null {
+  const parts = text.split(/\s+(?:ja|&)\s+|,\s*/).map(cleanText).filter(Boolean);
+  const names = parts.map((part) => (part.split(" ").length <= MAX_NAME_WORDS ? personName(part) : null));
+  return names.length > 0 && names.every((name) => name !== null && /^\p{Lu}/u.test(name)) ? (names as string[]) : null;
+}
+
+/**
+ * The line under the title names the original author ("Aleksis Kivi"), sometimes with
+ * a labelled line ("Dramatisointi Minna Leino"). A bare name is the writer; prose such
+ * as "Perustuu Aili Somersalon teokseen …" is skipped: genitives don't give names back.
+ */
+export function authorCredits(fieldHtml: string): RawCredit[] {
+  return fieldHtml.split(/<br\s*\/?>/i).flatMap((lineHtml) => {
+    const line = cleanText(cheerio.load(`<p>${lineHtml}</p>`)("p").text());
+    if (!line) return [];
+    // A role word first ("Dramatisointi Minna Leino"); otherwise it would pass as a three-word name.
+    // The name after it needs two words, so "Valo Ahonen" stays a person, not lighting by "Ahonen".
+    const labelled = /^(\p{L}+(?: ja \p{L}+)?)\s+(\p{Lu}\S*\s+\S.*)$/u.exec(line);
+    const roles = labelled ? mapRoleText(labelled[1]).filter((role) => role !== "OTHER") : [];
+    if (labelled && roles.length > 0) {
+      return (namesOnly(labelled[2]) ?? []).map((name) => ({ name, roleText: labelled[1], roles }));
+    }
+    return (namesOnly(line) ?? []).map((name) => ({ name, roleText: "", roles: ["WRITER" as const] }));
+  });
+}
+
+/** Authors the team list doesn't already credit for the text come first, like on a programme cover. */
+function withAuthors(authors: RawCredit[], team: RawCredit[]): RawCredit[] {
+  const credited = (author: RawCredit) =>
+    team.some((credit) => credit.name === author.name && author.roles.every((role) => credit.roles.includes(role)));
+  return [...authors.filter((author) => !credited(author)), ...team];
+}
+
+/**
+ * Guest runs (Kärpäset, Haapajärven Elvis) have no team list, only a text block:
+ * "<h2>Työryhmä</h2><p><strong>Käsikirjoitus ja ohjaus</strong> Sirkku Peltola <strong>…".
+ * Each bold label owns the names after it, up to the next label.
+ */
+export function textBlockCredits(blockHtml: string): RawCredit[] {
+  const $ = cheerio.load(`<div>${blockHtml.replace(/<br\s*\/?>/gi, " ")}</div>`);
+  const credits: RawCredit[] = [];
+  let roleText = "";
+  $("div")
+    .find("p")
+    .contents()
+    .each((_, node) => {
+      const text = cleanText($(node).text());
+      if (node.type === "tag" && node.name === "strong") {
+        roleText = text;
+        return;
+      }
+      const roles = roleText ? mapRoleText(roleText) : [];
+      if (!text || roles.length === 0) return;
+      for (const part of text.split(/,\s*|\s+ja\s+|\s+och\s+/)) {
+        const name = personName(part);
+        if (name && /^\p{Lu}/u.test(name)) credits.push({ name, roleText, roles });
+      }
+    });
+  return credits;
+}
+
+function teamTextBlock($: cheerio.CheerioAPI): string {
+  const heading = $("h2").filter((_, element) => /^(työryhmä|arbetsgrupp)$/i.test(cleanText($(element).text()))).first();
+  return heading.length > 0 ? (heading.parent().html() ?? "") : "";
+}
+
 function parseCredits($: cheerio.CheerioAPI): RawCredit[] {
+  if ($(".production-team-member").length === 0) return textBlockCredits(teamTextBlock($));
   const credits: RawCredit[] = [];
   $(".production-team-member").each((_, element) => {
     const member = $(element);
@@ -142,7 +212,10 @@ function parseReviews($: cheerio.CheerioAPI): RawCriticReview[] {
   const reviews: RawCriticReview[] = [];
   $("article.review--teaser").each((_, element) => {
     const article = $(element);
-    const url = article.find(".field--name-field-review-link a[href]").first().attr("href");
+    const link = article.find(".field--name-field-review-link a[href]").first();
+    const url = link.attr("href");
+    // "Lue arvio hs.fi (maksumuuri)" is a review behind a paywall; "Lue juttu: yle.fi" a feature.
+    const linkText = cleanText(link.text()).toLowerCase();
     const byline = cleanText(article.find(".field--name-field-subtitle").first().text());
     if (!url || !/^https?:\/\//.test(url)) return;
     // Byline format: "Mika Pekkola – Kansan Uutiset"
@@ -151,6 +224,8 @@ function parseReviews($: cheerio.CheerioAPI): RawCriticReview[] {
       url,
       critic: outlet ? critic : undefined,
       outlet: outlet ?? (byline || new URL(url).hostname.replace(/^www\./, "")),
+      paywalled: linkText.includes("maksumuuri"),
+      feature: /^lue (?:juttu|haastattelu)/.test(linkText),
     });
   });
   return reviews;
@@ -178,7 +253,7 @@ export function parseDetail(html: string, ref: Pick<RawProduction, "externalId" 
     runEnd: performances.at(-1)?.startsAt,
     languages: ["fi"],
     subtitleLangs: everyPerformance ? (performances[0].subtitleLangs ?? []) : [],
-    credits: parseCredits($),
+    credits: withAuthors(authorCredits($(".field--name-field-author-information").first().html() ?? ""), parseCredits($)),
     performances,
     criticReviews: parseReviews($),
     isVisiting: ref.isVisiting,

@@ -11,8 +11,11 @@ export interface AboutSection {
   blocks: Block[];
   /** Render the list of theatres after this section's text. */
   theatres?: boolean;
-  /** Render the contact address after this section's text. */
-  contact?: boolean;
+  /**
+   * The contact address after this section's text: "section" when the section is only
+   * there to give it (left out without an address), "line" when it just ends with it.
+   */
+  contact?: "section" | "line";
 }
 
 export interface About {
@@ -61,11 +64,12 @@ const ABOUT: Record<Locale, About> = {
         blocks: [
           "Hakurobottimme kertoo nimensä ja yhteystietonsa jokaisessa pyynnössä, noudattaa robots.txt-tiedostoa ja hakee enintään yhden sivun sekunnissa samalta palvelimelta. Jos haluatte korjata jotain tai että lopetamme tietojenne hakemisen, kirjoittakaa meille.",
         ],
+        contact: "line",
       },
       {
         heading: "Palaute ja korjaukset",
         blocks: ["Virheet, toiveet ja kysymykset otetaan ilolla vastaan."],
-        contact: true,
+        contact: "section",
       },
     ],
   },
@@ -106,11 +110,12 @@ const ABOUT: Record<Locale, About> = {
         blocks: [
           "Vår sökrobot uppger sitt namn och sina kontaktuppgifter i varje förfrågan, följer robots.txt och hämtar högst en sida i sekunden från samma server. Om ni vill rätta något eller vill att vi slutar hämta era uppgifter, skriv till oss.",
         ],
+        contact: "line",
       },
       {
         heading: "Respons och rättelser",
         blocks: ["Fel, önskemål och frågor tas gärna emot."],
-        contact: true,
+        contact: "section",
       },
     ],
   },
@@ -151,11 +156,12 @@ const ABOUT: Record<Locale, About> = {
         blocks: [
           "Our crawler states its name and contact details with every request, follows robots.txt and fetches at most one page a second from a server. If you want something corrected, or want us to stop collecting your listings, write to us.",
         ],
+        contact: "line",
       },
       {
         heading: "Feedback and corrections",
         blocks: ["Mistakes, wishes and questions are all welcome."],
-        contact: true,
+        contact: "section",
       },
     ],
   },

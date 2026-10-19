@@ -1,5 +1,5 @@
 import type { ReportReason } from "@/generated/prisma/enums";
-import { isCurrent } from "@/lib/catalogue/select";
+import { isCurrent, lifecycle } from "@/lib/catalogue/select";
 import { db } from "@/lib/db";
 import type { EntryInput } from "./entry-form";
 import { clearWatched } from "./watchlist";
@@ -16,9 +16,12 @@ export interface LogContext {
   tags: Array<{ slug: string; labelFi: string; labelSv: string; labelEn: string }>;
   earlier: Array<{ id: string; seenOn: Date; rating: number | null }>;
   userName: string;
+  /** False before the first performance: there is nothing to have seen yet. */
+  started: boolean;
 }
 
-export async function getLogContext(userId: string, slug: string, asOf: Date): Promise<LogContext | null> {
+/** Signed out (`userId` null), there are no earlier entries and no name: the form fills a draft. */
+export async function getLogContext(userId: string | null, slug: string, asOf: Date): Promise<LogContext | null> {
   const since = new Date(asOf.getTime() - LOG_WINDOW_DAYS * 86_400_000);
   const production = await db.production.findUnique({
     where: { slug },
@@ -33,15 +36,19 @@ export async function getLogContext(userId: string, slug: string, asOf: Date): P
     },
   });
   if (!production) return null;
-  const [tags, earlier, user] = await Promise.all([
+  const [tags, earlier, user, firstPast] = await Promise.all([
     db.tag.findMany({ orderBy: { sortOrder: "asc" } }),
-    db.diaryEntry.findMany({
-      where: { userId, productionId: production.id },
-      select: { id: true, seenOn: true, rating: true },
-      orderBy: { seenOn: "desc" },
-    }),
-    db.user.findUniqueOrThrow({ where: { id: userId }, select: { name: true } }),
+    userId
+      ? db.diaryEntry.findMany({
+          where: { userId, productionId: production.id },
+          select: { id: true, seenOn: true, rating: true },
+          orderBy: { seenOn: "desc" },
+        })
+      : [],
+    userId ? db.user.findUniqueOrThrow({ where: { id: userId }, select: { name: true } }) : { name: "" },
+    db.performance.findFirst({ where: { productionId: production.id, startsAt: { lte: asOf } }, select: { startsAt: true } }),
   ]);
+  const { started } = lifecycle({ ...production, next: null, performances: firstPast ? [firstPast] : [] }, asOf);
   return {
     production: {
       id: production.id,
@@ -57,6 +64,7 @@ export async function getLogContext(userId: string, slug: string, asOf: Date): P
     tags: tags.map(({ slug: tagSlug, labelFi, labelSv, labelEn }) => ({ slug: tagSlug, labelFi, labelSv, labelEn })),
     earlier,
     userName: user.name,
+    started,
   };
 }
 

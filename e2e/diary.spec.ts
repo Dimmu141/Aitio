@@ -1,5 +1,5 @@
 import { expect, test } from "./fixtures";
-import { randomIp, signIn, uniqueEmail } from "./helpers";
+import { randomIp, signIn, signInFromLog, uniqueEmail } from "./helpers";
 
 const PRODUCTION = "/esitys/nattland-svenska-teatern";
 
@@ -7,12 +7,14 @@ test("sign in, mark as seen with a review, see it in the diary and on the produc
   await page.goto(PRODUCTION);
   await page.getByRole("link", { name: "Merkitse nähdyksi" }).click();
 
-  // Not signed in: the log page sends us to sign in and back.
-  await signIn(page, uniqueEmail("log"));
-  await expect(page).toHaveURL(/\/merkitse\/nattland-svenska-teatern$/);
-  await expect(page.getByRole("heading", { name: "Nattland" })).toBeVisible();
-
+  // Not signed in: fill it in first; the entry waits as a draft while we sign in.
+  await expect(page.getByText("Voit täyttää merkinnän jo nyt.")).toBeVisible();
   await page.getByRole("radio", { name: "4 / 5 tähteä" }).check({ force: true });
+  await signInFromLog(page, uniqueEmail("log"));
+  await expect(page).toHaveURL(/\/merkitse\/nattland-svenska-teatern\?draft=1$/);
+  await expect(page.getByRole("heading", { name: "Nattland" })).toBeVisible();
+  await expect(page.getByRole("radio", { name: "4 / 5 tähteä" })).toBeChecked();
+
   await page.getByText("Lisää arvio ja tunnisteet").click();
   const review = `Vahva ilta ${Date.now()}`;
   await page.getByLabel("Lyhyt arvio").fill(review);
@@ -33,15 +35,15 @@ test("sign in, mark as seen with a review, see it in the diary and on the produc
 
 test("the two-tap path: mark as seen and save with the defaults", async ({ page }) => {
   await page.goto("/merkitse/viidakon-villit-naiset-kansallisteatteri");
-  await signIn(page, uniqueEmail("twotap"));
+  await signInFromLog(page, uniqueEmail("twotap"));
   await page.getByRole("button", { name: "Tallenna" }).click();
   await expect(page.getByRole("status")).toHaveText("Tallennettu päiväkirjaan.");
   await expect(page.getByRole("link", { name: "Viidakon villit naiset" })).toBeVisible();
 });
 
 test("a future date is refused", async ({ page }) => {
+  // Checked before anything is kept: no sign-in needed to see it.
   await page.goto("/merkitse/nattland-svenska-teatern");
-  await signIn(page, uniqueEmail("future"));
   await page.getByLabel("Päivämäärä").evaluate((input: HTMLInputElement) => {
     input.removeAttribute("max");
     input.value = "2099-01-01";
@@ -54,12 +56,12 @@ test("other people can report a review, but not their own", async ({ browser }) 
   const visitor = () => browser.newContext({ extraHTTPHeaders: { "x-forwarded-for": randomIp() } });
   const author = await (await visitor()).newPage();
   await author.goto("/merkitse/nattland-svenska-teatern");
-  await signIn(author, uniqueEmail("author"));
+  await signInFromLog(author, uniqueEmail("author"));
   await author.getByText("Lisää arvio ja tunnisteet").click();
   const review = `Raportoitava ${Date.now()}`;
   await author.getByLabel("Lyhyt arvio").fill(review);
   await author.getByRole("button", { name: "Tallenna" }).click();
-  await expect(author.getByRole("status")).toBeVisible();
+  await expect(author.getByRole("status")).toHaveText("Tallennettu päiväkirjaan.");
 
   await author.goto(PRODUCTION);
   const reportLink = author.getByRole("listitem").filter({ hasText: review }).getByRole("link", { name: "Ilmoita" });

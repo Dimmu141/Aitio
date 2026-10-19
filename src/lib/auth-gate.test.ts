@@ -9,6 +9,11 @@ describe("signInRedirect", () => {
     );
   });
 
+  it("lets a signed-out visitor fill in a new entry, but not edit one", () => {
+    expect(signInRedirect("/fi/merkitse/x", "/merkitse/x", false)).toBeNull();
+    expect(signInRedirect("/fi/merkitse/x", "/merkitse/x?entry=abc", false)).toBe("/kirjaudu?next=%2Fmerkitse%2Fx%3Fentry%3Dabc");
+  });
+
   it("lets everything through with a session cookie", () => {
     expect(signInRedirect("/fi/paivakirja", "/paivakirja", true)).toBeNull();
   });

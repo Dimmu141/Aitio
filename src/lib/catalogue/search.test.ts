@@ -19,6 +19,7 @@ function card(slug: string, title: string, next: string | null, year: number | n
     end: null,
     onSoon: true,
     closingSoon: false,
+    phase: next ? "running" : "past",
     year,
   };
 }
