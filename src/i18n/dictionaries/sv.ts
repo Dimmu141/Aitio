@@ -61,6 +61,7 @@ export const sv: Dictionary = {
     showAllPerformances: (n: number) => `Visa alla ${n} föreställningar`,
     at: (time: string) => `kl. ${time}`,
     directedBy: "regi",
+    writtenAndDirectedBy: "text och regi",
     remaining: (n: number, last: string) => `${n === 1 ? "1 föreställning" : `${n} föreställningar`} kvar · sista ${last}`,
     ends: "Slutar",
     moreDates: (n: number) => (n === 1 ? "+ 1 föreställning till" : `+ ${n} föreställningar till`),

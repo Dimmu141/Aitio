@@ -10,11 +10,11 @@ import { PosterBlock } from "@/components/production/PosterBlock";
 import { RunProgress } from "@/components/production/RunProgress";
 import Link from "next/link";
 import { getDictionary } from "@/i18n";
-import type { CreditRole } from "@/generated/prisma/enums";
 import type { Dictionary } from "@/i18n/dictionaries/fi";
 import type { Locale } from "@/i18n/config";
 import { href } from "@/i18n/paths";
 import { watchAction } from "@/lib/actions";
+import { posterFoot } from "@/lib/catalogue/credits";
 import { getAllSlugs, getProduction, type ProductionPage } from "@/lib/catalogue/queries";
 import { withPlaceholder } from "@/lib/static-params";
 import { formatPerformance, formatShortDate } from "@/lib/format";
@@ -64,15 +64,6 @@ function hostname(url: string): string {
   return new URL(url).hostname.replace(/^www\./, "");
 }
 
-/** Poster foot like a programme cover: "Writer · ohjaus Director". */
-function posterFoot(page: ProductionPage, t: Dictionary): string | null {
-  const first = (role: CreditRole) => page.credits.find((credit) => credit.role === role)?.person.name;
-  const writer = first("WRITER");
-  const director = first("DIRECTOR");
-  const parts = [writer, director && `${t.production.directedBy} ${director}`].filter(Boolean);
-  return parts.length > 0 ? parts.join(" · ") : null;
-}
-
 export default async function ProductionRoute({ params }: PageProps<"/[locale]/esitys/[slug]">) {
   const { slug } = await params;
   const { locale, t } = await getDictionary();
@@ -85,7 +76,7 @@ export default async function ProductionRoute({ params }: PageProps<"/[locale]/e
   return (
     <article>
       <header>
-        <PosterBlock theatreSlug={page.theatre.slug} title={page.title} kicker={page.theatre.name} foot={posterFoot(page, t)} />
+        <PosterBlock theatreSlug={page.theatre.slug} title={page.title} kicker={page.theatre.name} foot={posterFoot(page.credits, t.production)} />
         <p className="ai-facts">
           <Link href={href(locale, "teatteri", page.theatre.slug)}>{page.theatre.name}</Link>
           {[page.stage, page.durationText].filter(Boolean).map((fact) => ` · ${fact}`)}

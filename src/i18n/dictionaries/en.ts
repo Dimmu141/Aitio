@@ -61,6 +61,7 @@ export const en: Dictionary = {
     showAllPerformances: (n: number) => `Show all ${n} performances`,
     at: (time: string) => time,
     directedBy: "directed by",
+    writtenAndDirectedBy: "written and directed by",
     remaining: (n: number, last: string) => `${n === 1 ? "1 performance" : `${n} performances`} left · last ${last}`,
     ends: "Ends",
     moreDates: (n: number) => (n === 1 ? "+ 1 more performance" : `+ ${n} more performances`),

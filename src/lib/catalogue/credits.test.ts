@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { groupCredits } from "./credits";
+import { groupCredits, posterFoot } from "./credits";
 import type { CreditRow } from "./types";
 
 const credit = (role: CreditRow["role"], slug: string, characterName: string | null = null): CreditRow => ({
@@ -26,5 +26,21 @@ describe("groupCredits", () => {
       { role: "DIRECTOR", people: [{ slug: "a", name: "A", characterName: null }] },
       { role: "WRITER", people: [{ slug: "a", name: "A", characterName: null }] },
     ]);
+  });
+});
+
+describe("posterFoot", () => {
+  const labels = { directedBy: "ohjaus", writtenAndDirectedBy: "teksti ja ohjaus" };
+
+  it("names writer and director like a programme cover", () => {
+    expect(posterFoot([credit("DIRECTOR", "d"), credit("WRITER", "w")], labels)).toBe("W · ohjaus D");
+  });
+
+  it("names someone who wrote and directed only once", () => {
+    expect(posterFoot([credit("WRITER", "smeds"), credit("DIRECTOR", "smeds")], labels)).toBe("teksti ja ohjaus SMEDS");
+  });
+
+  it("is null without either", () => {
+    expect(posterFoot([credit("CAST", "c")], labels)).toBeNull();
   });
 });

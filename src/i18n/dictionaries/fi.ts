@@ -72,6 +72,7 @@ export const fi = {
     showAllPerformances: (n: number) => `Näytä kaikki ${n} esitystä`,
     at: (time: string) => `klo ${time}`,
     directedBy: "ohjaus",
+    writtenAndDirectedBy: "teksti ja ohjaus",
     remaining: (n: number, last: string) => `${n === 1 ? "1 esitys" : `${n} esitystä`} jäljellä · viimeinen ${last}`,
     ends: "Päättyy",
     moreDates: (n: number) => (n === 1 ? "+ 1 muu esitys" : `+ ${n} muuta esitystä`),
