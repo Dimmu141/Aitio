@@ -54,7 +54,8 @@ export function filterOptions(cards: ProductionCard[], asOf: Date): FilterOption
       ...unique(cards.flatMap((card) => card.languages).filter((lang) => lang !== "zxx")).sort(),
       ...(cards.some(isEnglishFriendly) ? [ENGLISH_FRIENDLY] : []),
     ],
-    subs: SUBTITLE_FILTER_ENABLED ? unique(cards.flatMap((card) => card.subtitleLangs)).sort() : [],
+    // "Wordless" is never a subtitle language to choose.
+    subs: SUBTITLE_FILTER_ENABLED ? unique(cards.flatMap((card) => card.subtitleLangs)).filter((code) => code !== "zxx").sort() : [],
     when: WHEN.filter((when) => {
       const dates = whenDates(when, asOf);
       return cards.some((card) => firstOn(card.soon, dates));

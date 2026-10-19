@@ -12,7 +12,23 @@ export interface ClassificationInput {
   hasWriter?: boolean;
   /** Musicals and operas credit a composer; most plays don't. */
   hasComposer?: boolean;
+  /** A conductor or musical director ("Kapellmästare", "Kapellimestari"): a musical, with a director. */
+  hasConductor?: boolean;
+  /** Credits for instruments ("Violin", "Trummor"): a band on stage, i.e. a concert when they outnumber the cast. */
+  musicianCount?: number;
   castCount: number;
+}
+
+const CONDUCTOR = /kapellmästare|kapellimest|musikalisk led|musiikinjoh|musiikillinen joh|dirigent|conductor|musical director/i;
+const INSTRUMENT =
+  /^(?:violin|viulu|fiol|trummor|rummut|slagverk|lyömäsoittimet|piano|flygel|kontrabas|basso|bas|kitara|gitarr|guitar|trumpet|trumpetti|trombon|pasuuna|tuba|klarinett|klarinetti|saxofon|saksofoni|cello|sello|dragspel|harmonikka|vibrafon|tangentinstrument|kosketinsoittimet|keyboards?)\b/i;
+
+export function isConductorLabel(roleText: string): boolean {
+  return CONDUCTOR.test(roleText);
+}
+
+export function isInstrumentLabel(roleText: string): boolean {
+  return INSTRUMENT.test(roleText.trim());
 }
 
 export interface Classification {
@@ -40,7 +56,8 @@ const RULES: Array<{ type: ProductionTypeName; pattern: RegExp; confidence: numb
   },
   { type: "OPERA", pattern: /\booppera|\bopera\b/i, confidence: 0.8 },
   { type: "DANCE", pattern: /\btanssi|\bdans\b|baletti|balett|dance company|nykytanssi/i, confidence: 0.75 },
-  { type: "MUSICAL", pattern: /musikaali|musikal\b|musical/i, confidence: 0.85 },
+  // "Musikalen som inte lämnar någon oberörd" (Next to Normal's subtitle) needs the definite form too.
+  { type: "MUSICAL", pattern: /musikaali|musikal(?:en)?\b|musical/i, confidence: 0.85 },
 ];
 
 /**
@@ -54,6 +71,14 @@ export function classifyProduction(input: ClassificationInput): Classification {
     if (rule.pattern.test(haystack)) {
       return { type: rule.type, confidence: rule.confidence };
     }
+  }
+  // A band credited player by player, outnumbering the cast: a concert (Georg Malmstén & HumppAvanti!).
+  if ((input.musicianCount ?? 0) >= 3 && (input.musicianCount ?? 0) > input.castCount) {
+    return { type: "CONCERT", confidence: 0.75 };
+  }
+  // A conductor and a director: a musical (Mary Poppins, Next to Normal); operas say so earlier.
+  if (input.hasConductor && input.hasDirector) {
+    return { type: "MUSICAL", confidence: 0.7 };
   }
   // Musicals and plays have a choreographer too, but always a director.
   if (input.hasChoreographer && !input.hasDirector) {

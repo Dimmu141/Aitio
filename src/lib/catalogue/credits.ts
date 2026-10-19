@@ -41,7 +41,12 @@ export interface TeamRow {
   person: { slug: string; name: string };
   /** "Ohjaus ja dramatisointi", "Lavastussuunnittelu, pukusuunnittelu". */
   roles: string;
+  /** Every credit is OTHER (assistants, technicians): listed after a few, behind "+ N muuta". */
+  minor: boolean;
 }
+
+/** "Muut tekijät" shown before the rest fold away. */
+export const MINOR_ROWS_SHOWN = 5;
 
 /** "Lavastussuunnittelu", "Pukusuunnittelu" → "Lavastussuunnittelu, pukusuunnittelu" (acronyms kept). */
 function joinLabels(labels: string[]): string {
@@ -56,13 +61,14 @@ function joinLabels(labels: string[]): string {
  * theatre gave no label, it is the translated role name.
  */
 export function teamRows(credits: CreditRow[], roleName: (role: CreditRole) => string, sourceText: boolean): TeamRow[] {
-  const byPerson = new Map<string, { person: TeamRow["person"]; labels: string[] }>();
+  const byPerson = new Map<string, { person: TeamRow["person"]; labels: string[]; minor: boolean }>();
   for (const credit of credits) {
     if (credit.role === "CAST") continue;
-    const row = byPerson.get(credit.person.slug) ?? { person: credit.person, labels: [] };
+    const row = byPerson.get(credit.person.slug) ?? { person: credit.person, labels: [], minor: true };
+    row.minor &&= credit.role === "OTHER";
     const label = (sourceText && credit.roleText) || roleName(credit.role);
     if (!row.labels.some((seen) => seen.toLocaleLowerCase("fi") === label.toLocaleLowerCase("fi"))) row.labels.push(label);
     byPerson.set(credit.person.slug, row);
   }
-  return [...byPerson.values()].map(({ person, labels }) => ({ person, roles: joinLabels(labels) }));
+  return [...byPerson.values()].map(({ person, labels, minor }) => ({ person, roles: joinLabels(labels), minor }));
 }

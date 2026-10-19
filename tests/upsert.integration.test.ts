@@ -134,4 +134,38 @@ describe.skipIf(!url)("upsertProduction (integration)", () => {
     expect(await syncListing(db, theatre.id, ["34985"], new Date())).toBe(0);
     expect((await db.production.findUniqueOrThrow({ where: { slug: "nattland-svenska-teatern" } })).delistedAt).toBeNull();
   });
+  it("splits credit cells into people and never stores a group as a person", async () => {
+    const { productionId } = await upsertProduction(
+      db,
+      theatre,
+      {
+        ...detail,
+        externalId: "split-people",
+        title: "Split people",
+        url: "https://svenskateatern.fi/repertoar/split-people/",
+        credits: [
+          { name: "Max Martin ja ystävät", roleText: "Sävellys", roles: ["COMPOSER"] },
+          { name: "Carl Knif & Kristofer Möller", roleText: "Regi", roles: ["DIRECTOR"] },
+          { name: "Koncept och manus", roleText: "Text", roles: ["WRITER"] },
+        ],
+      },
+      new Date(),
+    );
+    const credits = await db.credit.findMany({ where: { productionId }, include: { person: true } });
+    const names = credits.map((credit) => credit.person.name).sort();
+    expect(names).toEqual(expect.arrayContaining(["Carl Knif", "Kristofer Möller", "Max Martin"]));
+    expect(await db.person.count({ where: { name: { in: ["Max Martin ja ystävät", "Koncept och manus"] } } })).toBe(0);
+  });
+  it("sentence-cases a shouting title and keeps an admin's correction through later scrapes", async () => {
+    const { setTitleOverride } = await import("@/lib/ops/catalogue-admin");
+    const shouting = { ...detail, externalId: "aja-baja", title: "AJA, BAJA ALFONS ÅBERG!", url: "https://svenskateatern.fi/repertoar/aja-baja/" };
+    const { productionId } = await upsertProduction(db, theatre, shouting, new Date());
+    expect(await db.production.findUniqueOrThrow({ where: { id: productionId } })).toMatchObject({
+      title: "Aja, baja alfons åberg!",
+      titleCased: true,
+    });
+    await setTitleOverride(productionId, "Aja, baja Alfons Åberg!");
+    await upsertProduction(db, theatre, shouting, new Date());
+    expect((await db.production.findUniqueOrThrow({ where: { id: productionId } })).title).toBe("Aja, baja Alfons Åberg!");
+  });
 });

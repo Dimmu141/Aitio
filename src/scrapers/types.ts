@@ -33,6 +33,8 @@ export const rawProductionSchema = z.object({
   stageHint: z.string().optional(),
   authorHint: z.string().optional(),
   isVisiting: z.boolean().default(false),
+  /** When the source last edited the entry, if its listing says. */
+  sourceUpdatedAt: z.date().optional(),
 });
 export type RawProduction = z.infer<typeof rawProductionSchema>;
 
@@ -82,6 +84,8 @@ export const rawProductionDetailSchema = z.object({
   /** The production's own ticket link, for sources whose performance rows have none (KOM). */
   ticketUrl: z.url().optional(),
   premiereDate: z.date().optional(),
+  /** When the source last edited the page, if it says (see Production.sourceUpdatedAt). */
+  sourceUpdatedAt: z.date().optional(),
   runStart: z.date().optional(),
   runEnd: z.date().optional(),
   languages: z.array(z.string()),

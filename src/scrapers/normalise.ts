@@ -1,7 +1,7 @@
 import type { PrismaClient } from "@/generated/prisma/client";
-import { classifyProduction } from "./classify";
-import { slugify } from "./text";
-import type { RawProductionDetail } from "./types";
+import { classifyProduction, isConductorLabel, isInstrumentLabel } from "./classify";
+import { sentenceCaseShouting, slugify, splitPeople } from "./text";
+import type { RawCredit, RawProductionDetail } from "./types";
 
 export interface UpsertSummary {
   productionId: string;
@@ -23,6 +23,8 @@ export function planProduction(detail: RawProductionDetail) {
     hasChoreographer: detail.credits.some((credit) => credit.roles.includes("CHOREOGRAPHER")),
     hasWriter: detail.credits.some((credit) => credit.roles.includes("WRITER") || credit.roles.includes("ADAPTATION")),
     hasComposer: detail.credits.some((credit) => credit.roles.includes("COMPOSER")),
+    hasConductor: detail.credits.some((credit) => isConductorLabel(credit.roleText)),
+    musicianCount: detail.credits.filter((credit) => isInstrumentLabel(credit.roleText)).length,
     castCount: detail.credits.filter((credit) => credit.roles.includes("CAST")).length,
   });
   return { detail, classification };
@@ -73,6 +75,28 @@ async function keepUnannounced(
   });
 }
 
+/** One person's credits on a production, a row per role; returns how many rows. */
+async function upsertCredit(
+  db: PrismaClient,
+  productionId: string,
+  name: string,
+  credit: RawCredit,
+  sortOrder: number,
+  seenAt: Date,
+): Promise<number> {
+  const person = await upsertPerson(db, name);
+  const roleText = credit.roleText.trim() || null;
+  const characterName = credit.characterName ?? null;
+  for (const role of credit.roles) {
+    await db.credit.upsert({
+      where: { personId_productionId_role: { personId: person.id, productionId, role } },
+      create: { personId: person.id, productionId, role, roleText, characterName, sortOrder, lastSeenAt: seenAt },
+      update: { roleText, characterName, sortOrder, lastSeenAt: seenAt },
+    });
+  }
+  return credit.roles.length;
+}
+
 /**
  * Upsert one scraped production with its performances, credits and critic links.
  * Never deletes: performances and credits that disappeared simply keep their old
@@ -92,16 +116,21 @@ export async function upsertProduction(
     existing?.slug ??
     (await uniqueProductionSlug(db, `${slugify(detail.title)}-${theatre.slug}`, theatre.id, detail.externalId));
 
+  // An admin's correction wins; otherwise a shouting source title gets sentence case.
+  const cased = sentenceCaseShouting(detail.title);
   const data = {
-    title: detail.title,
+    title: existing?.titleOverride ?? cased,
+    titleCased: cased !== detail.title,
     sourceUrl: detail.url,
     stageId: stage?.id ?? null,
     type: classification.type,
     typeConfidence: classification.confidence,
     languages: detail.languages,
-    subtitleLangs: detail.subtitleLangs,
+    // "Wordless" in a subtitle field means no subtitles are needed, not a subtitle language.
+    subtitleLangs: detail.subtitleLangs.filter((code) => code !== "zxx"),
     // A premiere is history: once stated it stays, even when the page later stops printing it.
     premiereDate: detail.premiereDate ?? existing?.premiereDate ?? null,
+    sourceUpdatedAt: detail.sourceUpdatedAt ?? null,
     runStart: detail.runStart ?? null,
     runEnd: detail.runEnd ?? null,
     durationText: detail.durationText ?? null,
@@ -124,13 +153,13 @@ export async function upsertProduction(
         startsAt: performance.startsAt,
         stageId: performanceStage?.id ?? null,
         ticketUrl: performance.ticketUrl ?? null,
-        subtitleLangs: performance.subtitleLangs ?? [],
+        subtitleLangs: (performance.subtitleLangs ?? []).filter((code) => code !== "zxx"),
         lastSeenAt: seenAt,
       },
       update: {
         stageId: performanceStage?.id ?? null,
         ticketUrl: performance.ticketUrl ?? null,
-        subtitleLangs: performance.subtitleLangs ?? [],
+        subtitleLangs: (performance.subtitleLangs ?? []).filter((code) => code !== "zxx"),
         lastSeenAt: seenAt,
       },
     });
@@ -139,23 +168,9 @@ export async function upsertProduction(
 
   let creditCount = 0;
   for (const [index, credit] of detail.credits.entries()) {
-    const person = await upsertPerson(db, credit.name);
-    const roleText = credit.roleText.trim() || null;
-    for (const role of credit.roles) {
-      await db.credit.upsert({
-        where: { personId_productionId_role: { personId: person.id, productionId: production.id, role } },
-        create: {
-          personId: person.id,
-          productionId: production.id,
-          role,
-          roleText,
-          characterName: credit.characterName ?? null,
-          sortOrder: index,
-          lastSeenAt: seenAt,
-        },
-        update: { roleText, characterName: credit.characterName ?? null, sortOrder: index, lastSeenAt: seenAt },
-      });
-      creditCount += 1;
+    // Every source passes through here: split "A ja B", drop "… ja ystävät", skip labels.
+    for (const name of splitPeople(credit.name)) {
+      creditCount += await upsertCredit(db, production.id, name, credit, index, seenAt);
     }
   }
 

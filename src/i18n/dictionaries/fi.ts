@@ -1,3 +1,4 @@
+import type { When } from "@/lib/catalogue/when";
 import type { ProductionType } from "@/generated/prisma/enums";
 
 const types: Record<ProductionType, string> = {
@@ -27,7 +28,7 @@ export const fi = {
     premieresAside: "kahden viikon sisällä",
     morePremieres: (n: number) => (n === 1 ? "+ 1 muu ensi-ilta" : `+ ${n} muuta ensi-iltaa`),
     title: "Ohjelmassa",
-    intro: "Esitykset seuraavan kahden viikon aikana.",
+    intro: { soon: "Esitykset lähipäivinä.", today: "Esitykset tänään.", tomorrow: "Esitykset huomenna.", weekend: "Esitykset viikonloppuna.", week: "Esitykset seuraavan seitsemän päivän aikana.", all: "Esitykset seuraavan kahden viikon aikana." } as Record<When, string>,
     closingSoon: "Viimeiset esitykset",
     closingCount: (n: number) => (n === 1 ? "Yksi näistä päättyy kahden viikon sisällä." : `${n} näistä päättyy kahden viikon sisällä.`),
     today: "Tänään",
@@ -74,6 +75,7 @@ export const fi = {
     at: (time: string) => `klo ${time}`,
     directedBy: "ohjaus",
     writtenAndDirectedBy: "teksti ja ohjaus",
+    moreCredits: (n: number) => `+ ${n} muuta`,
     remaining: (n: number, last: string) => `${n === 1 ? "1 esitys" : `${n} esitystä`} jäljellä · viimeinen ${last}`,
     ends: "Päättyy",
     moreDates: (n: number) => (n === 1 ? "+ 1 muu esitys" : `+ ${n} muuta esitystä`),
@@ -81,7 +83,7 @@ export const fi = {
     criticsAside: "linkit alkuperäisiin",
     sourceLine: "Tiedot",
     updated: "päivitetty",
-    spokenIn: { it: "italiaksi", fi: "suomeksi", sv: "ruotsiksi", en: "englanniksi", ru: "venäjäksi", uk: "ukrainaksi", es: "espanjaksi", ar: "arabiaksi", lv: "latviaksi", et: "viroksi", fr: "ranskaksi", de: "saksaksi", sign: "viittomakielellä", zxx: "sanaton" } as Record<string, string>,
+    spokenIn: { it: "italiaksi", fi: "suomeksi", sv: "ruotsiksi", en: "englanniksi", ru: "venäjäksi", uk: "ukrainaksi", es: "espanjaksi", ar: "arabiaksi", lv: "latviaksi", et: "viroksi", fr: "ranskaksi", de: "saksaksi", sign: "viittomakielellä", zxx: "sanaton esitys" } as Record<string, string>,
     histogramLabel: "Arvosanojen jakauma",
     stars: (value: number) => `${value.toLocaleString("fi-FI")} tähteä`,
     stage: "Näyttämö",
@@ -115,7 +117,7 @@ export const fi = {
     OTHER: "Muut tekijät",
   },
   types,
-  languages: { it: "italia", fi: "suomi", sv: "ruotsi", en: "englanti", ru: "venäjä", uk: "ukraina", es: "espanja", ar: "arabia", lv: "latvia", et: "viro", fr: "ranska", de: "saksa", sign: "viittomakieli", zxx: "sanaton" } as Record<string, string>,
+  languages: { it: "italia", fi: "suomi", sv: "ruotsi", en: "englanti", ru: "venäjä", uk: "ukraina", es: "espanja", ar: "arabia", lv: "latvia", et: "viro", fr: "ranska", de: "saksa", sign: "viittomakieli", zxx: "sanaton esitys" } as Record<string, string>,
   theatre: {
     current: "Ohjelmistossa nyt",
     upcoming: "Tulossa",

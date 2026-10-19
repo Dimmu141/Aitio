@@ -64,14 +64,19 @@ describe("teamRows", () => {
 
   it("gives each person one row in the theatre's wording and order", () => {
     expect(teamRows(seven, roleName, true)).toEqual([
-      { person: { slug: "aleksis-kivi", name: "ALEKSIS-KIVI" }, roles: "Teksti" },
-      { person: { slug: "mika-myllyaho", name: "MIKA-MYLLYAHO" }, roles: "Ohjaus ja dramatisointi" },
-      { person: { slug: "katri-rentto", name: "KATRI-RENTTO" }, roles: "Lavastussuunnittelu, pukusuunnittelu" },
+      { person: { slug: "aleksis-kivi", name: "ALEKSIS-KIVI" }, roles: "Teksti", minor: false },
+      { person: { slug: "mika-myllyaho", name: "MIKA-MYLLYAHO" }, roles: "Ohjaus ja dramatisointi", minor: false },
+      { person: { slug: "katri-rentto", name: "KATRI-RENTTO" }, roles: "Lavastussuunnittelu, pukusuunnittelu", minor: false },
     ]);
   });
 
   it("uses the translated role names on a page in another language", () => {
     expect(teamRows(seven, roleName, false).map((row) => row.roles)).toEqual(["Teksti", "Ohjaus, dramatisointi", "Suunnittelu"]);
+  });
+
+  it("marks people credited only for other roles, so they can fold away", () => {
+    const rows = teamRows([credit("OTHER", "tech", null, "Valotekniikka"), credit("DIRECTOR", "d"), credit("OTHER", "d", null, "Tuotanto")], roleName, true);
+    expect(rows.map((row) => [row.person.slug, row.minor])).toEqual([["tech", true], ["d", false]]);
   });
 
   it("keeps acronyms as written", () => {

@@ -1,3 +1,4 @@
+import type { When } from "@/lib/catalogue/when";
 import type { Dictionary } from "./fi";
 
 export const sv: Dictionary = {
@@ -16,7 +17,7 @@ export const sv: Dictionary = {
     premieresAside: "inom två veckor",
     morePremieres: (n: number) => (n === 1 ? "+ 1 premiär till" : `+ ${n} premiärer till`),
     title: "På repertoaren",
-    intro: "Föreställningar under de kommande två veckorna.",
+    intro: { soon: "Föreställningar de närmaste dagarna.", today: "Föreställningar i dag.", tomorrow: "Föreställningar i morgon.", weekend: "Föreställningar i helgen.", week: "Föreställningar de kommande sju dagarna.", all: "Föreställningar de kommande två veckorna." } as Record<When, string>,
     closingSoon: "Sista chansen",
     closingCount: (n: number) => (n === 1 ? "En av dessa slutar inom två veckor." : `${n} av dessa slutar inom två veckor.`),
     today: "I dag",
@@ -63,6 +64,7 @@ export const sv: Dictionary = {
     at: (time: string) => `kl. ${time}`,
     directedBy: "regi",
     writtenAndDirectedBy: "text och regi",
+    moreCredits: (n: number) => `+ ${n} till`,
     remaining: (n: number, last: string) => `${n === 1 ? "1 föreställning" : `${n} föreställningar`} kvar · sista ${last}`,
     ends: "Slutar",
     moreDates: (n: number) => (n === 1 ? "+ 1 föreställning till" : `+ ${n} föreställningar till`),
@@ -70,7 +72,7 @@ export const sv: Dictionary = {
     criticsAside: "länkar till originalen",
     sourceLine: "Uppgifter",
     updated: "uppdaterad",
-    spokenIn: { it: "på italienska", fi: "på finska", sv: "på svenska", en: "på engelska", ru: "på ryska", uk: "på ukrainska", es: "på spanska", ar: "på arabiska", lv: "på lettiska", et: "på estniska", fr: "på franska", de: "på tyska", sign: "på teckenspråk", zxx: "ordlös" },
+    spokenIn: { it: "på italienska", fi: "på finska", sv: "på svenska", en: "på engelska", ru: "på ryska", uk: "på ukrainska", es: "på spanska", ar: "på arabiska", lv: "på lettiska", et: "på estniska", fr: "på franska", de: "på tyska", sign: "på teckenspråk", zxx: "ordlös föreställning" },
     histogramLabel: "Betygsfördelning",
     stars: (value: number) => `${value.toLocaleString("sv-FI")} stjärnor`,
     stage: "Scen",
@@ -113,7 +115,7 @@ export const sv: Dictionary = {
     TALK: "Samtal",
     OTHER: "Övrigt",
   },
-  languages: { it: "italienska", fi: "finska", sv: "svenska", en: "engelska", ru: "ryska", uk: "ukrainska", es: "spanska", ar: "arabiska", lv: "lettiska", et: "estniska", fr: "franska", de: "tyska", sign: "teckenspråk", zxx: "ordlös" },
+  languages: { it: "italienska", fi: "finska", sv: "svenska", en: "engelska", ru: "ryska", uk: "ukrainska", es: "spanska", ar: "arabiska", lv: "lettiska", et: "estniska", fr: "franska", de: "tyska", sign: "teckenspråk", zxx: "ordlös föreställning" },
   theatre: {
     current: "På repertoaren nu",
     upcoming: "Kommande",

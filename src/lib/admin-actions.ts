@@ -7,7 +7,7 @@ import { ProductionType } from "@/generated/prisma/enums";
 import { CATALOGUE_TAG } from "@/lib/catalogue/queries";
 import { productionTag } from "@/lib/catalogue/tags";
 import { moderate } from "@/lib/diary/service";
-import { setTypeOverride } from "@/lib/ops/catalogue-admin";
+import { setTitleOverride, setTypeOverride } from "@/lib/ops/catalogue-admin";
 import { isAdmin } from "@/lib/ops/admin";
 import { getCurrentUser } from "@/lib/session";
 
@@ -32,6 +32,15 @@ export async function setTypeOverrideAction(formData: FormData): Promise<void> {
   updateTag(CATALOGUE_TAG);
   if (slug) updateTag(productionTag(slug));
   redirect(`${ADMIN_PATH}?saved=type#tyypit`);
+}
+
+export async function setTitleOverrideAction(formData: FormData): Promise<void> {
+  await requireAdmin();
+  const title = z.string().max(200).parse(field(formData, "title"));
+  const slug = await setTitleOverride(field(formData, "productionId"), title);
+  updateTag(CATALOGUE_TAG);
+  if (slug) updateTag(productionTag(slug));
+  redirect(`${ADMIN_PATH}?saved=title#otsikot`);
 }
 
 export async function moderateAction(formData: FormData): Promise<void> {

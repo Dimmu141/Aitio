@@ -43,6 +43,8 @@ export function parseShowsJson(json: string): RawProduction[] {
       title: decodeTitle(parsed.data.title.rendered),
       url: parsed.data.link,
       isVisiting: false,
+      // WordPress gives local Helsinki time without an offset.
+      sourceUpdatedAt: helsinkiToUtc(parsed.data.modified.slice(0, 10), parsed.data.modified.slice(11, 16)),
     });
   }
   return results;
@@ -114,7 +116,10 @@ function dedupeCredits(credits: RawCredit[]): RawCredit[] {
   });
 }
 
-export function parseDetail(html: string, ref: Pick<RawProduction, "externalId" | "url" | "title">): RawProductionDetail {
+export function parseDetail(
+  html: string,
+  ref: Pick<RawProduction, "externalId" | "url" | "title"> & { sourceUpdatedAt?: Date },
+): RawProductionDetail {
   const $ = cheerio.load(html);
   const info = parseInfoBox($);
   const performances = parsePerformances($);
@@ -130,6 +135,7 @@ export function parseDetail(html: string, ref: Pick<RawProduction, "externalId" 
     subtitle: cleanText($(".block-show-information h3").first().text()) || undefined,
     durationText: info.get("längd"),
     premiereDate: info.has("premiär") ? parseFinnishDate(info.get("premiär") ?? "") : undefined,
+    sourceUpdatedAt: ref.sourceUpdatedAt,
     runStart: periodStart ?? performances[0]?.startsAt,
     runEnd: periodEnd ?? performances.at(-1)?.startsAt,
     languages: ["sv"],

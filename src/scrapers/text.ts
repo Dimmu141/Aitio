@@ -152,3 +152,45 @@ export function personName(raw: string): string | null {
   const prose = words.length > 1 && words.some((word) => /^\p{Ll}/u.test(word) && !NAME_PARTICLES.has(word));
   return prose ? null : name;
 }
+
+/** Joins between names in one credit cell: "A, B ja C", "A & B", "A + B", "A och B". */
+const NAME_JOINS = /\s*,\s*|\s+(?:\+|&|ja|och|and)\s+/;
+/** "… ja ystävät", "… m.fl.": a group around the person, never a person of its own. */
+const GROUP_SUFFIX = /^(?:ystävät|vänner|friends|muut|m\.?\s?fl\.?|med flera|ym\.?|ynnä muut)$/i;
+/** "Studio Total", "ATR-tuotanto Oy": a company credited next to a person. */
+const COMPANY = /^(?:studio|teater|teatteri|kompani|company)\s|\s(?:oy|ab|ry|ltd|oyj)$/i;
+
+/**
+ * The people in one credit cell, or none when the cell is a label rather than names
+ * ("Grafisk design och logga" was stored as a person). "Max Martin ja ystävät" → Max
+ * Martin; "Anna-Maria Lipponen + Studio Total" → Anna-Maria Lipponen; "Jonte Ramsten,
+ * Ville Virtanen och Birthe Wingren" → three people.
+ */
+export function splitPeople(raw: string): string[] {
+  // "Pia Ingman m.fl." ends with the group without a joining word.
+  const trimmed = cleanText(raw).replace(/\s+(?:m\.?\s?fl\.?|med flera|ym\.?|ynnä muut)$/i, "");
+  const parts = trimmed.split(NAME_JOINS).filter(Boolean);
+  const names: string[] = [];
+  for (const part of parts) {
+    if (GROUP_SUFFIX.test(part) || COMPANY.test(part)) continue;
+    const name = personName(part);
+    // Lowercase prose among the parts means the whole cell is a phrase, not a list of names.
+    if (!name || (parts.length > 1 && !/^\p{Lu}/u.test(name))) return [];
+    names.push(name);
+  }
+  return names;
+}
+
+/**
+ * Sources that shout ("NÅT ATT GÖRA", "PÄHKINÄNSÄRKIJÄN JOULU") get sentence case. Only
+ * titles with no lowercase letter at all, a space and at least six letters: "KAJ" is a
+ * band's own spelling and "1984" has nothing to case. Proper nouns inside can come out
+ * wrong ("Aja, baja alfons åberg!"), which is what Production.titleOverride is for.
+ */
+export function sentenceCaseShouting(title: string): string {
+  const letters = title.match(/\p{L}/gu) ?? [];
+  if (/\p{Ll}/u.test(title) || letters.length < 6 || !/\s/.test(title.trim())) return title;
+  const lower = title.toLocaleLowerCase("fi");
+  const first = lower.search(/\p{L}/u);
+  return lower.slice(0, first) + lower.charAt(first).toLocaleUpperCase("fi") + lower.slice(first + 1);
+}

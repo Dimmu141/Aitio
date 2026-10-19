@@ -2,16 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Notice } from "@/components/Notice";
-import { buttonDanger, buttonSecondary } from "@/components/ui";
+import { buttonDanger, buttonSecondary, input } from "@/components/ui";
 import { ProductionType } from "@/generated/prisma/enums";
 import { getDictionary } from "@/i18n";
 import { href } from "@/i18n/paths";
-import { moderateAction, setTypeOverrideAction } from "@/lib/admin-actions";
+import { moderateAction, setTitleOverrideAction, setTypeOverrideAction } from "@/lib/admin-actions";
 import { db } from "@/lib/db";
 import { moderationQueue } from "@/lib/diary/service";
 import { formatPerformance } from "@/lib/format";
 import { isAdmin } from "@/lib/ops/admin";
-import { typeReviewQueue } from "@/lib/ops/catalogue-admin";
+import { titleReviewQueue, typeReviewQueue } from "@/lib/ops/catalogue-admin";
 import { recentRuns, type RunRow } from "@/lib/ops/runs";
 import { health, type Health } from "@/lib/ops/schedule";
 import { requireUser } from "@/lib/session";
@@ -84,6 +84,41 @@ async function ScrapeHealth({ now }: { now: Date }) {
             </li>
           );
         })}
+      </ul>
+    </section>
+  );
+}
+
+async function TitleReview() {
+  const rows = await titleReviewQueue();
+  if (rows.length === 0) return null;
+  return (
+    <section aria-labelledby="otsikot" className="space-y-4">
+      <h2 id="otsikot" className="text-section">
+        Otsikot
+      </h2>
+      <p className="text-base text-ink-muted">
+        Lähde kirjoitti nämä isoilla kirjaimilla, ja ne muutettiin virkkeen muotoon. Korjaa erisnimet; tyhjä kenttä poistaa korjauksen.
+      </p>
+      <ul>
+        {rows.map((row) => (
+          <li key={row.id} className="space-y-2 border-b border-rule py-3">
+            <span className="block text-base text-ink-muted">
+              {row.theatre}
+              {row.overridden && " · korjattu käsin"}
+            </span>
+            <form action={setTitleOverrideAction} className="flex flex-wrap gap-2">
+              <input type="hidden" name="productionId" value={row.id} />
+              <label className="sr-only" htmlFor={`title-${row.id}`}>
+                Otsikko
+              </label>
+              <input id={`title-${row.id}`} name="title" defaultValue={row.title} className={`${input} min-w-0 flex-1`} />
+              <button type="submit" className={buttonSecondary}>
+                Tallenna
+              </button>
+            </form>
+          </li>
+        ))}
       </ul>
     </section>
   );
@@ -197,6 +232,7 @@ export default async function AdminPage({ searchParams }: PageProps<"/[locale]/y
       {query.saved && <Notice>Tallennettu.</Notice>}
       <ScrapeHealth now={now} />
       <TypeReview now={now} />
+      <TitleReview />
       <Moderation />
     </div>
   );

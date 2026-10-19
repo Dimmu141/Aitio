@@ -1,3 +1,4 @@
+import type { When } from "@/lib/catalogue/when";
 import type { Dictionary } from "./fi";
 
 export const en: Dictionary = {
@@ -16,7 +17,7 @@ export const en: Dictionary = {
     premieresAside: "within two weeks",
     morePremieres: (n: number) => (n === 1 ? "+ 1 more premiere" : `+ ${n} more premieres`),
     title: "What's on",
-    intro: "Performances in the next two weeks.",
+    intro: { soon: "Performances in the next few days.", today: "Performances today.", tomorrow: "Performances tomorrow.", weekend: "Performances this weekend.", week: "Performances in the next seven days.", all: "Performances in the next two weeks." } as Record<When, string>,
     closingSoon: "Last chance",
     closingCount: (n: number) => (n === 1 ? "One of these ends within two weeks." : `${n} of these end within two weeks.`),
     today: "Today",
@@ -63,6 +64,7 @@ export const en: Dictionary = {
     at: (time: string) => time,
     directedBy: "directed by",
     writtenAndDirectedBy: "written and directed by",
+    moreCredits: (n: number) => `+ ${n} more`,
     remaining: (n: number, last: string) => `${n === 1 ? "1 performance" : `${n} performances`} left · last ${last}`,
     ends: "Ends",
     moreDates: (n: number) => (n === 1 ? "+ 1 more performance" : `+ ${n} more performances`),
@@ -70,7 +72,7 @@ export const en: Dictionary = {
     criticsAside: "links to the originals",
     sourceLine: "Details",
     updated: "updated",
-    spokenIn: { it: "in Italian", fi: "in Finnish", sv: "in Swedish", en: "in English", ru: "in Russian", uk: "in Ukrainian", es: "in Spanish", ar: "in Arabic", lv: "in Latvian", et: "in Estonian", fr: "in French", de: "in German", sign: "in sign language", zxx: "wordless" },
+    spokenIn: { it: "in Italian", fi: "in Finnish", sv: "in Swedish", en: "in English", ru: "in Russian", uk: "in Ukrainian", es: "in Spanish", ar: "in Arabic", lv: "in Latvian", et: "in Estonian", fr: "in French", de: "in German", sign: "in sign language", zxx: "non-verbal" },
     histogramLabel: "Rating distribution",
     stars: (value: number) => `${value} stars`,
     stage: "Stage",
@@ -113,7 +115,7 @@ export const en: Dictionary = {
     TALK: "Talk",
     OTHER: "Other",
   },
-  languages: { it: "Italian", fi: "Finnish", sv: "Swedish", en: "English", ru: "Russian", uk: "Ukrainian", es: "Spanish", ar: "Arabic", lv: "Latvian", et: "Estonian", fr: "French", de: "German", sign: "sign language", zxx: "wordless" },
+  languages: { it: "Italian", fi: "Finnish", sv: "Swedish", en: "English", ru: "Russian", uk: "Ukrainian", es: "Spanish", ar: "Arabic", lv: "Latvian", et: "Estonian", fr: "French", de: "German", sign: "sign language", zxx: "non-verbal" },
   theatre: {
     current: "On now",
     upcoming: "Coming up",

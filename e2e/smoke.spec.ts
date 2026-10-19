@@ -76,6 +76,11 @@ test("a person credited in one production is not indexed, but their links are fo
   await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
 });
 
+test("the front page says which days the list covers", async ({ page }) => {
+  await page.goto("/?when=all");
+  await expect(page.getByText("Esitykset seuraavan kahden viikon aikana.")).toBeVisible();
+});
+
 test("the front page names Aitio in its title", async ({ page }) => {
   await page.goto("/");
   await expect(page).toHaveTitle("Aitio – teatteri, tanssi ja ooppera Helsingissä");

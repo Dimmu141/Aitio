@@ -89,6 +89,12 @@ describe.skipIf(!url)("diary service (integration)", () => {
       },
     });
     expect((await service.getLogContext(users.anna, "kommande", asOf))?.started).toBe(false);
+    // Running since before our first scrape: only future dates stored, no stated premiere.
+    const running = await db.production.create({
+      data: { slug: "pagaende", title: "Pågående", theatreId, externalId: "pagaende", sourceUrl: "https://svenskateatern.fi/repertoar/pagaende/", lastSeenAt: asOf },
+    });
+    await db.performance.create({ data: { productionId: running.id, startsAt: new Date(asOf.getTime() + 86_400_000), lastSeenAt: asOf } });
+    expect((await service.getLogContext(users.anna, "pagaende", asOf))?.started).toBe(true);
   });
 
   it("replaces tags on edit", async () => {

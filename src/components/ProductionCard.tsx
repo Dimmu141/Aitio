@@ -51,7 +51,7 @@ export function ProductionCard({
   // Finnish is the default and goes unsaid; anything else is worth knowing before clicking.
   const language = [
     ...card.languages.filter((code) => code !== "fi").map((code) => t.production.spokenIn[code] ?? t.languages[code] ?? code),
-    card.subtitleLangs.length > 0 ? subtitleText(card.subtitleLangs, t) : null,
+    subtitleText(card.subtitleLangs, t),
   ].filter(Boolean);
   return (
     <li className="flex gap-3 border-b border-rule py-4">

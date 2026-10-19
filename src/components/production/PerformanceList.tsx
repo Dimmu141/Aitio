@@ -20,7 +20,7 @@ export function calendarHref(slug: string, startsAt: Date, locale: Locale): stri
 
 function Row({ row, slug, asOf, locale, t }: RowProps) {
   const when = formatPerformance(row.startsAt, locale, asOf);
-  const meta = [row.stage, row.subtitleLangs.length > 0 ? subtitleText(row.subtitleLangs, t) : null].filter(Boolean);
+  const meta = [row.stage, subtitleText(row.subtitleLangs, t)].filter(Boolean);
   return (
     <li className="ai-perf">
       <span className="ai-perf__when">
@@ -44,8 +44,15 @@ function Row({ row, slug, asOf, locale, t }: RowProps) {
   );
 }
 
-export function subtitleText(codes: string[], t: Dictionary): string {
-  return `${t.production.subtitles} ${codes.map((code) => code.toUpperCase()).join(" · ")}`;
+/** Subtitle languages a reader can act on: "wordless" (zxx) is not a subtitle language. */
+export function subtitleCodes(codes: string[]): string[] {
+  return codes.filter((code) => code !== "zxx");
+}
+
+/** "Tekstitys: englanti, suomi", in words: codes like "FI" or "ZXX" never reach the page. */
+export function subtitleText(codes: string[], t: Dictionary): string | null {
+  const names = subtitleCodes(codes).map((code) => t.languages[code] ?? code);
+  return names.length > 0 ? `${t.production.subtitles}: ${names.join(", ")}` : null;
 }
 
 /** The next three dates; the rest open in place (no JavaScript needed). */

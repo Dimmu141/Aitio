@@ -98,13 +98,44 @@ describe("lifecycle", () => {
   it("is running while performances are coming", () => {
     expect(lifecycle(facts({ next: day(3), performances: [{ startsAt: day(3) }] }), asOf)).toEqual({
       phase: "running",
-      started: false,
+      started: true,
       year: null,
     });
   });
 
+  // The seen button (19 Oct 2026 second review): Orvot and Viidakon villit naiset run with
+  // no stated premiere and only future dates stored; Seitsemän veljestä has nothing yet.
+  it("can be logged when it runs, even if every stored date is still ahead and no premiere is stated", () => {
+    const orvot = lifecycle(facts({ next: day(1), performances: [{ startsAt: day(1) }, { startsAt: day(8) }] }), asOf);
+    expect(orvot).toMatchObject({ phase: "running", started: true });
+  });
+
+  it("cannot be logged before a stated premiere, even with previews scheduled", () => {
+    const taru = facts({ next: day(3), performances: [{ startsAt: day(3) }], premiereDate: day(30) });
+    expect(lifecycle(taru, asOf).started).toBe(false);
+  });
+
+  it("can be logged once a preview before the premiere has been performed", () => {
+    const preview = facts({ next: day(3), performances: [{ startsAt: day(-1) }, { startsAt: day(3) }], premiereDate: day(30) });
+    expect(lifecycle(preview, asOf).started).toBe(true);
+  });
+
+  it("cannot be logged without any performance (Tulossa)", () => {
+    expect(lifecycle(facts({}), asOf).started).toBe(false);
+  });
+
   it("is upcoming when listed without any dates (Seitsemän veljestä, spring 2027)", () => {
     expect(lifecycle(facts({}), asOf)).toEqual({ phase: "upcoming", started: false, year: null });
+  });
+
+  it("archives an undated post the source hasn't edited for weeks (Konstens natt, last edited in August)", () => {
+    expect(lifecycle(facts({ sourceUpdatedAt: day(-60) }), asOf).phase).toBe("archive");
+    expect(lifecycle(facts({ sourceUpdatedAt: day(-50) }), asOf).phase).toBe("archive");
+  });
+
+  it("keeps a recently edited undated post upcoming, and a stale one with a date ahead too", () => {
+    expect(lifecycle(facts({ sourceUpdatedAt: day(-10) }), asOf).phase).toBe("upcoming");
+    expect(lifecycle(facts({ sourceUpdatedAt: day(-90), premiereDate: day(40) }), asOf).phase).toBe("upcoming");
   });
 
   it("is upcoming before a stated premiere, and cannot be logged yet", () => {

@@ -18,7 +18,10 @@ describe("sign-in link token", () => {
 
   it("refuses tampered, truncated or foreign tokens", () => {
     const token = sealSignIn(claim, secret);
-    const flipped = `${token.slice(0, -2)}${token.endsWith("A") ? "B" : "A"}${token.slice(-1)}`;
+    // Flip one bit of the last byte: always a change, unlike swapping a base64 character for a guessed one.
+    const raw = Buffer.from(token, "base64url");
+    raw[raw.length - 1] ^= 1;
+    const flipped = raw.toString("base64url");
     expect(openSignIn(flipped, secret)).toBeNull();
     expect(openSignIn(token.slice(0, 20), secret)).toBeNull();
     expect(openSignIn(token, "another-secret-another-secret")).toBeNull();
