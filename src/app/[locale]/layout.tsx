@@ -6,6 +6,8 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { TabBar } from "@/components/TabBar";
 import { LOCALES } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
+import { shareImagePath } from "@/lib/metadata";
+import { OG_SIZE } from "@/lib/og/size";
 import { SITE_URL } from "@/lib/site";
 import { TOKENS } from "@/lib/tokens";
 import "../globals.css";
@@ -44,7 +46,9 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getDictionary();
+  const { locale, t } = await getDictionary();
+  // Pages without pageMetadata (diary, settings) still share with the site card.
+  const image = { url: shareImagePath(locale), ...OG_SIZE, alt: t.site.name };
   return {
     metadataBase: SITE_URL,
     title: { default: `${t.site.name}: ${t.site.tagline}`, template: `%s · ${t.site.name}` },
@@ -52,6 +56,8 @@ export async function generateMetadata(): Promise<Metadata> {
     applicationName: t.site.name,
     icons: { apple: "/icons/apple-touch-icon.png" },
     appleWebApp: { title: t.site.name, statusBarStyle: "default" },
+    openGraph: { siteName: t.site.name, images: [image] },
+    twitter: { card: "summary_large_image", images: [image] },
   };
 }
 

@@ -57,6 +57,18 @@ test("the language switcher keeps the page, or falls back to the front page with
   await expect(page).toHaveURL(new RegExp(`${target}$`));
 });
 
+for (const path of ["/esitys/viidakon-villit-naiset-kansallisteatteri", "/sv/teater/svenska-teatern", "/en/person/anna-maria-lipponen", "/"]) {
+  test(`${path} has a share image a link preview can fetch without a redirect`, async ({ page, request }) => {
+    await page.goto(path);
+    await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute("content", "summary_large_image");
+    const image = await page.locator('meta[property="og:image"]').getAttribute("content");
+    expect(image).toMatch(/\/api\/og/);
+    const response = await request.get(new URL(image ?? "").pathname + new URL(image ?? "").search, { maxRedirects: 0 });
+    expect(response.status()).toBe(200);
+    expect(response.headers()["content-type"]).toBe("image/png");
+  });
+}
+
 test("the front page names Aitio in its title", async ({ page }) => {
   await page.goto("/");
   await expect(page).toHaveTitle("Aitio – teatteri, tanssi ja ooppera Helsingissä");

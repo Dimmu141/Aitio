@@ -18,6 +18,8 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: SECURITY_HEADERS }];
   },
+  // The share images read their TTF fonts from disk (src/lib/og/image.tsx).
+  outputFileTracingIncludes: { "/api/og/**": ["./src/app/fonts/og/*.ttf"] },
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {
