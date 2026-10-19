@@ -57,6 +57,6 @@ describe("toCard for a delisted production", () => {
   it("keeps the performances within the window and reads the running time", () => {
     const card = toCard(source([{ startsAt: day(1), subtitleLangs: [] }, { startsAt: day(20), subtitleLangs: [] }]), asOf);
     expect(card.soon).toEqual([day(1)]);
-    expect(card.duration).toEqual({ minutes: 150, intervals: 1 });
+    expect(card.duration).toEqual({ minutes: 150, intervals: 1, estimate: false });
   });
 });

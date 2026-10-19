@@ -46,6 +46,7 @@ export const en: Dictionary = {
       return [h > 0 && `${h} h`, m > 0 && `${m} min`].filter(Boolean).join(" ");
     },
     intervals: (n: number) => (n === 0 ? "no interval" : n === 1 ? "interval" : `${n} intervals`),
+    approximately: "about",
     nextPerformance: "Next performance",
     noUpcoming: "No upcoming performances.",
     performedIn: (year: number) => `Performed ${year}`,

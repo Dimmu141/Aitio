@@ -15,6 +15,7 @@ import type { Locale } from "@/i18n/config";
 import { href } from "@/i18n/paths";
 import { watchAction } from "@/lib/actions";
 import { posterFoot } from "@/lib/catalogue/credits";
+import { durationLabel, parseDuration } from "@/lib/catalogue/duration";
 import { getAllSlugs, getProduction, type ProductionPage } from "@/lib/catalogue/queries";
 import { withPlaceholder } from "@/lib/static-params";
 import { formatPerformance, formatShortDate } from "@/lib/format";
@@ -79,7 +80,9 @@ export default async function ProductionRoute({ params }: PageProps<"/[locale]/e
         <PosterBlock theatreSlug={page.theatre.slug} title={page.title} kicker={page.theatre.name} foot={posterFoot(page.credits, t.production)} />
         <p className="ai-facts">
           <Link href={href(locale, "teatteri", page.theatre.slug)}>{page.theatre.name}</Link>
-          {[page.stage, page.durationText].filter(Boolean).map((fact) => ` · ${fact}`)}
+          {[page.stage, durationLabel(parseDuration(page.durationText), t.production, true)]
+            .filter(Boolean)
+            .map((fact) => ` · ${fact}`)}
         </p>
         <BadgeRow>
           {page.closingSoon && (

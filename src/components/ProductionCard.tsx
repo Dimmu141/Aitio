@@ -4,6 +4,7 @@ import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/fi";
 import { href } from "@/i18n/paths";
 import { typeLabel } from "@/lib/catalogue/type-label";
+import { durationLabel } from "@/lib/catalogue/duration";
 import type { ProductionCard as Card } from "@/lib/catalogue/types";
 import { formatPerformance, formatShortDate, formatTime, isoDateTime } from "@/lib/format";
 import { theatreTone } from "@/lib/poster";
@@ -96,8 +97,5 @@ function statusText(card: Card, t: Dictionary): string | null {
 }
 
 function durationText(card: Card, t: Dictionary): string | null {
-  if (!card.duration?.minutes) return null;
-  const intervals = card.duration.intervals;
-  const length = t.production.durationShort(card.duration.minutes);
-  return intervals === null ? length : `${length}, ${t.production.intervals(intervals)}`;
+  return durationLabel(card.duration, t.production);
 }

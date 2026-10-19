@@ -57,6 +57,7 @@ export const fi = {
       return [h > 0 && `${h} t`, m > 0 && `${m} min`].filter(Boolean).join(" ");
     },
     intervals: (n: number) => (n === 0 ? "ei väliaikaa" : n === 1 ? "väliaika" : `${n} väliaikaa`),
+    approximately: "noin",
     nextPerformance: "Seuraava esitys",
     noUpcoming: "Ei tulevia esityksiä.",
     performedIn: (year: number) => `Esitetty ${year}`,

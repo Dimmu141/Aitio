@@ -46,6 +46,7 @@ export const sv: Dictionary = {
       return [h > 0 && `${h} h`, m > 0 && `${m} min`].filter(Boolean).join(" ");
     },
     intervals: (n: number) => (n === 0 ? "ingen paus" : n === 1 ? "paus" : `${n} pauser`),
+    approximately: "ca",
     nextPerformance: "Nästa föreställning",
     noUpcoming: "Inga kommande föreställningar.",
     performedIn: (year: number) => `Spelades ${year}`,
