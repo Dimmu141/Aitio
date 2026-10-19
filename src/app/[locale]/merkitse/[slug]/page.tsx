@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { cookies } from "next/headers";
+import { connection } from "next/server";
 import { notFound, redirect } from "next/navigation";
 import { Notice } from "@/components/Notice";
 import { buttonDanger, buttonPrimary, chip, input } from "@/components/ui";
@@ -8,11 +10,12 @@ import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/fi";
 import { href } from "@/i18n/paths";
 import { deleteEntryAction, saveEntryAction } from "@/lib/actions";
+import { DRAFT_COOKIE, openDraft } from "@/lib/diary/draft";
 import { defaultWhen, MAX_REVIEW_LENGTH } from "@/lib/diary/entry-form";
 import { type EditableEntry, getLogContext, getOwnEntry, type LogContext } from "@/lib/diary/service";
 import { MAX_TAGS_PER_ENTRY } from "@/lib/diary/tags";
 import { formatCalendarDate, formatPerformance, helsinkiDate } from "@/lib/format";
-import { requireUser } from "@/lib/session";
+import { getCurrentUser, requireUser } from "@/lib/session";
 
 /** Personal and per request. */
 export const instant = false;
@@ -198,12 +201,17 @@ export default async function LogPage({ params, searchParams }: PageProps<"/[loc
   const [{ slug }, query, { locale, t }] = await Promise.all([params, searchParams, getDictionary()]);
   const entryParam = typeof query.entry === "string" ? query.entry : null;
   const self = `${href(locale, "merkitse", slug)}${entryParam ? `?entry=${encodeURIComponent(entryParam)}` : ""}`;
-  const user = await requireUser(locale, self);
+  // A new entry can be filled in signed out; it waits as a draft while the visitor signs in.
+  const user = entryParam ? await requireUser(locale, self) : await getCurrentUser();
 
+  // Request time only: signed out this page is reachable by prefetch, which may not take the time.
+  await connection();
   const asOf = new Date();
-  const context = await getLogContext(user.id, slug, asOf);
+  const context = await getLogContext(user?.id ?? null, slug, asOf);
   if (!context) notFound();
-  const entry = entryParam ? await getOwnEntry(user.id, context.production.id, entryParam) : null;
+  const entry = user && entryParam ? await getOwnEntry(user.id, context.production.id, entryParam) : null;
+  const draft = entry ? null : openDraft((await cookies()).get(DRAFT_COOKIE)?.value, slug, process.env.BETTER_AUTH_SECRET ?? "");
+  const values = entry ?? (draft && { ...draft, id: "", seenOn: new Date(`${draft.seenOn}T12:00:00Z`) });
   // Before the premiere only an existing entry can be edited (e.g. one logged before the dates were known).
   if (!context.started && !entry) redirect(href(locale, "esitys", slug));
   const errors = typeof query.error === "string" ? query.error.split(",") : [];
@@ -235,14 +243,16 @@ export default async function LogPage({ params, searchParams }: PageProps<"/[loc
       )}
 
       <Errors codes={errors} t={t} />
+      {!user && <Notice>{t.log.signedOutNote}</Notice>}
+      {user && draft && <Notice>{t.log.draftReady}</Notice>}
 
       <form action={saveEntryAction} className="space-y-8">
         <input type="hidden" name="locale" value={locale} />
         <input type="hidden" name="slug" value={slug} />
         {entry && <input type="hidden" name="entryId" value={entry.id} />}
-        <WhenField context={context} entry={entry} asOf={asOf} locale={locale} t={t} />
-        <RatingField entry={entry} locale={locale} t={t} />
-        <MoreFields context={context} entry={entry} locale={locale} t={t} />
+        <WhenField context={context} entry={values} asOf={asOf} locale={locale} t={t} />
+        <RatingField entry={values} locale={locale} t={t} />
+        <MoreFields context={context} entry={values} locale={locale} t={t} />
         {/* Sticky so the second tap is always within reach on a phone. */}
         <div className="sticky bottom-0 -mx-4 border-t border-rule bg-paper/95 px-4 py-3">
           <button type="submit" className={`${buttonPrimary} w-full`}>

@@ -10,6 +10,7 @@ import { href } from "@/i18n/paths";
 import { auth, LOCALE_HEADER, NEXT_HEADER } from "@/lib/auth";
 import { CLIENT_IP_HEADERS, SIGN_IN_EMAIL_COOKIE, SIGN_IN_MINUTES } from "@/lib/auth-config";
 import { openSignIn } from "@/lib/sign-in-token";
+import { DRAFT_COOKIE, DRAFT_MINUTES, sealDraft } from "@/lib/diary/draft";
 import { productionTag } from "@/lib/catalogue/tags";
 import { formFields, parseEntryForm } from "@/lib/diary/entry-form";
 import * as diary from "@/lib/diary/service";
@@ -121,10 +122,11 @@ export async function saveEntryAction(formData: FormData): Promise<void> {
   const entryId = text(formData, "entryId") || null;
   const logPath = href(locale, "merkitse", slug);
   const back: Record<string, string> = entryId ? { entry: entryId } : {};
-  const user = await requireUser(locale, logPath);
+  // Signed out, a new entry is kept as a draft while the visitor signs in (see draft.ts).
+  const user = entryId ? await requireUser(locale, logPath) : await getCurrentUser();
 
   const asOf = new Date();
-  const context = await diary.getLogContext(user.id, slug, asOf);
+  const context = await diary.getLogContext(user?.id ?? null, slug, asOf);
   if (!context) redirect(href(locale));
   if (!context.started && !entryId) redirect(href(locale, "esitys", slug));
   const parsed = parseEntryForm(formFields(formData), {
@@ -133,12 +135,24 @@ export async function saveEntryAction(formData: FormData): Promise<void> {
     asOf,
   });
   if (!parsed.ok) redirect(withQuery(logPath, { ...back, error: parsed.errors.join(",") }));
+  const jar = await cookies();
+  if (!user) {
+    jar.set(DRAFT_COOKIE, sealDraft(slug, parsed.value, process.env.BETTER_AUTH_SECRET ?? ""), {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: DRAFT_MINUTES * 60,
+    });
+    redirect(signInHref(locale, withQuery(logPath, { draft: "1" })));
+  }
   if (!entryId && !(await consume(`diary:${user.id}`, LIMITS.diarySaves))) {
     redirect(withQuery(logPath, { error: "rate" }));
   }
 
   const saved = await diary.saveEntry(user.id, context.production.id, entryId, parsed.value);
   if (!saved) redirect(logPath);
+  if (!entryId) jar.delete(DRAFT_COOKIE);
   updateTag(productionTag(slug));
   redirect(withQuery(href(locale, "paivakirja"), { saved: saved.id }));
 }

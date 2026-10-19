@@ -1,5 +1,5 @@
 import type { Locale } from "@/i18n/config";
-import { SIGN_IN_MINUTES, SESSION_DAYS } from "@/lib/auth-config";
+import { DRAFT_MINUTES, SESSION_DAYS, SIGN_IN_MINUTES } from "@/lib/auth-config";
 import { RATE_LIMIT_RETENTION_DAYS } from "@/lib/ops/cleanup";
 
 /**
@@ -106,7 +106,7 @@ function fi(config: PrivacyConfig, updated: string): Policy {
       {
         heading: "Evästeet",
         blocks: [
-          `Käytämme vain kirjautumiseen välttämättömiä evästeitä (nimet alkavat aitio.), yksi niistä muistaa sähköpostiosoitteesi koodin kirjoittamisen ajan, enintään ${SIGN_IN_MINUTES} minuuttia. Niitä ei tarvitse hyväksyä erikseen. Emme käytä analytiikka-, mainos- tai seurantaevästeitä, ja fontit ladataan Aition omalta palvelimelta.`,
+          `Käytämme vain kirjautumiseen välttämättömiä evästeitä (nimet alkavat aitio.), yksi niistä muistaa sähköpostiosoitteesi koodin kirjoittamisen ajan, enintään ${SIGN_IN_MINUTES} minuuttia, ja toinen säilyttää ennen kirjautumista täytetyn merkinnän salattuna enintään ${DRAFT_MINUTES} minuuttia. Niitä ei tarvitse hyväksyä erikseen. Emme käytä analytiikka-, mainos- tai seurantaevästeitä, ja fontit ladataan Aition omalta palvelimelta.`,
         ],
       },
       {
@@ -173,7 +173,7 @@ function sv(config: PrivacyConfig, updated: string): Policy {
       {
         heading: "Kakor",
         blocks: [
-          `Vi använder bara kakor som behövs för inloggningen (namnen börjar med aitio.); en av dem minns din e-postadress medan du skriver in koden, högst ${SIGN_IN_MINUTES} minuter. De behöver inte godkännas separat. Vi använder inga kakor för analys, reklam eller spårning, och typsnitten laddas från Aitios egen server.`,
+          `Vi använder bara kakor som behövs för inloggningen (namnen börjar med aitio.); en av dem minns din e-postadress medan du skriver in koden, högst ${SIGN_IN_MINUTES} minuter, och en annan håller en anteckning du fyllt i före inloggningen, krypterad, högst ${DRAFT_MINUTES} minuter. De behöver inte godkännas separat. Vi använder inga kakor för analys, reklam eller spårning, och typsnitten laddas från Aitios egen server.`,
         ],
       },
       {
@@ -240,7 +240,7 @@ function en(config: PrivacyConfig, updated: string): Policy {
       {
         heading: "Cookies",
         blocks: [
-          `We only use cookies needed for signing in (their names start with aitio.); one remembers your email address while you type the code, for ${SIGN_IN_MINUTES} minutes at most. They don't need separate consent. We use no analytics, advertising or tracking cookies, and fonts are served from Aitio's own server.`,
+          `We only use cookies needed for signing in (their names start with aitio.); one remembers your email address while you type the code, for ${SIGN_IN_MINUTES} minutes at most, and another keeps an entry you filled in before signing in, encrypted, for ${DRAFT_MINUTES} minutes at most. They don't need separate consent. We use no analytics, advertising or tracking cookies, and fonts are served from Aitio's own server.`,
         ],
       },
       {

@@ -20,7 +20,8 @@ export interface LogContext {
   started: boolean;
 }
 
-export async function getLogContext(userId: string, slug: string, asOf: Date): Promise<LogContext | null> {
+/** Signed out (`userId` null), there are no earlier entries and no name: the form fills a draft. */
+export async function getLogContext(userId: string | null, slug: string, asOf: Date): Promise<LogContext | null> {
   const since = new Date(asOf.getTime() - LOG_WINDOW_DAYS * 86_400_000);
   const production = await db.production.findUnique({
     where: { slug },
@@ -37,12 +38,14 @@ export async function getLogContext(userId: string, slug: string, asOf: Date): P
   if (!production) return null;
   const [tags, earlier, user, firstPast] = await Promise.all([
     db.tag.findMany({ orderBy: { sortOrder: "asc" } }),
-    db.diaryEntry.findMany({
-      where: { userId, productionId: production.id },
-      select: { id: true, seenOn: true, rating: true },
-      orderBy: { seenOn: "desc" },
-    }),
-    db.user.findUniqueOrThrow({ where: { id: userId }, select: { name: true } }),
+    userId
+      ? db.diaryEntry.findMany({
+          where: { userId, productionId: production.id },
+          select: { id: true, seenOn: true, rating: true },
+          orderBy: { seenOn: "desc" },
+        })
+      : [],
+    userId ? db.user.findUniqueOrThrow({ where: { id: userId }, select: { name: true } }) : { name: "" },
     db.performance.findFirst({ where: { productionId: production.id, startsAt: { lte: asOf } }, select: { startsAt: true } }),
   ]);
   const { started } = lifecycle({ ...production, next: null, performances: firstPast ? [firstPast] : [] }, asOf);

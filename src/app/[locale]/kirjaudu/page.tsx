@@ -96,6 +96,8 @@ export default async function SignInPage({ searchParams }: PageProps<"/[locale]/
     <div className="max-w-xl space-y-5">
       <h1 className="text-display">{t.auth.title}</h1>
       {message && <Notice tone="error">{message}</Notice>}
+      {/* From "Merkitse nähdyksi" signed out: the entry is in the draft cookie. */}
+      {next.includes("draft=1") && <Notice>{t.auth.draftKept}</Notice>}
       <p className="text-lg">{t.auth.intro}</p>
       <form action={signInAction} className="space-y-4">
         <input type="hidden" name="locale" value={locale} />

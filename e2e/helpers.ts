@@ -51,6 +51,17 @@ export async function signIn(page: Page, email: string): Promise<void> {
   await page.getByRole("button", { name: "Kirjaudu sisään" }).click();
 }
 
+/**
+ * On a signed-out "Merkitse nähdyksi" page: save, which keeps the entry as a draft and
+ * asks to sign in, sign in, and land back on the form, prefilled from the draft.
+ */
+export async function signInFromLog(page: Page, email: string): Promise<void> {
+  await page.getByRole("button", { name: "Tallenna" }).click();
+  await expect(page.getByText("Merkintäsi on tallessa.")).toBeVisible();
+  await signIn(page, email);
+  await expect(page.getByText("Merkintäsi odotti kirjautumista.")).toBeVisible();
+}
+
 /** A made-up client IP, so every test gets its own rate-limit bucket like a real visitor would. */
 export function randomIp(): string {
   const octet = () => 1 + Math.floor(Math.random() * 254);

@@ -163,6 +163,7 @@ export const sv: Dictionary = {
   },
   auth: {
     title: "Logga in",
+    draftKept: "Din anteckning är sparad tills vidare. Logga in, så kommer du tillbaka för att kontrollera och spara den.",
     intro: "Vi skickar en sexsiffrig kod och en inloggningslänk till din e-post. Inget lösenord behövs och du behöver inte skapa ett konto separat.",
     email: "E-postadress",
     code: "Koden från e-posten",
@@ -189,6 +190,8 @@ export const sv: Dictionary = {
     signOut: "Logga ut",
   },
   log: {
+    signedOutNote: "Du kan fylla i anteckningen redan nu. När du sparar loggar du in med din e-postadress, och anteckningen väntar så länge.",
+    draftReady: "Din anteckning väntade på inloggningen. Kontrollera den och spara.",
     button: "Markera som sedd",
     title: "Markera som sedd",
     editTitle: "Redigera anteckningen",

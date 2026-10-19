@@ -10,6 +10,9 @@ export const SESSION_DAYS = 90;
 /** Sign-in codes (and the emailed link that carries one) expire after this; quoted in the email and the privacy policy. */
 export const SIGN_IN_MINUTES = 20;
 
+/** How long an entry filled in before signing in waits (diary/draft.ts); the privacy policy quotes it. */
+export const DRAFT_MINUTES = 60;
+
 /** Wrong codes allowed per emailed code before it stops working. */
 export const SIGN_IN_ATTEMPTS = 5;
 

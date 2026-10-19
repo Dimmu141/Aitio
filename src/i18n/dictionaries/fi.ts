@@ -165,6 +165,7 @@ export const fi = {
   },
   auth: {
     title: "Kirjaudu",
+    draftKept: "Merkintäsi on tallessa. Kirjaudu, niin palaat tarkistamaan ja tallentamaan sen.",
     intro: "Lähetämme sähköpostiisi kuusinumeroisen koodin ja kirjautumislinkin. Salasanaa ei tarvita, eikä tiliä tarvitse luoda erikseen.",
     email: "Sähköpostiosoite",
     code: "Koodi sähköpostista",
@@ -191,6 +192,8 @@ export const fi = {
     signOut: "Kirjaudu ulos",
   },
   log: {
+    signedOutNote: "Voit täyttää merkinnän jo nyt. Tallennettaessa kirjaudut sähköpostiosoitteellasi, ja merkintä odottaa sen ajan.",
+    draftReady: "Merkintäsi odotti kirjautumista. Tarkista se ja tallenna.",
     button: "Merkitse nähdyksi",
     title: "Merkitse nähdyksi",
     editTitle: "Muokkaa merkintää",

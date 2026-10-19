@@ -163,6 +163,7 @@ export const en: Dictionary = {
   },
   auth: {
     title: "Sign in",
+    draftKept: "Your entry is kept. Sign in and you'll come back to check and save it.",
     intro: "We'll email you a six-digit code and a sign-in link. No password, and no separate account to create.",
     email: "Email address",
     code: "Code from the email",
@@ -189,6 +190,8 @@ export const en: Dictionary = {
     signOut: "Sign out",
   },
   log: {
+    signedOutNote: "You can fill this in now. When you save, you sign in with your email address, and the entry waits meanwhile.",
+    draftReady: "Your entry waited while you signed in. Check it and save.",
     button: "Mark as seen",
     title: "Mark as seen",
     editTitle: "Edit entry",

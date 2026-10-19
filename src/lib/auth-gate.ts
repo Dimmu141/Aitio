@@ -13,5 +13,7 @@ export function signInRedirect(internalPath: string, publicPathWithQuery: string
   if (hasSessionCookie) return null;
   const [locale, section] = internalPath.split("/").filter(Boolean);
   if (!locale || !isLocale(locale) || !section || !PERSONAL.has(section)) return null;
+  // Logging a show starts signed out (the entry waits as a draft); editing one does not.
+  if (section === "merkitse" && !new URLSearchParams(publicPathWithQuery.split("?")[1] ?? "").has("entry")) return null;
   return `${href(locale, "kirjaudu")}?next=${encodeURIComponent(publicPathWithQuery)}`;
 }
