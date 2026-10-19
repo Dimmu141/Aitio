@@ -67,3 +67,28 @@ describe("Svenska Teatern production page", () => {
     expect(detail.credits.some((credit) => /Acency North/.test(credit.name))).toBe(false);
   });
 });
+
+describe("Svenska Teatern page with a centred team instead of a team list", () => {
+  // Änglagård (captured 19 Oct 2026): the parser used to keep 20 actors and nobody else.
+  const detail = parseDetail(fixture("production-anglagard.html"), {
+    externalId: "anglagard",
+    url: "https://svenskateatern.fi/repertoar/anglagard/",
+    title: "Änglagård",
+  });
+  const credited = (role: string) =>
+    detail.credits.filter((credit) => credit.roles.some((candidate) => candidate === role)).map((credit) => credit.name);
+
+  it("reads 'Regi MARIA LUNDSTRÖM' paragraphs and cases the names", () => {
+    expect(credited("DIRECTOR")).toEqual(["Maria Lundström"]);
+    expect(credited("WRITER")).toEqual(["Edward af Sillén & Daniel Réhn"]); // split when stored
+    expect(credited("COMPOSER")).toEqual(["Fredrik Kempe"]);
+    expect(credited("CHOREOGRAPHER")).toEqual(["Lenka Vagnerová"]);
+    expect(credited("DESIGNER")).toHaveLength(5);
+    expect(credited("CAST")).toHaveLength(20);
+  });
+
+  it("skips producers and the rights agency, and the Stockholm director is not the director", () => {
+    expect(detail.credits.some((credit) => /Lancken|Nordic Drama/i.test(credit.name))).toBe(false);
+    expect(detail.credits.find((credit) => credit.roleText === "Originalregi")?.roles).toEqual(["OTHER"]);
+  });
+});

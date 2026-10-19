@@ -2,7 +2,7 @@ import * as cheerio from "cheerio";
 import { z } from "zod";
 import { politeFetch } from "../http";
 import { mapRoleText } from "../roles";
-import { cleanText, helsinkiToUtc, languageCodes, parseFinnishDate } from "../text";
+import { cleanText, helsinkiToUtc, languageCodes, nameCaseShouting, parseFinnishDate } from "../text";
 import {
   rawProductionDetailSchema,
   type RawCredit,
@@ -88,6 +88,24 @@ function parseInfoBox($: cheerio.CheerioAPI): Map<string, string> {
   return info;
 }
 
+/**
+ * Guest musicals without a team list print it as centred paragraphs instead (Änglagård,
+ * Oct 2026): "<strong>Regi<br></strong>MARIA LUNDSTRÖM", names in capitals.
+ */
+function centredCredits($: cheerio.CheerioAPI): RawCredit[] {
+  const credits: RawCredit[] = [];
+  $("p.has-text-align-center").each((_, element) => {
+    const paragraph = $(element);
+    const label = paragraph.children("strong").first();
+    const roleText = cleanText(label.text());
+    if (!roleText || paragraph.contents().first().get(0) !== label.get(0)) return;
+    const name = cleanText(paragraph.text().slice(label.text().length));
+    const roles = mapRoleText(roleText);
+    if (name && roles.length > 0) credits.push({ name: nameCaseShouting(name), roleText, roles });
+  });
+  return credits;
+}
+
 function parseCredits($: cheerio.CheerioAPI): RawCredit[] {
   const credits: RawCredit[] = [];
   $(".member").each((_, element) => {
@@ -97,6 +115,7 @@ function parseCredits($: cheerio.CheerioAPI): RawCredit[] {
     const roles = mapRoleText(roleText);
     if (name && roles.length > 0) credits.push({ name, roleText, roles });
   });
+  if (credits.length === 0) credits.push(...centredCredits($));
   $(".single-person").each((_, element) => {
     const person = $(element);
     const name = cleanText(person.find("h3.name").first().text());

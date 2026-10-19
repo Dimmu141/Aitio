@@ -1,4 +1,4 @@
-import { cleanText, personName } from "./text";
+import { cleanText, splitPeople } from "./text";
 import type { ProductionTypeName as ProductionType, RawProduction, RawProductionDetail } from "./types";
 
 /**
@@ -9,9 +9,10 @@ import type { ProductionTypeName as ProductionType, RawProduction, RawProduction
  * Measured on a dry run of all 13 sources (19 Oct 2026, 201 productions); rules that cried
  * wolf were dropped: a premiere long before the first listed show (Kansallisteatteri, HKT
  * and Svenska Teatern drop past dates: 0 of 13 real) and "no performances" (archive pages
- * and announced premieres: 0 of 77 real).
+ * and announced premieres: 0 of 77 real). Names are judged as upsertProduction will store
+ * them (after splitPeople): flagging raw "A och B" cells cried wolf 11 times out of 12.
  */
-export type SanityRule = "missing-team" | "role-looks-like-names" | "name-not-a-person" | "title-mismatch";
+export type SanityRule = "missing-team" | "role-looks-like-names" | "person-dropped" | "title-mismatch";
 
 export interface SanityWarning {
   rule: SanityRule;
@@ -72,13 +73,19 @@ const suspiciousRoles: Rule = (_ref, detail) =>
   );
 
 /**
- * Two people in one name ("A och B", "Mats Forss, Jesper Karlsson"), a label ("Koncept och
- * manus") or a group ("Arbetsgruppen").
+ * A credit that saving drops entirely although it starts with a name: upsertProduction
+ * splits every cell with splitPeople, so "A och B" and labels ("Koncept och manus") are
+ * already handled there. What is left is a person lost with the label, like "Irena Kraus
+ * efter boken …" before splitPeople learnt "efter".
  */
-const notAPerson: Rule = (_ref, detail) =>
-  [...new Set(detail.credits.map((credit) => credit.name).filter((name) => personName(name) !== name || name.includes(",")))].map(
-    (name) => `Ei henkilön nimi: "${name}"`,
-  );
+const personDropped: Rule = (_ref, detail) =>
+  [
+    ...new Set(
+      detail.credits
+        .map((credit) => credit.name)
+        .filter((name) => splitPeople(name).length === 0 && /^\p{Lu}\p{Ll}+\s\p{Lu}\p{Ll}+/u.test(name)),
+    ),
+  ].map((name) => `Tekijä katoaa tallennettaessa: "${name}"`);
 
 /** Soft hyphens, case, punctuation and "&"/"och"/"ja" aside ("Sås och Kopp" = "Sås & Kopp"). */
 export function titleKey(title: string): string {
@@ -105,7 +112,7 @@ const titleMismatch: Rule = (ref, detail) => {
 const RULES: Array<[SanityRule, Rule]> = [
   ["missing-team", missingTeam],
   ["role-looks-like-names", suspiciousRoles],
-  ["name-not-a-person", notAPerson],
+  ["person-dropped", personDropped],
   ["title-mismatch", titleMismatch],
 ];
 

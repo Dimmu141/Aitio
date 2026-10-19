@@ -12,7 +12,19 @@ import {
   yearFromWeekday,
   sentenceCaseShouting,
   splitPeople,
+  nameCaseShouting,
 } from "./text";
+
+describe("nameCaseShouting", () => {
+  it.each([
+    ["EDWARD AF SILLÉN", "Edward af Sillén"],
+    ["KARL-JOHAN ANKARBLOM", "Karl-Johan Ankarblom"],
+    ["VICKY VON DER LANCKEN", "Vicky von der Lancken"],
+    ["Lenka Vagnerová", "Lenka Vagnerová"],
+  ])("%s", (raw, name) => {
+    expect(nameCaseShouting(raw)).toBe(name);
+  });
+});
 
 describe("helsinkiToUtc", () => {
   it("uses UTC+3 in summer time", () => {
@@ -127,6 +139,7 @@ describe("splitPeople", () => {
     ["Eva-Maria Dahlin och Lisa Lindén", ["Eva-Maria Dahlin", "Lisa Lindén"]],
     ["Kristian Smeds", ["Kristian Smeds"]],
     ["Pia Ingman m.fl.", ["Pia Ingman"]],
+    ["Irena Kraus efter boken ”OM Niklas Strömstedt”", ["Irena Kraus"]],
   ])("%s", (raw, people) => {
     expect(splitPeople(raw)).toEqual(people);
   });

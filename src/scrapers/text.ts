@@ -153,6 +153,23 @@ export function personName(raw: string): string | null {
   return prose ? null : name;
 }
 
+/**
+ * A name printed in capitals, cased as a name: "EDWARD AF SILLÉN" → "Edward af Sillén",
+ * "KARL-JOHAN ANKARBLOM" → "Karl-Johan Ankarblom". A name with any lowercase letter is
+ * left as printed ("Lenka Vagnerová", "KAJ" in a mixed-case cell).
+ */
+export function nameCaseShouting(name: string): string {
+  if (/\p{Ll}/u.test(name)) return name;
+  return name
+    .split(" ")
+    .map((word, index) => {
+      const lower = word.toLocaleLowerCase("fi");
+      if (index > 0 && NAME_PARTICLES.has(lower)) return lower;
+      return lower.replace(/(^|[-'’])(\p{L})/gu, (_, before: string, letter: string) => before + letter.toLocaleUpperCase("fi"));
+    })
+    .join(" ");
+}
+
 /** Joins between names in one credit cell: "A, B ja C", "A & B", "A + B", "A och B". */
 const NAME_JOINS = /\s*,\s*|\s+(?:\+|&|ja|och|and)\s+/;
 /** "… ja ystävät", "… m.fl.": a group around the person, never a person of its own. */
@@ -168,7 +185,10 @@ const COMPANY = /^(?:studio|teater|teatteri|kompani|company)\s|\s(?:oy|ab|ry|ltd
  */
 export function splitPeople(raw: string): string[] {
   // "Pia Ingman m.fl." ends with the group without a joining word.
-  const trimmed = cleanText(raw).replace(/\s+(?:m\.?\s?fl\.?|med flera|ym\.?|ynnä muut)$/i, "");
+  const trimmed = cleanText(raw)
+    .replace(/\s+(?:m\.?\s?fl\.?|med flera|ym\.?|ynnä muut)$/i, "")
+    // "Irena Kraus efter boken ”OM Niklas Strömstedt”": the source, not more people.
+    .replace(/\s+(?:efter|after)\s+.*$/i, "");
   const parts = trimmed.split(NAME_JOINS).filter(Boolean);
   const names: string[] = [];
   for (const part of parts) {

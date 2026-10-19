@@ -46,18 +46,20 @@ describe("sanity warnings", () => {
     expect(rules(detail({ credits: [actor, designer] }))).toEqual([]);
   });
 
-  it("flags names inside a role and things stored as people", () => {
+  it("flags names inside a role", () => {
     const broken = detail({
-      credits: [
-        director,
-        designer,
-        { name: "Taavi Hasunen", roleText: "Näyttämöllä Youssef Asad Alkhatib ja", roles: ["CAST"] },
-        { name: "Linnea Sjunnesson och Fredrik Fischer", roleText: "Översättning", roles: ["OTHER"] },
-        { name: "Colombine teaterförlag", roleText: "Rättigheter", roles: ["OTHER"] },
-        { name: "Mats Forss, Jesper Karlsson", roleText: "Ljusdesign", roles: ["DESIGNER"] },
-      ],
+      credits: [director, designer, { name: "Taavi Hasunen", roleText: "Näyttämöllä Youssef Asad Alkhatib ja", roles: ["CAST"] }],
     });
-    expect(rules(broken)).toEqual(["role-looks-like-names", "name-not-a-person", "name-not-a-person", "name-not-a-person"]);
+    expect(rules(broken)).toEqual(["role-looks-like-names"]);
+  });
+
+  it("flags only a person that saving would drop, not cells saving already splits or skips", () => {
+    const credit = (name: string): RawCredit => ({ name, roleText: "Manus", roles: ["WRITER"] });
+    const handled = ["Linnea Sjunnesson och Fredrik Fischer", "Mats Forss, Jesper Karlsson", "Koncept och manus", "Arbetsgruppen"];
+    expect(rules(detail({ credits: [director, actor, designer, ...handled.map(credit)] }))).toEqual([]);
+    expect(rules(detail({ credits: [director, actor, designer, credit("Anna Virtanen ja muiden kirjoittama teksti")] }))).toEqual([
+      "person-dropped",
+    ]);
   });
 
   it("flags a list card that names another show, not a shortened title", () => {

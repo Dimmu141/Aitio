@@ -41,6 +41,11 @@ Things these captures taught us, which a refresh must keep true:
 - **ryhmateatteri.fi** has one production on (checked against its own programme page on
   18 Oct 2026; `ohjelmisto-liput.html` is kept for reference, not used by the tests).
 
+- **svenskateatern.fi** guest musicals can lack the `.member` team list and print the team as
+  centred paragraphs, "<strong>Regi</strong> MARIA LUNDSTRÖM" (`production-anglagard.html`,
+  19 Oct 2026). They are read only when there is no team list; names are cased with
+  `nameCaseShouting`, and "Originalregi" (the Stockholm original) is not the director.
+
 ## What the live run changed (18 Oct 2026)
 
 | Source | Firecrawl fixtures said | Live server HTML | Fix |

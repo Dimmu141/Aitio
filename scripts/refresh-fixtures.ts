@@ -43,6 +43,7 @@ const FIXTURES: Array<{ url: string; file: string; form?: Record<string, string>
   },
   { url: showsUrl(1), file: "fixtures/svenska-teatern/shows-page-1.json" },
   { url: "https://svenskateatern.fi/repertoar/nattland/", file: "fixtures/svenska-teatern/production-nattland.html" },
+  { url: "https://svenskateatern.fi/repertoar/anglagard/", file: "fixtures/svenska-teatern/production-anglagard.html" },
   { url: HKT_LIST_URL, file: "fixtures/hkt/list-esitykset.html" },
   { url: `${HKT_LIST_URL}page/2/`, file: "fixtures/hkt/list-esitykset-page-2.html" },
   { url: "https://hkt.fi/esitykset/julia/", file: "fixtures/hkt/production-julia.html" },
