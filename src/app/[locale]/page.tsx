@@ -37,7 +37,8 @@ async function OnStage({
   const [{ asOf, cards }, params] = await Promise.all([getOnStage(), searchParams]);
   const options = filterOptions(cards, asOf);
   const filters = parseFilters(params, options);
-  const shown = applyFilters(cards, { ...filters, when: effectiveWhen(filters, options) }, asOf);
+  const when = effectiveWhen(filters, options);
+  const shown = applyFilters(cards, { ...filters, when }, asOf);
   // The openings strip keeps its two weeks whatever range the list shows.
   const premieres = premieresSoon(applyFilters(cards, { ...filters, when: undefined }, asOf), asOf);
   const closing = shown.filter((card) => card.closingSoon).length;
@@ -51,6 +52,8 @@ async function OnStage({
 
   return (
     <div className="space-y-4">
+      {/* Says what the list covers, so it follows the chip rather than a fixed two weeks. */}
+      <p className="max-w-measure text-ink-muted">{t.home.intro[when]}</p>
       <WhenChips options={options} filters={filters} locale={locale} t={t} />
       <FilterBar options={options} filters={filters} locale={locale} t={t} />
 
@@ -155,7 +158,6 @@ export default async function HomePage({ searchParams }: PageProps<"/[locale]">)
     <div className="ai-wide space-y-6">
       <header className="max-w-measure">
         <h1 className="text-display">{t.home.title}</h1>
-        <p className="mt-1 text-ink-muted">{t.home.intro}</p>
       </header>
       <OnStage searchParams={searchParams} locale={locale} t={t} />
     </div>

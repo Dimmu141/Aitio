@@ -1,3 +1,4 @@
+import type { When } from "@/lib/catalogue/when";
 import type { Dictionary } from "./fi";
 
 export const en: Dictionary = {
@@ -16,7 +17,7 @@ export const en: Dictionary = {
     premieresAside: "within two weeks",
     morePremieres: (n: number) => (n === 1 ? "+ 1 more premiere" : `+ ${n} more premieres`),
     title: "What's on",
-    intro: "Performances in the next two weeks.",
+    intro: { soon: "Performances in the next few days.", today: "Performances today.", tomorrow: "Performances tomorrow.", weekend: "Performances this weekend.", week: "Performances in the next seven days.", all: "Performances in the next two weeks." } as Record<When, string>,
     closingSoon: "Last chance",
     closingCount: (n: number) => (n === 1 ? "One of these ends within two weeks." : `${n} of these end within two weeks.`),
     today: "Today",

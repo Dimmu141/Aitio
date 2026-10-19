@@ -1,3 +1,4 @@
+import type { When } from "@/lib/catalogue/when";
 import type { ProductionType } from "@/generated/prisma/enums";
 
 const types: Record<ProductionType, string> = {
@@ -27,7 +28,7 @@ export const fi = {
     premieresAside: "kahden viikon sisällä",
     morePremieres: (n: number) => (n === 1 ? "+ 1 muu ensi-ilta" : `+ ${n} muuta ensi-iltaa`),
     title: "Ohjelmassa",
-    intro: "Esitykset seuraavan kahden viikon aikana.",
+    intro: { soon: "Esitykset lähipäivinä.", today: "Esitykset tänään.", tomorrow: "Esitykset huomenna.", weekend: "Esitykset viikonloppuna.", week: "Esitykset seuraavan seitsemän päivän aikana.", all: "Esitykset seuraavan kahden viikon aikana." } as Record<When, string>,
     closingSoon: "Viimeiset esitykset",
     closingCount: (n: number) => (n === 1 ? "Yksi näistä päättyy kahden viikon sisällä." : `${n} näistä päättyy kahden viikon sisällä.`),
     today: "Tänään",
