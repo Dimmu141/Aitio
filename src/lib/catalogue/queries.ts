@@ -5,6 +5,7 @@ import { hasFullSchedule } from "@/scrapers/theatres";
 import { cardSelect, toCard } from "./cards";
 import {
   effectiveType,
+  canBeSeen,
   isClosingSoon,
   currentProductionCount,
   isCurrent,
@@ -186,7 +187,7 @@ export async function getProduction(slug: string): Promise<ProductionPage | null
     fullSchedule,
     closingSoon: isClosingSoon(timing, row.runEnd, fullSchedule, asOf),
     phase: life.phase,
-    started: life.started,
+    started: life.started && canBeSeen(row),
     year: life.year,
     credits: row.credits
       .filter((credit) => isCurrent(credit, row))

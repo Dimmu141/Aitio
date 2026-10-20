@@ -36,13 +36,13 @@ export interface Classification {
   confidence: number;
 }
 
+/** Not performances at all: open houses, guided tours, job ads, family days. */
+export const NOT_A_PERFORMANCE =
+  /konstens natt|taiteiden yö|familjelördag|perhelauantai|kostymprovning|rundvandring|opastettu kierros|anställer|rekrytoi/i;
+
 const RULES: Array<{ type: ProductionTypeName; pattern: RegExp; confidence: number }> = [
-  // Not performances at all: open houses, guided tours, job ads, family days. Visitors never see "Muu".
-  {
-    type: "OTHER",
-    pattern: /konstens natt|taiteiden yö|familjelördag|perhelauantai|kostymprovning|rundvandring|opastettu kierros|anställer|rekrytoi/i,
-    confidence: 0.8,
-  },
+  // Visitors never see "Muu", and these can't be logged as seen (canBeSeen).
+  { type: "OTHER", pattern: NOT_A_PERFORMANCE, confidence: 0.8 },
   { type: "STANDUP", pattern: /stand[- ]?up|standup|humorlandskamp/i, confidence: 0.95 },
   {
     type: "TALK",

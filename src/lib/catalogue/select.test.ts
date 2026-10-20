@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  canBeSeen,
   effectiveType,
   isClosingSoon,
   isCurrent,
@@ -232,5 +233,25 @@ describe("currentProductionCount", () => {
     // Writer and director of one show, plus a credit the theatre has since removed.
     expect(currentProductionCount([credit("a"), credit("a"), credit("b", older)])).toBe(1);
     expect(currentProductionCount([credit("a"), credit("b")])).toBe(2);
+  });
+});
+
+describe("canBeSeen", () => {
+  const show = (title: string, stage: string | null, type: "OTHER" | "PLAY" = "OTHER", typeOverride: "PLAY" | null = null) => ({
+    title,
+    stage: stage ? { name: stage } : null,
+    type,
+    typeOverride,
+  });
+
+  it("refuses a guided tour or an open house", () => {
+    expect(canBeSeen(show("Topelius och teatern", "Rundvandring"))).toBe(false);
+    expect(canBeSeen(show("Konstens natt 2026", null))).toBe(false);
+  });
+
+  it("allows real performances, unknown types and an admin's override", () => {
+    expect(canBeSeen(show("Änglagård", "Stora scenen", "PLAY"))).toBe(true);
+    expect(canBeSeen(show("Wishamalii (FI/JO)", "AMOS-scenen"))).toBe(true); // OTHER, but a performance
+    expect(canBeSeen(show("Topelius och teatern", "Rundvandring", "OTHER", "PLAY"))).toBe(true);
   });
 });

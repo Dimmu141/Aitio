@@ -1,4 +1,5 @@
 import type { ProductionType } from "@/generated/prisma/enums";
+import { NOT_A_PERFORMANCE } from "@/scrapers/classify";
 
 /**
  * A theatre is shown once its source has delivered something. One added to the seed
@@ -29,6 +30,20 @@ export function currentProductionCount(
 
 export function effectiveType(production: { type: ProductionType; typeOverride: ProductionType | null }): ProductionType {
   return production.typeOverride ?? production.type;
+}
+
+/**
+ * Whether "Merkitse nähdyksi" makes sense at all: not for a guided tour or an open house
+ * (Topelius och teatern, stage "Rundvandring"; third review, 20 Oct 2026). An admin's type
+ * override to a real genre makes it loggable again.
+ */
+export function canBeSeen(production: {
+  type: ProductionType;
+  typeOverride: ProductionType | null;
+  title: string;
+  stage: { name: string } | null;
+}): boolean {
+  return effectiveType(production) !== "OTHER" || !NOT_A_PERFORMANCE.test(`${production.title} ${production.stage?.name ?? ""}`);
 }
 
 export function windowEnd(asOf: Date, days = WINDOW_DAYS): Date {
