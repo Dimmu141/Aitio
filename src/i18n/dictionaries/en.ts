@@ -71,7 +71,7 @@ export const en: Dictionary = {
     allDates: "All dates",
     criticsAside: "links to the originals",
     sourceLine: "Details",
-    updated: "updated",
+    checked: "checked",
     spokenIn: { it: "in Italian", fi: "in Finnish", sv: "in Swedish", en: "in English", ru: "in Russian", uk: "in Ukrainian", es: "in Spanish", ar: "in Arabic", lv: "in Latvian", et: "in Estonian", fr: "in French", de: "in German", sign: "in sign language", zxx: "non-verbal" },
     histogramLabel: "Rating distribution",
     stars: (value: number) => `${value} stars`,

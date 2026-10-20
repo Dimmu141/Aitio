@@ -82,7 +82,7 @@ export const fi = {
     allDates: "Kaikki päivät",
     criticsAside: "linkit alkuperäisiin",
     sourceLine: "Tiedot",
-    updated: "päivitetty",
+    checked: "tarkistettu",
     spokenIn: { it: "italiaksi", fi: "suomeksi", sv: "ruotsiksi", en: "englanniksi", ru: "venäjäksi", uk: "ukrainaksi", es: "espanjaksi", ar: "arabiaksi", lv: "latviaksi", et: "viroksi", fr: "ranskaksi", de: "saksaksi", sign: "viittomakielellä", zxx: "sanaton esitys" } as Record<string, string>,
     histogramLabel: "Arvosanojen jakauma",
     stars: (value: number) => `${value.toLocaleString("fi-FI")} tähteä`,

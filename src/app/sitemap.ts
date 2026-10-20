@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { connection } from "next/server";
 import { LOCALES, type Section } from "@/i18n/config";
 import { alternates } from "@/i18n/paths";
 import { getAllSlugs } from "@/lib/catalogue/queries";
@@ -19,6 +20,9 @@ function entries(section: Section | undefined, slug: string | undefined, lastMod
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  // Built per request (its data stays cached under the catalogue tag): prerendered, the file
+  // kept serving 19 Oct's lastmod dates after the next day's scrapes.
+  await connection();
   const { productions, theatres, people } = await getAllSlugs();
   return [
     ...entries(undefined, undefined),

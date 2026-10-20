@@ -39,7 +39,7 @@ const page: ProductionPage = {
   ratings: summariseRatings([]),
   tags: [],
   reviews: [],
-  updatedAt: new Date(),
+  checkedAt: new Date(),
 };
 
 describe("productionJsonLd", () => {

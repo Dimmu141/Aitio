@@ -42,6 +42,19 @@ export function health(latest: RunSummary | undefined, now: Date): Health {
   return latest.itemsFound > 0 && latest.failedDetails / latest.itemsFound > 0.25 ? "partial" : "ok";
 }
 
+/** Daily runs with Hobby's cron jitter (up to ~an hour late) plus slack: past this, a source is stale. */
+export const OVERDUE_AFTER_HOURS = 26;
+
+/** Sources without a successful run in the last OVERDUE_AFTER_HOURS (never-run ones included). */
+export function overdueSources(sourceIds: string[], runs: RunSummary[], now: Date): string[] {
+  return sourceIds.filter(
+    (id) =>
+      !runs.some(
+        (run) => run.sourceId === id && run.status === "SUCCESS" && now.getTime() - run.startedAt.getTime() <= OVERDUE_AFTER_HOURS * HOUR,
+      ),
+  );
+}
+
 /** Whether a finished run deserves an email to the admins. */
 export function needsAlert(status: Health): boolean {
   return status === "failed" || status === "partial" || status === "stuck";
