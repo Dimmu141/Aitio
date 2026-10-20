@@ -87,7 +87,7 @@ async function OnStage({
               </h3>
               <ul className="md:grid md:grid-cols-2 md:gap-x-10">
                 {day.cards.map((card) => (
-                  <ProductionCard key={card.slug} card={card} asOf={asOf} locale={locale} t={t} when="time" heading="h4" />
+                  <ProductionCard key={card.slug} card={card} times={card.times} asOf={asOf} locale={locale} t={t} when="time" heading="h4" />
                 ))}
               </ul>
             </section>

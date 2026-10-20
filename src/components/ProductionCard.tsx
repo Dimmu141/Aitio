@@ -23,6 +23,7 @@ export function ProductionCard({
   when = "date",
   heading = "h3",
   note,
+  times,
   children,
 }: {
   card: Card;
@@ -33,6 +34,8 @@ export function ProductionCard({
   when?: "date" | "time";
   heading?: "h3" | "h4";
   note?: string;
+  /** Under a day heading: every start that day, "klo 11.00, 12.00, 13.00". */
+  times?: Date[];
   /** Extra controls under the card, e.g. "Poista listalta" on the watchlist. */
   children?: ReactNode;
 }) {
@@ -74,7 +77,9 @@ export function ProductionCard({
         <p className="text-meta text-ink-muted">
           {card.next && (
             <time dateTime={isoDateTime(card.next)} className="font-bold text-ink">
-              {when === "time" ? t.production.at(formatTime(card.next, locale)) : formatPerformance(card.next, locale, asOf)}
+              {when === "time"
+                ? t.production.at((times ?? [card.next]).map((time) => formatTime(time, locale)).join(", "))
+                : formatPerformance(card.next, locale, asOf)}
             </time>
           )}
           {!card.next && status}
