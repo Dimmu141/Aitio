@@ -147,8 +147,8 @@ export function personName(raw: string): string | null {
   const name = cleanText(raw.split(/\s+\/\s+/)[0]);
   const words = name.split(" ").filter(Boolean);
   if (words.length === 0) return null;
-  // Collective labels, not people.
-  if (/^(työryhmä|arbetsgruppen?|ensemble|team)$/i.test(name)) return null;
+  // Collective labels, not people, also after a show's name ("Starman Työryhmä", Oct 2026).
+  if (/^team$|(?:^|\s)(?:työryhmä|arbetsgruppen?|ensemble)$/i.test(name)) return null;
   const prose = words.length > 1 && words.some((word) => /^\p{Ll}/u.test(word) && !NAME_PARTICLES.has(word));
   return prose ? null : name;
 }
@@ -174,8 +174,21 @@ export function nameCaseShouting(name: string): string {
 const NAME_JOINS = /\s*,\s*|\s+(?:\+|&|ja|och|and)\s+/;
 /** "… ja ystävät", "… m.fl.": a group around the person, never a person of its own. */
 const GROUP_SUFFIX = /^(?:ystävät|vänner|friends|muut|m\.?\s?fl\.?|med flera|ym\.?|ynnä muut)$/i;
+/** A full name: two or more capitalised words ("Anna-Maria Lipponen", "Edward af Sillén"). */
+const FULL_NAME = /^\p{Lu}[\p{L}'’-]*(?:\s+(?:\p{Lu}[\p{L}'’-]*|af|av|de|der|van|von|di|da|du|la|le))*\s+\p{Lu}[\p{L}'’-]*$/u;
 /** "Studio Total", "ATR-tuotanto Oy": a company credited next to a person. */
 const COMPANY = /^(?:studio|teater|teatteri|kompani|company)\s|\s(?:oy|ab|ry|ltd|oyj)$/i;
+
+/**
+ * "Name / Name" is two people; "Name / Company" (Espoo) is one person, and personName
+ * drops the company. Split only when both sides are full names and neither is a company.
+ */
+function splitSlash(part: string): string[] {
+  // With or without spaces: "August Strindberg/Marie-Louise Ekman" (Svenska Teatern).
+  const sides = part.split(/\s*\/\s*/);
+  if (sides.length === 1) return [part];
+  return sides.every((side) => FULL_NAME.test(side) && !COMPANY.test(side)) ? sides : [part];
+}
 
 /**
  * The people in one credit cell, or none when the cell is a label rather than names
@@ -186,10 +199,10 @@ const COMPANY = /^(?:studio|teater|teatteri|kompani|company)\s|\s(?:oy|ab|ry|ltd
 export function splitPeople(raw: string): string[] {
   // "Pia Ingman m.fl." ends with the group without a joining word.
   const trimmed = cleanText(raw)
-    .replace(/\s+(?:m\.?\s?fl\.?|med flera|ym\.?|ynnä muut)$/i, "")
+    .replace(/\s+(?:m\.?\s?fl\.?|med flera|ym\.?|ynnä muut|med vänner|och vänner|and friends)$/i, "")
     // "Irena Kraus efter boken ”OM Niklas Strömstedt”": the source, not more people.
     .replace(/\s+(?:efter|after)\s+.*$/i, "");
-  const parts = trimmed.split(NAME_JOINS).filter(Boolean);
+  const parts = trimmed.split(NAME_JOINS).filter(Boolean).flatMap(splitSlash);
   const names: string[] = [];
   for (const part of parts) {
     if (GROUP_SUFFIX.test(part) || COMPANY.test(part)) continue;

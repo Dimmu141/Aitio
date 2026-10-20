@@ -140,6 +140,17 @@ describe("splitPeople", () => {
     ["Kristian Smeds", ["Kristian Smeds"]],
     ["Pia Ingman m.fl.", ["Pia Ingman"]],
     ["Irena Kraus efter boken ”OM Niklas Strömstedt”", ["Irena Kraus"]],
+    // The third review (20 Oct 2026).
+    ["Silva Lillrank och Outi Paasivirta", ["Silva Lillrank", "Outi Paasivirta"]],
+    ["Christoffer Österlund & Tom Laurmaa", ["Christoffer Österlund", "Tom Laurmaa"]],
+    ["Juulia Björn, Nina-Maria Häggblom, Noona Leppinen", ["Juulia Björn", "Nina-Maria Häggblom", "Noona Leppinen"]],
+    ["Ylipää med vänner", ["Ylipää"]],
+    ["Okko Kivikataja / Heikki Nikula", ["Okko Kivikataja", "Heikki Nikula"]],
+    ["August Strindberg/Marie-Louise Ekman", ["August Strindberg", "Marie-Louise Ekman"]],
+    ["AC/DC", ["AC/DC"]],
+    ["Anacarsis Ramos / Pornotráfico", ["Anacarsis Ramos"]],
+    ["Jaakko Saariluoma / Teatteri Takomo", ["Jaakko Saariluoma"]],
+    ["Ida Rosenblad, Ella Slunga, Kristina Grönqvist von Bonsdorff", ["Ida Rosenblad", "Ella Slunga", "Kristina Grönqvist von Bonsdorff"]],
   ])("%s", (raw, people) => {
     expect(splitPeople(raw)).toEqual(people);
   });
@@ -151,6 +162,8 @@ describe("splitPeople", () => {
 
   it("never makes a person of a group or a company alone", () => {
     expect(splitPeople("ATR-tuotanto Oy")).toEqual([]);
+    expect(splitPeople("Starman Työryhmä")).toEqual([]);
+    expect(splitPeople("työryhmä")).toEqual([]);
     expect(splitPeople("ystävät")).toEqual([]);
   });
 });
