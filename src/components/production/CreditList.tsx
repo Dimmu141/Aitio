@@ -6,10 +6,10 @@ import { groupCredits, MINOR_ROWS_SHOWN, teamRows, type TeamRow } from "@/lib/ca
 import type { CreditRow } from "@/lib/catalogue/types";
 import { Section } from "./Section";
 
-function Row({ label, person, locale }: { label: string; person: { slug: string; name: string }; locale: Locale }) {
+function Row({ label, lang, person, locale }: { label: string; lang?: Locale; person: { slug: string; name: string }; locale: Locale }) {
   return (
     <div className="ai-credit">
-      <dt>{label}</dt>
+      <dt lang={lang}>{label}</dt>
       <dd>
         <Link href={href(locale, "henkilo", person.slug)}>{person.name}</Link>
       </dd>
@@ -18,8 +18,8 @@ function Row({ label, person, locale }: { label: string; person: { slug: string;
 }
 
 /**
- * The team first, one row per person with their roles as the theatre wrote them (when the
- * page is in the theatre's language); the cast under its own label, each with their part.
+ * The team first, one row per person with their roles as the theatre wrote them (marked
+ * with the theatre's language when the page is in another); the cast under its own label.
  */
 export function CreditList({
   credits,
@@ -32,13 +32,21 @@ export function CreditList({
   locale: Locale;
   t: Dictionary;
 }) {
-  const team = teamRows(credits, (role) => t.roles[role], locale === sourceLanguage);
+  const team = teamRows(credits, (role) => t.roles[role]);
   // The creative team in full; assistants and technicians after a handful, the rest folded.
   const minor = team.filter((row) => row.minor);
   const shown = [...team.filter((row) => !row.minor), ...minor.slice(0, MINOR_ROWS_SHOWN)];
   const folded = minor.slice(MINOR_ROWS_SHOWN);
   const rows = (list: TeamRow[]) =>
-    list.map((row) => <Row key={row.person.slug} label={row.roles} person={row.person} locale={locale} />);
+    list.map((row) => (
+      <Row
+        key={row.person.slug}
+        label={row.roles}
+        lang={row.sourceText && sourceLanguage !== locale ? sourceLanguage : undefined}
+        person={row.person}
+        locale={locale}
+      />
+    ));
   const cast = groupCredits(credits).find((group) => group.role === "CAST");
   if (team.length === 0 && !cast) return null;
   return (
