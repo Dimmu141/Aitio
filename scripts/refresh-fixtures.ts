@@ -36,6 +36,8 @@ const FIXTURES: Array<{ url: string; file: string; form?: Record<string, string>
   },
   // A guest run: "Kantaesitys oli Tampereen Työväen Teatterissa", no premiere of its own.
   { url: "https://www.kansallisteatteri.fi/esitys/karpaset", file: "fixtures/kansallisteatteri/production-karpaset.html" },
+  // A guest run whose "Työryhmä" heading is a bold paragraph, not an h2.
+  { url: "https://www.kansallisteatteri.fi/esitys/haapajarven-elvis", file: "fixtures/kansallisteatteri/production-haapajarven-elvis.html" },
   // No dates yet (spring 2027); "Ohjaus ja dramatisointi" and the original author, Aleksis Kivi.
   {
     url: "https://www.kansallisteatteri.fi/esitys/seitseman-veljesta",
@@ -83,6 +85,8 @@ const FIXTURES: Array<{ url: string; file: string; form?: Record<string, string>
   { url: "https://oopperabaletti.fi/ohjelmisto/figaron-haat/", file: "fixtures/kansallisooppera/production-figaron-haat.html" },
   { url: "https://oopperabaletti.fi/ohjelmisto/hamlet/", file: "fixtures/kansallisooppera/production-hamlet.html" },
   { url: "https://oopperabaletti.fi/ohjelmisto/aistit/", file: "fixtures/kansallisooppera/production-aistit.html" },
+  // A guest production: the team is running text under "Tekijät", not a <dl>.
+  { url: "https://oopperabaletti.fi/ohjelmisto/nocturno/", file: "fixtures/kansallisooppera/production-nocturno.html" },
   { url: ZODIAK_LIST_URL, file: "fixtures/zodiak/ohjelmisto.html" },
   { url: "https://www.zodiak.fi/fi/ohjelmisto/ghosts-rosegarden", file: "fixtures/zodiak/production-ghosts-rosegarden.html" },
   { url: "https://www.zodiak.fi/fi/ohjelmisto/lampi-2", file: "fixtures/zodiak/production-lampi-2.html" },

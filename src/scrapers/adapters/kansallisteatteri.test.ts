@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { authorCredits, parseDetail, parseList, subtitleLanguages, textBlockCredits } from "./kansallisteatteri";
+import { textBlockCredits } from "../text-block";
+import { authorCredits, parseDetail, parseList, subtitleLanguages } from "./kansallisteatteri";
 
 // Fixtures captured from the live site on 2026-10-18. Refresh with `pnpm fixtures:refresh`.
 const fixture = (name: string) => readFileSync(`fixtures/kansallisteatteri/${name}`, "utf8");
@@ -224,6 +225,18 @@ describe("Kansallisteatteri guest runs", () => {
 
   it("skips the producing company", () => {
     expect(karpaset.credits.map((credit) => credit.name)).not.toContain("ATR-tuotanto Oy");
+  });
+
+  it("finds the text block under a bold-paragraph heading too", () => {
+    // Haapajärven Elvis: "<p><strong>Työryhmä</strong></p>" instead of an h2.
+    const elvis = parseDetail(fixture("production-haapajarven-elvis.html"), {
+      externalId: "haapajarven-elvis",
+      url: "https://www.kansallisteatteri.fi/esitys/haapajarven-elvis",
+      isVisiting: true,
+    });
+    expect(elvis.credits.filter((credit) => credit.roles.includes("CAST"))).toHaveLength(9);
+    expect(elvis.credits).toContainEqual(expect.objectContaining({ name: "Lauri Maijala", roleText: "Käsikirjoitus, ohjaus ja lavastus" }));
+    expect(elvis.credits).toContainEqual(expect.objectContaining({ name: "Kati Keronen", roleText: "Naamioinnin suunnittelu" }));
   });
 
   it("splits names on commas and 'ja'", () => {

@@ -2,6 +2,16 @@
 
 A mobile-first website for logging, rating and discovering theatre in Finland: Letterboxd mechanics, Untappd-style check-ins, Show-Score-style tags. See [`BRIEF.md`](BRIEF.md) for the full project brief and roadmap.
 
+## Where things stand (20 Oct 2026)
+
+Live at https://omaaitio.fi (Vercel, functions in `fra1`; Neon in Frankfurt; Brevo for email). All milestones in `BRIEF.md` are built, 13 sources are scraped daily by Vercel Cron, and what's left before a public launch is in `LAUNCH.md`. The sections below are a log per milestone: each "Known gaps" list was written at the time, and items fixed since are marked **Resolved** with the date.
+
+Still open, across all milestones:
+
+- **No type for circus, puppetry or game performances.** The classifier leaves them OTHER (hidden from visitors and the type filter) for the admin's type list; Nocturno at the Opera is one.
+- **A missing page without JavaScript** shows Next.js's generic English 404 (`next-error-h1`); our own `not-found.tsx` arrives only with the RSC payload.
+- **Person matching is by name**, form errors lose the input, no public profiles, no audit log for admin actions, no error tracking beyond Vercel's logs and the scrape alerts, no full CSP.
+
 ## Status: milestone 1 (data layer and first scrapers)
 
 | Done | Notes |
@@ -57,9 +67,9 @@ We store facts only: titles, dates, stages, credits, ticket links and links to r
 
 - **Person matching is by name.** Two different actors with the same name would merge. Fine for now; revisit with theatre person-page URLs as stable IDs.
 - **Svenska Teatern's REST list includes about 85 shows back to 2022.** All are stored, because old productions are useful for diary entries ("I saw this in 2023"). Pages without performances just get no dates.
-- **Kansallisteatteri subtitles** are shown per performance on their site; not parsed yet, so `subtitleLangs` is empty there.
+- **Kansallisteatteri subtitles**: **Resolved 18 Oct 2026**, parsed per performance from a live fixture.
 - **Classifier** is keyword based; check `typeConfidence` below 0.6 manually until the admin override page exists.
-- **The live fetch path has still not run end-to-end.** The cloud environment's network policy blocks the theatre sites (proxy 403), so do one `pnpm scrape --dry-run --limit 3` locally first. Migration, seed and integration tests have now run against real PostgreSQL 16.
+- **The live fetch path**: **Resolved 18 Oct 2026**, every source scraped live (`fixtures/SOURCES.md`).
 
 ## Status: milestone 2 (read-only site)
 
@@ -94,13 +104,13 @@ pnpm build && pnpm test:e2e             # smoke tests against the production bui
 
 ### Known gaps
 
-- **Subtitle filter is off** (`SUBTITLE_FILTER_ENABLED` in `src/lib/catalogue/filters.ts`). Kansallisteatteri shows subtitles per performance, but every row in our fixture has an empty subtitle column, so the format is unknown. Needs a fixture of a subtitled production and `Performance.subtitleLangs`.
-- **Cache refresh after a scrape is time-based** (up to an hour). The CLI scraper cannot call `revalidateTag`; the Vercel Cron route in milestone 4 should call `revalidateTag("catalogue")`.
-- **Design roles are merged.** Lavastus, puvut, valot and so on all show as Suunnittelu, because the scraper maps labels to a few roles and drops the original label. Storing the label text would fix it.
-- **Critic links show the outlet only.** Kansallisteatteri also gives the critic's name and headline; one of the two Helsingin Sanomat links is a feature article, not a review.
-- **Without JavaScript**, the language links on detail pages go to the other language's front page, and the 404 page shows Next.js's generic text.
-- **No OpenGraph image yet.** A typographic poster image (`opengraph-image.tsx`) would suit the brief.
-- **Theatre pages without data** (four of six theatres until milestone 4) show only "Ei esityksiä ohjelmistossa juuri nyt".
+- **Subtitle filter**: **Resolved 18 Oct 2026**, on since Kansallisteatteri's per-performance subtitles are parsed.
+- **Cache refresh after a scrape**: **Resolved**, the cron route calls `revalidateTag("catalogue", { expire: 0 })` after a successful run.
+- **Design roles**: **Resolved 19 Oct 2026**, the source's label is kept in `Credit.roleText` and shown.
+- **Critic links**: **Resolved 19 Oct 2026**, they carry `critic`, `paywalled` and `feature`.
+- **Without JavaScript**, the language links now point at the same page in the other language (**resolved**), but the 404 page still shows Next.js's generic text (open, see the top).
+- **OpenGraph image**: **Resolved**, `/api/og/<section>/<slug>` (not the `opengraph-image` convention; see CLAUDE.md).
+- **Theatre pages without data**: **Resolved**, a theatre is listed only once it has a production (`LISTED_THEATRE`).
 
 ## Status: milestone 3 (users and diary)
 
@@ -137,10 +147,10 @@ Sign in locally: `pnpm dev`, enter any address on `/kirjaudu`, copy the link fro
 
 ### Known gaps
 
-- **No privacy policy page.** We now store email addresses, names and reviews, so a tietosuojaseloste is required before launch, plus a decision on Resend: it is a US company. Resend can send from an EU region, but check its DPA, or switch `src/lib/email.ts` to a Finnish/EU SMTP provider.
+- **Privacy policy and email provider**: **Resolved 18 Oct 2026**, `/tietosuoja` exists and Brevo (EU) sends the email.
 - **Form errors lose the input.** A rejected form (e.g. a future date) redirects back with the message but without what was typed; the inputs are constrained enough that this is rare.
 - **No public profiles or following.** Reviews show a display name only; the diary is private.
-- **Moderation is a CLI.** Fine for a handful of reports a week; an admin page belongs in milestone 4 with the type-override page.
+- **Moderation**: **Resolved**, the queue is in `/yllapito`; `pnpm moderation` still works.
 - **An expired session cookie without JavaScript** on a personal page shows the sign-in redirect only with JS (the proxy sees a cookie and lets it through).
 - **e2e tests need the dev database** and delete their own `@example.fi` users afterwards; point `DATABASE_URL` at a disposable database if you'd rather not touch dev data.
 
@@ -150,7 +160,7 @@ Sign in locally: `pnpm dev`, enter any address on `/kirjaudu`, copy the link fro
 
 | Source | How | Quirks the fixtures taught us |
 |---|---|---|
-| Kansallisteatteri | HTML | per-performance subtitles still not parsed (empty in every capture) |
+| Kansallisteatteri | HTML | per-performance subtitles (parsed since 18 Oct 2026); guest runs write the team as running text |
 | Svenska Teatern | REST list + HTML | old productions kept for diary entries |
 | HKT + Lilla Teatern | HTML + `/wp-json/hkt/ticket-list/<id>/` | performances only come from the JSON; its `timestamp` is Helsinki time posing as UTC, so we use `date` + `time` |
 | Ryhmäteatteri | REST `artist` + HTML | FI and EN posts per show (keep FI); subtitles only on some weekdays; one production on right now |
@@ -182,11 +192,11 @@ Every adapter has fixtures and tests (`src/scrapers/adapters/*.test.ts`); `fixtu
 
 ### Known gaps
 
-- **Not one live scrape yet.** The new fixtures were captured through Firecrawl because this environment blocks the theatre sites, and Firecrawl returns pages after JavaScript ran. Before trusting the cron: `pnpm fixtures:refresh && pnpm test`, then `pnpm scrape --dry-run --limit 3` per source. HKT and Espoo depend on endpoints their own scripts call (`/wp-json/hkt/ticket-list/`, `admin-ajax.php`); those requests are verified only through the captured data.
-- **Vercel plan limits not confirmed**: I could not find the current cron-count and duration limits in Vercel's docs from here. If six cron jobs or 300 s are not allowed on your plan, switch `vercel.json` to one `/api/cron/scrape/next` job, run several times a day if possible.
+- **Live scrape**: **Resolved 18 Oct 2026**, the Firecrawl fixtures were replaced with live server HTML and the parsers fixed.
+- **Vercel plan limits**: **Resolved 18 Oct 2026**, Hobby allows 100 daily cron jobs of up to 300 s (`LAUNCH.md` step 3).
 - **Espoo shows only its next few performances**, so its productions list only those, with the theatre's own ticket link for the rest.
-- **Kansallisteatteri subtitles** still unknown; the subtitle filter stays off, but the per-performance model it needs now exists.
-- **No production type for circus, puppetry or game performances**; they come out as OTHER or a guessed PLAY and wait in the admin's type list.
+- **Kansallisteatteri subtitles**: **Resolved 18 Oct 2026**.
+- **No production type for circus, puppetry or game performances**; they come out as OTHER and wait in the admin's type list. Since 20 Oct 2026 a source's own "other" (the Opera's "Muuta") stops the guess from credits, so a circus piece with a director is no longer called a play.
 - **Admins are an environment variable**, with no audit log of overrides or moderation decisions.
 - **The admin page answers non-admins with HTTP 200** and the not-found page (the status is sent before the page decides); none of its content is sent, which the e2e tests check.
 
@@ -216,10 +226,10 @@ Every adapter has fixtures and tests (`src/scrapers/adapters/*.test.ts`); `fixtu
 
 - **Over 200 subscribers** need more than one run a week: add a second cron job, or move to Resend's batch API.
 - **The email lists every closing production in the region**, not just the user's theatres. With six theatres that's a handful; with more, it should follow the theatres in the diary.
-- **No bounce or complaint handling**: a hard-bouncing address keeps getting tried each week. Resend webhooks can switch `digestOptIn` off.
-- **Seven cron jobs now**: the plan-limit question from milestone 4 still stands.
+- **Bounce and complaint handling**: **Resolved**, Brevo's webhook (`/api/email/events`) switches the digest off.
+- **Cron job count**: **Resolved**, 15 jobs fit Hobby's 100.
 - **The year review is private.** A shareable version would need public profiles, which is a privacy decision for later.
-- **The Resend sender address** (`EMAIL_FROM`) is the sign-in one; a separate `uutiset@` address would protect sign-in deliverability if the digest ever gets marked as spam.
+- **The sender address** (`EMAIL_FROM`, now on Brevo) is the sign-in one; a separate `uutiset@` address would protect sign-in deliverability if the digest ever gets marked as spam.
 
 ## Status: launch readiness
 
@@ -234,7 +244,7 @@ The step-by-step launch is in **`LAUNCH.md`**. What the code now has for it:
 
 ### Known gaps
 
-- **Still no live scrape**: step 0 in `LAUNCH.md`.
+- **Live scrape**: **Resolved 18 Oct 2026** (step 0 in `LAUNCH.md`).
 - **No full Content-Security-Policy**: Next's inline scripts would need per-request nonces, which would make every static page dynamic. The headers above stop clickjacking and MIME sniffing; XSS protection rests on React escaping.
 - **Brevo and `List-Unsubscribe`**: Brevo's API documentation says it doesn't accept standard headers, so our one-click unsubscribe header might be dropped or replaced. Step 2 of `LAUNCH.md` says how to check.
 - **The privacy policy is not legal advice**; have it read before launch.

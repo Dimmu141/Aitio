@@ -69,7 +69,7 @@ async function ScrapeHealth({ now }: { now: Date }) {
               </p>
               {latest && (
                 <p className="text-base">
-                  {formatPerformance(latest.startedAt, "fi", now)} · löytyi {latest.itemsFound}, tallennettu{" "}
+                  {formatPerformance(latest.startedAt, "fi", now)} · löytyi {latest.itemsFound}, muuttui{" "}
                   {latest.itemsChanged}, epäonnistui {latest.failedDetails}
                   {latest.message && <span className="block font-semibold text-accent">{latest.message}</span>}
                 </p>

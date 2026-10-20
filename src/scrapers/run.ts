@@ -50,6 +50,8 @@ export interface RunResult {
   sourceId: string;
   found: number;
   saved: number;
+  /** Productions whose stored facts differ from the previous run (new ones included), plus those delisted or relisted. */
+  changed: number;
   failed: Array<{ url: string; error: string }>;
   /** Listed by the theatre but its page answers 404: their broken link, not our failure. */
   missing: string[];
@@ -62,10 +64,15 @@ export interface RunResult {
  * Productions the theatre stopped listing (cancelled, removed) are marked delisted so
  * their stored future dates stop counting as "on stage"; a listed one is cleared again.
  * A listed production whose page failed to load stays as it is. Returns how many were
- * newly delisted.
+ * newly delisted and how many came back.
  */
-export async function syncListing(db: PrismaClient, theatreId: string, listed: string[], at: Date): Promise<number> {
-  await db.production.updateMany({
+export async function syncListing(
+  db: PrismaClient,
+  theatreId: string,
+  listed: string[],
+  at: Date,
+): Promise<{ delisted: number; relisted: number }> {
+  const relisted = await db.production.updateMany({
     where: { theatreId, externalId: { in: listed }, delistedAt: { not: null } },
     data: { delistedAt: null },
   });
@@ -73,7 +80,7 @@ export async function syncListing(db: PrismaClient, theatreId: string, listed: s
     where: { theatreId, externalId: { notIn: listed }, delistedAt: null },
     data: { delistedAt: at },
   });
-  return result.count;
+  return { delisted: result.count, relisted: relisted.count };
 }
 
 /**
@@ -94,7 +101,7 @@ export async function runSource(
   options: RunOptions,
 ): Promise<RunResult> {
   const log = options.log ?? console.log;
-  const result: RunResult = { sourceId: adapter.id, found: 0, saved: 0, failed: [], missing: [], warnings: [] };
+  const result: RunResult = { sourceId: adapter.id, found: 0, saved: 0, changed: 0, failed: [], missing: [], warnings: [] };
 
   const theatre = db ? await db.theatre.findUnique({ where: { sourceId: adapter.id } }) : null;
   if (db && !theatre) throw new Error(`No theatre with sourceId "${adapter.id}". Run the seed first.`);
@@ -159,13 +166,16 @@ export async function runSource(
 
       const summary = await upsertProduction(db, theatre, detail, seenAt);
       result.saved += 1;
-      log(`  ${summary.created ? "+" : "~"} ${summary.slug} (${summary.performances} perf, ${summary.credits} credits)`);
+      if (summary.changed) result.changed += 1;
+      log(`  ${summary.created ? "+" : summary.changed ? "~" : "="} ${summary.slug} (${summary.performances} perf, ${summary.credits} credits)`);
       for (const warning of warnings) log(`    ! ${warning.rule}: ${warning.detail}`);
     }
 
     // Only a complete run knows what the theatre no longer lists.
     if (db && theatre && !options.dryRun && !options.limit) {
-      const delisted = await syncListing(db, theatre.id, list.map((ref) => ref.externalId), seenAt);
+      const { delisted, relisted } = await syncListing(db, theatre.id, list.map((ref) => ref.externalId), seenAt);
+      // Leaving or returning to the listing changes what visitors see, so it counts as a change.
+      result.changed += delisted + relisted;
       if (delisted > 0) log(`  ${delisted} no longer listed by the theatre`);
     }
 
@@ -176,7 +186,7 @@ export async function runSource(
           status: "SUCCESS",
           finishedAt: new Date(),
           itemsFound: result.found,
-          itemsChanged: result.saved,
+          itemsChanged: result.changed,
           errors:
             result.failed.length || result.missing.length ? { failed: result.failed, missing: result.missing } : undefined,
         },
