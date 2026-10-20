@@ -10,6 +10,8 @@ export function slugify(value: string): string {
     .replace(/[̀-ͯ]/g, "")
     .toLowerCase()
     .replace(/&/g, " ja ")
+    // A bracket inside a word is wordplay, not a break: "Par(r)asvaloissa" is one word.
+    .replace(/(?<=[a-z0-9])[()[\]]+(?=[a-z0-9])/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 80);

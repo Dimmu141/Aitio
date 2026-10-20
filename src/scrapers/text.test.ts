@@ -55,6 +55,8 @@ describe("slugify", () => {
     expect(slugify("Änglagård")).toBe("anglagard");
     expect(slugify("Seitsemän veljestä")).toBe("seitseman-veljesta");
     expect(slugify("10 år med Ted & Kaj")).toBe("10-ar-med-ted-ja-kaj");
+    expect(slugify("Par(r)asvaloissa esittää")).toBe("parrasvaloissa-esittaa");
+    expect(slugify("Hamlet (ensi-ilta)")).toBe("hamlet-ensi-ilta");
   });
 });
 
