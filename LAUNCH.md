@@ -88,13 +88,13 @@ in `fra1`, Node 22, Vercel Authentication on preview deployments only. Live at
 **https://aitio-eight.vercel.app** (`aitio.vercel.app` belongs to someone else). Production
 env vars set: `DATABASE_URL` (Neon, pooled), `BETTER_AUTH_SECRET`, `CRON_SECRET`,
 `REVALIDATE_SECRET`, `EMAIL_WEBHOOK_SECRET` (all sensitive), `SITE_URL`, `ADMIN_EMAILS`,
-`SCRAPER_USER_AGENT`, `BREVO_API_KEY`, `EMAIL_FROM`. Still missing: `PRIVACY_CONTROLLER`,
-`PRIVACY_EMAIL`, so the privacy and about pages have no contact address. Previews have no
+`SCRAPER_USER_AGENT`, `BREVO_API_KEY`, `EMAIL_FROM`, and since then `PRIVACY_CONTROLLER` and
+`PRIVACY_EMAIL` (both shown on `/tietosuoja`, checked 20 Oct 2026). Previews have no
 database on purpose (they would write to production), so preview builds are skipped.
 
 **Custom domain:** `omaaitio.fi` (A `76.76.21.21`) and `www` (CNAME `cname.vercel-dns.com`,
 308 to the apex) since 18 Oct 2026; `SITE_URL=https://omaaitio.fi`. Sign-in only works on
-that origin. `PRIVACY_CONTROLLER` and `PRIVACY_EMAIL` are still missing.
+that origin.
 
 The first production deployment was made from the PR branch; once PR #1 is merged, pushes
 to `main` deploy production.
