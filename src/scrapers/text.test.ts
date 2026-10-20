@@ -172,6 +172,10 @@ describe("sentenceCaseShouting", () => {
   it.each([
     ["NÅT ATT GÖRA", "Nåt att göra"],
     ["PÄHKINÄNSÄRKIJÄN JOULU", "Pähkinänsärkijän joulu"],
+    // Third review (20 Oct 2026): only the shouting part before the dash.
+    ["PÄHKINÄNSÄRKIJÄN JOULU – juhla, jota et tiennyt kaipaavasi", "Pähkinänsärkijän joulu – juhla, jota et tiennyt kaipaavasi"],
+    ["KAJ – karar i arbeit", "KAJ – karar i arbeit"],
+    ["Tommy Körberg – Unplugged", "Tommy Körberg – Unplugged"],
     ["AJA, BAJA ALFONS ÅBERG!", "Aja, baja alfons åberg!"],
     ["KAJ", "KAJ"],
     ["1984", "1984"],

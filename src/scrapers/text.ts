@@ -221,6 +221,13 @@ export function splitPeople(raw: string): string[] {
  * wrong ("Aja, baja alfons åberg!"), which is what Production.titleOverride is for.
  */
 export function sentenceCaseShouting(title: string): string {
+  // A shouting title with a quiet subtitle: "PÄHKINÄNSÄRKIJÄN JOULU – juhla, jota et tiennyt kaipaavasi".
+  const dash = title.match(/^(.+?)(\s+[–—-]\s+.*)$/u);
+  if (dash && /\p{Ll}/u.test(dash[2]) && !/\p{Ll}/u.test(dash[1])) return caseShouting(dash[1]) + dash[2];
+  return caseShouting(title);
+}
+
+function caseShouting(title: string): string {
   const letters = title.match(/\p{L}/gu) ?? [];
   if (/\p{Ll}/u.test(title) || letters.length < 6 || !/\s/.test(title.trim())) return title;
   const lower = title.toLocaleLowerCase("fi");
