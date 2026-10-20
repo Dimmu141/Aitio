@@ -3,6 +3,7 @@ import { z } from "zod";
 import { politeFetch } from "../http";
 import { mapRoleText } from "../roles";
 import { cleanText, helsinkiToUtc, languageCodes, parseFinnishDate, personName } from "../text";
+import { textBlockCredits } from "../text-block";
 import {
   rawProductionDetailSchema,
   rawProductionSchema,
@@ -114,6 +115,8 @@ export function typeFromGenre(genre: string | undefined, title: string): Product
     if (/ooppera/i.test(title)) return "OPERA";
     if (/baletti/i.test(title)) return "DANCE";
   }
+  // "Muuta": the Opera's own "none of the above" (guest circus, galas).
+  if (/^muu/.test(text)) return "OTHER";
   return undefined;
 }
 
@@ -186,6 +189,21 @@ function castCredits($: Page): RawCredit[] {
     credits.push({ name, roleText: "Rooleissa", roles: ["CAST"], characterName: characterName || undefined });
   });
   return credits;
+}
+
+/**
+ * Guest productions (Nocturno, Circo Aereo) have no team list, only paragraphs under an
+ * h2 "Tekijät": "<strong>Ohjaus </strong>Sanna Silvennoinen<br><strong>Musiikki </strong>…".
+ */
+function guestTeamCredits($: Page): RawCredit[] {
+  const heading = $("h2").filter((_, element) => /^tekijät$/i.test(cleanText($(element).text()))).first();
+  const paragraphs = heading.nextUntil("h2", "p");
+  return textBlockCredits(paragraphs.toArray().map((element) => $.html(element)).join(""));
+}
+
+function credits($: Page): RawCredit[] {
+  const listed = [...teamCredits($), ...castCredits($)];
+  return listed.length > 0 ? listed : guestTeamCredits($);
 }
 
 const eventSchema = z.object({
@@ -261,7 +279,7 @@ export function parseDetail(
     ticketUrl: ticketUrl && /^https?:\/\//.test(ticketUrl) ? ticketUrl : undefined,
     ...run,
     ...parseLanguage(meta.get("kieli")),
-    credits: [...teamCredits($), ...castCredits($)],
+    credits: credits($),
     performances: parsePerformances($),
     // The page quotes reviews without links; we never store review text.
     criticReviews: [],

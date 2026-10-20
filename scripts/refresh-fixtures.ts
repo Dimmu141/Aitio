@@ -85,6 +85,8 @@ const FIXTURES: Array<{ url: string; file: string; form?: Record<string, string>
   { url: "https://oopperabaletti.fi/ohjelmisto/figaron-haat/", file: "fixtures/kansallisooppera/production-figaron-haat.html" },
   { url: "https://oopperabaletti.fi/ohjelmisto/hamlet/", file: "fixtures/kansallisooppera/production-hamlet.html" },
   { url: "https://oopperabaletti.fi/ohjelmisto/aistit/", file: "fixtures/kansallisooppera/production-aistit.html" },
+  // A guest production: the team is running text under "Tekijät", not a <dl>.
+  { url: "https://oopperabaletti.fi/ohjelmisto/nocturno/", file: "fixtures/kansallisooppera/production-nocturno.html" },
   { url: ZODIAK_LIST_URL, file: "fixtures/zodiak/ohjelmisto.html" },
   { url: "https://www.zodiak.fi/fi/ohjelmisto/ghosts-rosegarden", file: "fixtures/zodiak/production-ghosts-rosegarden.html" },
   { url: "https://www.zodiak.fi/fi/ohjelmisto/lampi-2", file: "fixtures/zodiak/production-lampi-2.html" },

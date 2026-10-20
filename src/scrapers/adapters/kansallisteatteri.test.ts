@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { authorCredits, parseDetail, parseList, subtitleLanguages, textBlockCredits } from "./kansallisteatteri";
+import { textBlockCredits } from "../text-block";
+import { authorCredits, parseDetail, parseList, subtitleLanguages } from "./kansallisteatteri";
 
 // Fixtures captured from the live site on 2026-10-18. Refresh with `pnpm fixtures:refresh`.
 const fixture = (name: string) => readFileSync(`fixtures/kansallisteatteri/${name}`, "utf8");

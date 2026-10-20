@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import type { CreditRoleName } from "../types";
 import { parseDetail, parseLanguage, parseList, typeFromGenre } from "./kansallisooppera";
 
 const fixture = (name: string) => readFileSync(`fixtures/kansallisooppera/${name}`, "utf8");
@@ -149,6 +150,23 @@ describe("Kansallisooppera ballet pages", () => {
     expect(aistit.performances).toHaveLength(9);
   });
 
+  it("reads a guest production's team from the running text under Tekijät", () => {
+    const nocturno = parseDetail(fixture("production-nocturno.html"), {
+      externalId: "nocturno",
+      url: "https://oopperabaletti.fi/ohjelmisto/nocturno/",
+      title: "Nocturno",
+      isVisiting: true,
+    });
+    const byRole = (role: CreditRoleName) => nocturno.credits.filter((credit) => credit.roles.includes(role)).map((c) => c.name);
+    expect(byRole("DIRECTOR")).toEqual(["Sanna Silvennoinen"]);
+    expect(byRole("COMPOSER")).toEqual(["Sami Klemola"]);
+    expect(byRole("CAST")).toHaveLength(8);
+    expect(nocturno.credits.find((credit) => credit.name === "Tinja Salmi")?.roleText).toBe("Puku- ja lavastussuunnittelu");
+    // "Tuotanto Circo Aereo, defunensemble" names companies, not people.
+    expect(nocturno.credits.some((credit) => credit.name === "Circo Aereo")).toBe(false);
+    expect(nocturno.typeHint).toBe("OTHER"); // Genre "Muuta"
+  });
+
   it("states no premiere date, so none is guessed from the run", () => {
     // "Milloin" starts the run, but the page never says it opened as a premiere (Dracula's
     // run this season is a revival); "Ensi-ilta jää … historiaan" is a review quote.
@@ -171,7 +189,7 @@ describe("helpers", () => {
     expect(typeFromGenre("Baletti", "Hamlet")).toBe("DANCE");
     expect(typeFromGenre("Nykyooppera", "The Handmaid's Tale")).toBe("OPERA");
     expect(typeFromGenre("Konsertti", "Oopperan ja Baletin Joulu")).toBe("CONCERT");
+    expect(typeFromGenre("Muuta", "Nocturno")).toBe("OTHER");
     expect(typeFromGenre("Lapsille", "Miniooppera Reininkulta")).toBe("OPERA");
-    expect(typeFromGenre("Muuta", "Nocturno")).toBeUndefined();
   });
 });

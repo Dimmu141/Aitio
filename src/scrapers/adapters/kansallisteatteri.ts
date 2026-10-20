@@ -2,6 +2,7 @@ import * as cheerio from "cheerio";
 import { politeFetch } from "../http";
 import { mapRoleText } from "../roles";
 import { cleanText, helsinkiToUtc, languageCodes, parseFinnishDate, personName } from "../text";
+import { textBlockCredits } from "../text-block";
 import {
   rawProductionDetailSchema,
   rawProductionSchema,
@@ -156,34 +157,6 @@ function withAuthors(authors: RawCredit[], team: RawCredit[]): RawCredit[] {
   const credited = (author: RawCredit) =>
     team.some((credit) => credit.name === author.name && author.roles.every((role) => credit.roles.includes(role)));
   return [...authors.filter((author) => !credited(author)), ...team];
-}
-
-/**
- * Guest runs (Kärpäset, Haapajärven Elvis) have no team list, only a text block:
- * "<h2>Työryhmä</h2><p><strong>Käsikirjoitus ja ohjaus</strong> Sirkku Peltola <strong>…".
- * Each bold label owns the names after it, up to the next label.
- */
-export function textBlockCredits(blockHtml: string): RawCredit[] {
-  const $ = cheerio.load(`<div>${blockHtml.replace(/<br\s*\/?>/gi, " ")}</div>`);
-  const credits: RawCredit[] = [];
-  let roleText = "";
-  $("div")
-    .find("p")
-    .contents()
-    .each((_, node) => {
-      const text = cleanText($(node).text());
-      if (node.type === "tag" && node.name === "strong") {
-        roleText = text;
-        return;
-      }
-      const roles = roleText ? mapRoleText(roleText) : [];
-      if (!text || roles.length === 0) return;
-      for (const part of text.split(/,\s*|\s+ja\s+|\s+och\s+/)) {
-        const name = personName(part);
-        if (name && /^\p{Lu}/u.test(name)) credits.push({ name, roleText, roles });
-      }
-    });
-  return credits;
 }
 
 /** The heading is an h2 on some pages and a bold paragraph ("<p><strong>Työryhmä</strong></p>") on others. */

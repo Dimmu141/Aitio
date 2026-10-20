@@ -174,7 +174,12 @@ describe("classifyProduction", () => {
 
   it("takes the source's own category over the keyword rules", () => {
     expect(classifyProduction({ ...base, title: "Hamlet", typeHint: "DANCE" })).toEqual({ type: "DANCE", confidence: 0.9 });
-    expect(classifyProduction({ title: "Nattland", hasDirector: true, castCount: 8, typeHint: "OTHER" }).type).toBe("PLAY");
+    // "Other" stops the guesses from credits (Nocturno is circus with a director), not the keywords.
+    expect(classifyProduction({ title: "Nocturno", hasDirector: true, castCount: 8, typeHint: "OTHER" })).toEqual({
+      type: "OTHER",
+      confidence: 0.3,
+    });
+    expect(classifyProduction({ title: "Pieni ooppera", hasDirector: true, castCount: 2, typeHint: "OTHER" }).type).toBe("OPERA");
   });
 
   it("falls back to OTHER with low confidence", () => {

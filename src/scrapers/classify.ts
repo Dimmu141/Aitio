@@ -72,6 +72,9 @@ export function classifyProduction(input: ClassificationInput): Classification {
       return { type: rule.type, confidence: rule.confidence };
     }
   }
+  // The source files it under "other" (the Opera's "Muuta": Nocturno, contemporary circus):
+  // a director alone doesn't make it a play. Low confidence puts it on the admin's type list.
+  if (input.typeHint === "OTHER") return { type: "OTHER", confidence: 0.3 };
   // A band credited player by player, outnumbering the cast: a concert (Georg Malmstén & HumppAvanti!).
   if ((input.musicianCount ?? 0) >= 3 && (input.musicianCount ?? 0) > input.castCount) {
     return { type: "CONCERT", confidence: 0.75 };

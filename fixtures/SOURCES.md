@@ -68,6 +68,10 @@ path used. None of these sources lists only the next few dates (`hasFullSchedule
   genre sets `typeHint` (Ooppera → OPERA, Baletti/Nykytanssi → DANCE). "Kieli" holds the sung
   language and surtitles. Tours, tea dances, free foyer events, Stage24 streams and concerts
   at other venues are skipped. Conductors ("Musiikinjohto") are OTHER, not COMPOSER.
+  Guest productions (Nocturno, 20 Oct 2026) have no `production-cast` list: the team is
+  bold-labelled running text under `<h2>Tekijät</h2>`, read with the shared
+  `textBlockCredits`. Genre "Muuta" is an OTHER hint, so a director alone doesn't make a
+  circus piece a play.
 - **zodiak.fi** lists each current production with every date on `/fi/ohjelmisto`; dates carry
   `data-date="YYYY-MM-DD"`. Only `type-esitykset` items are kept (no panels, seminars or free
   Z-Lab showings). Some productions play at Tanssin talo (Ghosts of Rosegarden, Oct 2026), so
