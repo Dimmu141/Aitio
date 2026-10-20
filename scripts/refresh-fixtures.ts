@@ -36,6 +36,8 @@ const FIXTURES: Array<{ url: string; file: string; form?: Record<string, string>
   },
   // A guest run: "Kantaesitys oli Tampereen Työväen Teatterissa", no premiere of its own.
   { url: "https://www.kansallisteatteri.fi/esitys/karpaset", file: "fixtures/kansallisteatteri/production-karpaset.html" },
+  // A guest run whose "Työryhmä" heading is a bold paragraph, not an h2.
+  { url: "https://www.kansallisteatteri.fi/esitys/haapajarven-elvis", file: "fixtures/kansallisteatteri/production-haapajarven-elvis.html" },
   // No dates yet (spring 2027); "Ohjaus ja dramatisointi" and the original author, Aleksis Kivi.
   {
     url: "https://www.kansallisteatteri.fi/esitys/seitseman-veljesta",

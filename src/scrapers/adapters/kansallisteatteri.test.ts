@@ -226,6 +226,18 @@ describe("Kansallisteatteri guest runs", () => {
     expect(karpaset.credits.map((credit) => credit.name)).not.toContain("ATR-tuotanto Oy");
   });
 
+  it("finds the text block under a bold-paragraph heading too", () => {
+    // Haapajärven Elvis: "<p><strong>Työryhmä</strong></p>" instead of an h2.
+    const elvis = parseDetail(fixture("production-haapajarven-elvis.html"), {
+      externalId: "haapajarven-elvis",
+      url: "https://www.kansallisteatteri.fi/esitys/haapajarven-elvis",
+      isVisiting: true,
+    });
+    expect(elvis.credits.filter((credit) => credit.roles.includes("CAST"))).toHaveLength(9);
+    expect(elvis.credits).toContainEqual(expect.objectContaining({ name: "Lauri Maijala", roleText: "Käsikirjoitus, ohjaus ja lavastus" }));
+    expect(elvis.credits).toContainEqual(expect.objectContaining({ name: "Kati Keronen", roleText: "Naamioinnin suunnittelu" }));
+  });
+
   it("splits names on commas and 'ja'", () => {
     expect(textBlockCredits("<p><strong>Rooleissa</strong> A Aa, B Bb ja C Cc</p>").map((credit) => credit.name)).toEqual(["A Aa", "B Bb", "C Cc"]);
   });
