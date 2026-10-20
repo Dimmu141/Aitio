@@ -186,8 +186,9 @@ export function textBlockCredits(blockHtml: string): RawCredit[] {
   return credits;
 }
 
+/** The heading is an h2 on some pages and a bold paragraph ("<p><strong>Työryhmä</strong></p>") on others. */
 function teamTextBlock($: cheerio.CheerioAPI): string {
-  const heading = $("h2").filter((_, element) => /^(työryhmä|arbetsgrupp)$/i.test(cleanText($(element).text()))).first();
+  const heading = $("h2, p:has(> strong)").filter((_, element) => /^(työryhmä|arbetsgrupp)$/i.test(cleanText($(element).text()))).first();
   return heading.length > 0 ? (heading.parent().html() ?? "") : "";
 }
 
