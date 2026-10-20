@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { parseDetail, parseList, parseNextPage, parsePostId, parseTicketList } from "./hkt";
+import { splitPeople } from "../text";
+import { bylineCredits, parseDetail, parseList, parseNextPage, parsePostId, parseTicketList } from "./hkt";
 
 const fixture = (name: string) => readFileSync(`fixtures/hkt/${name}`, "utf8");
 
@@ -64,6 +65,7 @@ describe("HKT production page", () => {
     externalId: "julia",
     url: "https://hkt.fi/esitykset/julia/",
     title: "Julia",
+    authorHint: "David West Read - Max Martin",
   });
   const obehoriga = parseDetail(fixture("production-de-obehoriga.html"), null, {
     externalId: "de-obehoriga",
@@ -125,5 +127,27 @@ describe("HKT production page", () => {
 
   it("passes the tagline to the classifier only", () => {
     expect(julia.subtitle).toBe("Elämää suurempi hittimusikaali");
+  });
+});
+
+describe("HKT byline", () => {
+  it("makes the composer after the book writer a composer only (& Julia)", () => {
+    const julia = parseDetail(fixture("production-julia.html"), null, {
+      externalId: "julia",
+      url: "https://hkt.fi/esitykset/julia/",
+      title: "Julia",
+      authorHint: "David West Read - Max Martin",
+    });
+    const roles = (name: string) => julia.credits.filter((credit) => splitPeople(credit.name).includes(name)).flatMap((credit) => credit.roles);
+    expect(roles("David West Read")).toEqual(["WRITER"]);
+    expect(roles("Max Martin")).toEqual(["COMPOSER"]);
+  });
+
+  it("keeps both roles for a sole author-composer", () => {
+    const credits = [
+      { name: "Lin-Manuel Miranda", roleText: "Teksti", roles: ["WRITER" as const] },
+      { name: "Lin-Manuel Miranda", roleText: "Sävellys", roles: ["COMPOSER" as const] },
+    ];
+    expect(bylineCredits(credits, "Lin-Manuel Miranda")).toEqual(credits);
   });
 });
