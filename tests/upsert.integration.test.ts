@@ -129,11 +129,11 @@ describe.skipIf(!url)("upsertProduction (integration)", () => {
   it("delists a production the theatre stopped listing, and relists it when it returns", async () => {
     const { syncListing } = await import("@/scrapers/run");
     const at = new Date();
-    expect(await syncListing(db, theatre.id, ["some-other-show"], at)).toBe(1);
+    expect(await syncListing(db, theatre.id, ["some-other-show"], at)).toEqual({ delisted: 1, relisted: 0 });
     expect((await db.production.findUniqueOrThrow({ where: { slug: "nattland-svenska-teatern" } })).delistedAt).toEqual(at);
     // Already delisted: not counted again.
-    expect(await syncListing(db, theatre.id, [], new Date())).toBe(0);
-    expect(await syncListing(db, theatre.id, ["34985"], new Date())).toBe(0);
+    expect(await syncListing(db, theatre.id, [], new Date())).toEqual({ delisted: 0, relisted: 0 });
+    expect(await syncListing(db, theatre.id, ["34985"], new Date())).toEqual({ delisted: 0, relisted: 1 });
     expect((await db.production.findUniqueOrThrow({ where: { slug: "nattland-svenska-teatern" } })).delistedAt).toBeNull();
   });
   it("splits credit cells into people and never stores a group as a person", async () => {

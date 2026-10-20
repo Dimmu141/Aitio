@@ -50,7 +50,7 @@ export interface RunResult {
   sourceId: string;
   found: number;
   saved: number;
-  /** Saved productions whose stored facts differ from the previous run (new ones included). */
+  /** Productions whose stored facts differ from the previous run (new ones included), plus those delisted or relisted. */
   changed: number;
   failed: Array<{ url: string; error: string }>;
   /** Listed by the theatre but its page answers 404: their broken link, not our failure. */
@@ -64,10 +64,15 @@ export interface RunResult {
  * Productions the theatre stopped listing (cancelled, removed) are marked delisted so
  * their stored future dates stop counting as "on stage"; a listed one is cleared again.
  * A listed production whose page failed to load stays as it is. Returns how many were
- * newly delisted.
+ * newly delisted and how many came back.
  */
-export async function syncListing(db: PrismaClient, theatreId: string, listed: string[], at: Date): Promise<number> {
-  await db.production.updateMany({
+export async function syncListing(
+  db: PrismaClient,
+  theatreId: string,
+  listed: string[],
+  at: Date,
+): Promise<{ delisted: number; relisted: number }> {
+  const relisted = await db.production.updateMany({
     where: { theatreId, externalId: { in: listed }, delistedAt: { not: null } },
     data: { delistedAt: null },
   });
@@ -75,7 +80,7 @@ export async function syncListing(db: PrismaClient, theatreId: string, listed: s
     where: { theatreId, externalId: { notIn: listed }, delistedAt: null },
     data: { delistedAt: at },
   });
-  return result.count;
+  return { delisted: result.count, relisted: relisted.count };
 }
 
 /**
@@ -168,7 +173,9 @@ export async function runSource(
 
     // Only a complete run knows what the theatre no longer lists.
     if (db && theatre && !options.dryRun && !options.limit) {
-      const delisted = await syncListing(db, theatre.id, list.map((ref) => ref.externalId), seenAt);
+      const { delisted, relisted } = await syncListing(db, theatre.id, list.map((ref) => ref.externalId), seenAt);
+      // Leaving or returning to the listing changes what visitors see, so it counts as a change.
+      result.changed += delisted + relisted;
       if (delisted > 0) log(`  ${delisted} no longer listed by the theatre`);
     }
 

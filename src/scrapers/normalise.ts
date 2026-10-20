@@ -116,6 +116,9 @@ async function factsFingerprint(db: PrismaClient, productionId: string): Promise
   const current = (row: { lastSeenAt: Date }) => row.lastSeenAt.getTime() >= production.lastSeenAt.getTime();
   return JSON.stringify([
     production.title,
+    // Not shown, but they move the production on or off the admin's review lists.
+    production.titleCased,
+    production.typeConfidence,
     production.sourceUrl,
     production.stageId,
     production.type,
