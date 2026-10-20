@@ -3,7 +3,7 @@ import { ProductionCard } from "@/components/ProductionCard";
 import { getDictionary } from "@/i18n";
 import type { Dictionary } from "@/i18n/dictionaries/fi";
 import { getAllSlugs, getPerson, type PersonCredit } from "@/lib/catalogue/queries";
-import { MIN_PRODUCTIONS_TO_INDEX } from "@/lib/catalogue/select";
+import { MIN_PRODUCTIONS_TO_INDEX, PERSON_INDEX_LOCALE } from "@/lib/catalogue/select";
 import { pageMetadata } from "@/lib/metadata";
 import { withPlaceholder } from "@/lib/static-params";
 
@@ -35,7 +35,8 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/henkilo/
     slug,
     title: page.name,
     description: `${page.name}: ${titles.join(", ")}. ${t.site.tagline}.`,
-    noindex: all.length < MIN_PRODUCTIONS_TO_INDEX,
+    noindex: all.length < MIN_PRODUCTIONS_TO_INDEX || locale !== PERSON_INDEX_LOCALE,
+    indexedLocales: [PERSON_INDEX_LOCALE],
   });
 }
 

@@ -1,4 +1,5 @@
 import type { ProductionType } from "@/generated/prisma/enums";
+import type { Locale } from "@/i18n/config";
 import { NOT_A_PERFORMANCE } from "@/scrapers/classify";
 
 /**
@@ -19,6 +20,12 @@ export function isCurrent(row: { lastSeenAt: Date }, production: { lastSeenAt: D
  * A person's page is indexed (and in the sitemap) from this many productions on. With one
  * credit the page only repeats the production's credit list: thin, and 800+ of them.
  */
+/**
+ * Person pages are indexed in Finnish only: the Swedish and English pages show the same
+ * names and productions, so search engines saw every person three times (third review,
+ * 20 Oct 2026). They stay reachable, with noindex, and out of the sitemap.
+ */
+export const PERSON_INDEX_LOCALE: Locale = "fi";
 export const MIN_PRODUCTIONS_TO_INDEX = 2;
 
 /** Distinct productions a person is currently credited in (stale credits don't count). */
