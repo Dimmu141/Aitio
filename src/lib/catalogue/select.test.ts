@@ -133,6 +133,14 @@ describe("lifecycle", () => {
     expect(lifecycle(facts({ sourceUpdatedAt: day(-50) }), asOf).phase).toBe("archive");
   });
 
+  // Third review (20 Oct 2026): both still in Svenska Teatern's listing, which is its whole archive.
+  it("archives both Konstens natt posts although the theatre still lists them", () => {
+    const today = new Date("2026-10-20T04:08:00Z");
+    for (const sourceUpdatedAt of [new Date("2026-08-20T05:34:00Z"), new Date("2025-08-07T12:00:00Z")]) {
+      expect(lifecycle(facts({ sourceUpdatedAt, delistedAt: null }), today).phase).toBe("archive");
+    }
+  });
+
   it("keeps a recently edited undated post upcoming, and a stale one with a date ahead too", () => {
     expect(lifecycle(facts({ sourceUpdatedAt: day(-10) }), asOf).phase).toBe("upcoming");
     expect(lifecycle(facts({ sourceUpdatedAt: day(-90), premiereDate: day(40) }), asOf).phase).toBe("upcoming");
