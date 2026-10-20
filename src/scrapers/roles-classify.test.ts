@@ -42,6 +42,7 @@ describe("mapRoleText for dance and crew", () => {
     expect(mapRoleText("Tanssijat")).toEqual(["CAST"]);
     expect(mapRoleText("Esiintyjät")).toEqual(["CAST"]);
     expect(mapRoleText("Dansare")).toEqual(["CAST"]);
+    expect(mapRoleText("Lavalla")).toEqual(["CAST"]); // Espoo's Jättömailla, Oct 2026
   });
 
   it("does not credit assistants as choreographers", () => {
@@ -53,6 +54,8 @@ describe("mapRoleText for dance and crew", () => {
     expect(mapRoleText("Av")).toEqual(["WRITER"]);
     expect(mapRoleText("Design av rekvisita")).toEqual(["DESIGNER"]);
     expect(mapRoleText("Manuskriptets översättning")).toEqual(["TRANSLATOR"]);
+    expect(mapRoleText("Manuskript")).toEqual(["WRITER"]);
+    expect(mapRoleText("Skenografia")).toEqual(["DESIGNER"]);
     expect(mapRoleText("På scen")).toEqual(["CAST"]);
     expect(mapRoleText("Bygge av scenografi")).toEqual([]);
     expect(mapRoleText("Intimitetskoreograf")).toEqual([]);

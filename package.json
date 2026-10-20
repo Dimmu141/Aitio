@@ -19,6 +19,7 @@
     "postinstall": "prisma generate",
     "test:e2e": "playwright test",
     "moderation": "tsx scripts/moderation.ts",
+    "people:merge": "tsx scripts/merge-people.ts",
     "launch:check": "tsx scripts/launch-check.ts"
   },
   "dependencies": {

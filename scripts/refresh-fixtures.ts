@@ -43,6 +43,7 @@ const FIXTURES: Array<{ url: string; file: string; form?: Record<string, string>
   },
   { url: showsUrl(1), file: "fixtures/svenska-teatern/shows-page-1.json" },
   { url: "https://svenskateatern.fi/repertoar/nattland/", file: "fixtures/svenska-teatern/production-nattland.html" },
+  { url: "https://svenskateatern.fi/repertoar/anglagard/", file: "fixtures/svenska-teatern/production-anglagard.html" },
   { url: HKT_LIST_URL, file: "fixtures/hkt/list-esitykset.html" },
   { url: `${HKT_LIST_URL}page/2/`, file: "fixtures/hkt/list-esitykset-page-2.html" },
   { url: "https://hkt.fi/esitykset/julia/", file: "fixtures/hkt/production-julia.html" },
@@ -56,6 +57,11 @@ const FIXTURES: Array<{ url: string; file: string; form?: Record<string, string>
   { url: KOM_LIST_URL, file: "fixtures/kom-teatteri/ohjelmisto.html" },
   { url: KOM_CALENDAR_URL, file: "fixtures/kom-teatteri/kalenteri.html" },
   { url: "https://kom-teatteri.fi/ohjelmisto/mysteriobuffo/", file: "fixtures/kom-teatteri/production-mysteriobuffo.html" },
+  { url: "https://kom-teatteri.fi/ohjelmisto/poiskatsojat/", file: "fixtures/kom-teatteri/production-poiskatsojat.html" },
+  {
+    url: "https://kom-teatteri.fi/ohjelmisto/kuinka-tulla-tapio-rautavaaraksi/",
+    file: "fixtures/kom-teatteri/production-kuinka-tulla-tapio-rautavaaraksi.html",
+  },
   { url: ESPOO_AJAX_URL, form: ESPOO_LIST_FORM, file: "fixtures/espoon-teatteri/ohjelmisto-ajax.html" },
   {
     url: "https://espoonteatteri.fi/ohjelmisto/rakastavaisten-kuoro/",

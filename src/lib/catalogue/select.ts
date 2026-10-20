@@ -1,4 +1,6 @@
 import type { ProductionType } from "@/generated/prisma/enums";
+import type { Locale } from "@/i18n/config";
+import { NOT_A_PERFORMANCE } from "@/scrapers/classify";
 
 /**
  * A theatre is shown once its source has delivered something. One added to the seed
@@ -18,6 +20,12 @@ export function isCurrent(row: { lastSeenAt: Date }, production: { lastSeenAt: D
  * A person's page is indexed (and in the sitemap) from this many productions on. With one
  * credit the page only repeats the production's credit list: thin, and 800+ of them.
  */
+/**
+ * Person pages are indexed in Finnish only: the Swedish and English pages show the same
+ * names and productions, so search engines saw every person three times (third review,
+ * 20 Oct 2026). They stay reachable, with noindex, and out of the sitemap.
+ */
+export const PERSON_INDEX_LOCALE: Locale = "fi";
 export const MIN_PRODUCTIONS_TO_INDEX = 2;
 
 /** Distinct productions a person is currently credited in (stale credits don't count). */
@@ -29,6 +37,20 @@ export function currentProductionCount(
 
 export function effectiveType(production: { type: ProductionType; typeOverride: ProductionType | null }): ProductionType {
   return production.typeOverride ?? production.type;
+}
+
+/**
+ * Whether "Merkitse nähdyksi" makes sense at all: not for a guided tour or an open house
+ * (Topelius och teatern, stage "Rundvandring"; third review, 20 Oct 2026). An admin's type
+ * override to a real genre makes it loggable again.
+ */
+export function canBeSeen(production: {
+  type: ProductionType;
+  typeOverride: ProductionType | null;
+  title: string;
+  stage: { name: string } | null;
+}): boolean {
+  return effectiveType(production) !== "OTHER" || !NOT_A_PERFORMANCE.test(`${production.title} ${production.stage?.name ?? ""}`);
 }
 
 export function windowEnd(asOf: Date, days = WINDOW_DAYS): Date {

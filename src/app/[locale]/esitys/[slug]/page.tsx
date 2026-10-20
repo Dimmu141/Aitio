@@ -148,7 +148,7 @@ export default async function ProductionRoute({ params }: PageProps<"/[locale]/e
         <ExternalLink href={page.sourceUrl} hint={t.production.externalLink}>
           {hostname(page.sourceUrl)}
         </ExternalLink>{" "}
-        · {t.production.updated} {formatShortDate(page.updatedAt, locale, page.asOf, false)}
+        · {t.production.checked} {formatShortDate(page.checkedAt, locale, page.asOf, false)}
       </p>
 
       {jsonLd.length > 0 && (

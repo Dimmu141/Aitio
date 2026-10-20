@@ -41,6 +41,8 @@ export interface TeamRow {
   person: { slug: string; name: string };
   /** "Ohjaus ja dramatisointi", "Lavastussuunnittelu, pukusuunnittelu". */
   roles: string;
+  /** Every label is the theatre's own wording (its language, not the page's). */
+  sourceText: boolean;
   /** Every credit is OTHER (assistants, technicians): listed after a few, behind "+ N muuta". */
   minor: boolean;
 }
@@ -56,19 +58,21 @@ function joinLabels(labels: string[]): string {
 }
 
 /**
- * The team, one row per person in the theatre's own order. With `sourceText` (the page is
- * in the theatre's language) each role reads as the theatre wrote it; otherwise, or when the
- * theatre gave no label, it is the translated role name.
+ * The team, one row per person in the theatre's own order, each role as the theatre wrote
+ * it, on every page language: "Kostymdesign" says more than a translated "Suunnittelu"
+ * (third review, 20 Oct 2026), and content stays in its original language. The translated
+ * role name is only the fallback when the theatre gave no label; the enum still filters.
  */
-export function teamRows(credits: CreditRow[], roleName: (role: CreditRole) => string, sourceText: boolean): TeamRow[] {
-  const byPerson = new Map<string, { person: TeamRow["person"]; labels: string[]; minor: boolean }>();
+export function teamRows(credits: CreditRow[], roleName: (role: CreditRole) => string): TeamRow[] {
+  const byPerson = new Map<string, { person: TeamRow["person"]; labels: string[]; minor: boolean; sourceText: boolean }>();
   for (const credit of credits) {
     if (credit.role === "CAST") continue;
-    const row = byPerson.get(credit.person.slug) ?? { person: credit.person, labels: [], minor: true };
+    const row = byPerson.get(credit.person.slug) ?? { person: credit.person, labels: [], minor: true, sourceText: true };
     row.minor &&= credit.role === "OTHER";
-    const label = (sourceText && credit.roleText) || roleName(credit.role);
+    row.sourceText &&= credit.roleText !== null;
+    const label = credit.roleText || roleName(credit.role);
     if (!row.labels.some((seen) => seen.toLocaleLowerCase("fi") === label.toLocaleLowerCase("fi"))) row.labels.push(label);
     byPerson.set(credit.person.slug, row);
   }
-  return [...byPerson.values()].map(({ person, labels, minor }) => ({ person, roles: joinLabels(labels), minor }));
+  return [...byPerson.values()].map(({ person, labels, minor, sourceText }) => ({ person, roles: joinLabels(labels), minor, sourceText }));
 }

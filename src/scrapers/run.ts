@@ -14,6 +14,7 @@ import { viirusAdapter } from "./adapters/viirus";
 import { zodiakAdapter } from "./adapters/zodiak";
 import { HttpError } from "./http";
 import { planProduction, upsertProduction } from "./normalise";
+import { sanityWarnings, type SanityWarning } from "./sanity";
 import type { RawProductionDetail, SourceAdapter } from "./types";
 
 export const ADAPTERS: Record<string, SourceAdapter> = {
@@ -52,6 +53,8 @@ export interface RunResult {
   failed: Array<{ url: string; error: string }>;
   /** Listed by the theatre but its page answers 404: their broken link, not our failure. */
   missing: string[];
+  /** Parsed fine but looks incomplete (src/scrapers/sanity.ts). */
+  warnings: SanityWarning[];
   aborted?: string;
 }
 
@@ -91,7 +94,7 @@ export async function runSource(
   options: RunOptions,
 ): Promise<RunResult> {
   const log = options.log ?? console.log;
-  const result: RunResult = { sourceId: adapter.id, found: 0, saved: 0, failed: [], missing: [] };
+  const result: RunResult = { sourceId: adapter.id, found: 0, saved: 0, failed: [], missing: [], warnings: [] };
 
   const theatre = db ? await db.theatre.findUnique({ where: { sourceId: adapter.id } }) : null;
   if (db && !theatre) throw new Error(`No theatre with sourceId "${adapter.id}". Run the seed first.`);
@@ -135,13 +138,21 @@ export async function runSource(
         continue;
       }
 
+      const { classification } = planProduction(detail);
+      const warnings = sanityWarnings(ref, detail, {
+        sourceId: adapter.id,
+        type: classification.type,
+        asOf: new Date(),
+      });
+      result.warnings.push(...warnings);
+
       if (options.dryRun || !db || !theatre) {
-        const { classification } = planProduction(detail);
         log(
           `  • ${detail.title} [${classification.type} ${classification.confidence}] ` +
             `stage=${detail.stage ?? "?"} performances=${detail.performances.length} ` +
             `credits=${detail.credits.length} reviews=${detail.criticReviews.length}`,
         );
+        for (const warning of warnings) log(`    ! ${warning.rule}: ${warning.detail}`);
         result.saved += 1;
         continue;
       }
@@ -149,6 +160,7 @@ export async function runSource(
       const summary = await upsertProduction(db, theatre, detail, seenAt);
       result.saved += 1;
       log(`  ${summary.created ? "+" : "~"} ${summary.slug} (${summary.performances} perf, ${summary.credits} credits)`);
+      for (const warning of warnings) log(`    ! ${warning.rule}: ${warning.detail}`);
     }
 
     // Only a complete run knows what the theatre no longer lists.

@@ -1,5 +1,5 @@
 import type { ReportReason } from "@/generated/prisma/enums";
-import { isCurrent, lifecycle } from "@/lib/catalogue/select";
+import { canBeSeen, isCurrent, lifecycle } from "@/lib/catalogue/select";
 import { db } from "@/lib/db";
 import type { EntryInput } from "./entry-form";
 import { clearWatched } from "./watchlist";
@@ -49,7 +49,8 @@ export async function getLogContext(userId: string | null, slug: string, asOf: D
     // The earliest is enough for `started`: past means performed, future still counts unless a premiere is ahead.
     db.performance.findFirst({ where: { productionId: production.id }, select: { startsAt: true }, orderBy: { startsAt: "asc" } }),
   ]);
-  const { started } = lifecycle({ ...production, next: null, performances: first ? [first] : [] }, asOf);
+  const life = lifecycle({ ...production, next: null, performances: first ? [first] : [] }, asOf);
+  const started = life.started && canBeSeen(production);
   return {
     production: {
       id: production.id,

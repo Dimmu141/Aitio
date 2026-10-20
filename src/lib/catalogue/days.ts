@@ -10,15 +10,19 @@ export interface Day {
   relative: "today" | "tomorrow" | null;
   /** A moment on that day, for formatting the heading. */
   sample: Date;
-  /** One per performance that day; each card's `next` is that performance. */
-  cards: ProductionCard[];
+  /** One per production that day; `next` is its first performance, `times` every one. */
+  cards: DayCard[];
 }
+
+/** A card under a day heading: Miniooppera Reininkulta at 11, 12, 13 and 14 is one card. */
+export type DayCard = ProductionCard & { times: Date[] };
 
 const DAY_MS = 86_400_000;
 
 /**
  * A real day-by-day programme: every performance in `soon` under its Helsinki day, in
- * date and time order, so a show on Tuesday and Wednesday is listed on both. The front
+ * date and time order, so a show on Tuesday and Wednesday is listed on both. Several
+ * performances of one production on one day share a card (third review, 20 Oct 2026). The front
  * page keeps this short by defaulting to the next few days. Relative names come from
  * asOf, the same moment the cached list was computed for.
  */
@@ -35,13 +39,24 @@ export function groupByDay(cards: ProductionCard[], asOf: Date): Day[] {
         sample: startsAt,
         cards: [],
       };
-      day.cards.push({ ...card, next: startsAt });
+      const same = day.cards.find((existing) => existing.slug === card.slug);
+      if (same) same.times.push(startsAt);
+      else day.cards.push({ ...card, next: startsAt, times: [startsAt] });
       days.set(date, day);
     }
   }
   return [...days.values()]
     .sort((a, b) => a.date.localeCompare(b.date))
-    .map((day) => ({ ...day, cards: day.cards.sort((a, b) => (a.next?.getTime() ?? 0) - (b.next?.getTime() ?? 0)) }));
+    .map((day) => ({
+      ...day,
+      cards: day.cards
+        .map((card) => ({ ...card, times: [...card.times].sort((a, b) => a.getTime() - b.getTime()), next: minDate(card.times) }))
+        .sort((a, b) => a.next.getTime() - b.next.getTime()),
+    }));
+}
+
+function minDate(dates: Date[]): Date {
+  return dates.reduce((earliest, date) => (date < earliest ? date : earliest));
 }
 
 /** A premiere is a new staging; a stand-up night or a concert "premiering" is not news here. */

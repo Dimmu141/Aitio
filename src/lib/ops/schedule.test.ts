@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { hasBearer } from "./bearer";
-import { health, needsAlert, nextSource, ranRecently, type RunSummary } from "./schedule";
+import { health, needsAlert, nextSource, overdueSources, ranRecently, type RunSummary } from "./schedule";
 
 const now = new Date("2026-10-19T03:00:00Z");
 const hoursAgo = (hours: number) => new Date(now.getTime() - hours * 3_600_000);
@@ -50,6 +50,22 @@ describe("health", () => {
       "failed",
       "stuck",
     ]);
+  });
+});
+
+describe("overdueSources", () => {
+  const ids = ["hkt", "espoon-teatteri"];
+
+  it("flags a source whose last success is over 26 hours old, or that never ran", () => {
+    // espoon-teatteri on 20 Oct 2026: one run, at 14:22 on the 18th.
+    expect(overdueSources(ids, [run({ startedAt: hoursAgo(25) }), run({ sourceId: "espoon-teatteri", startedAt: hoursAgo(37) })], now)).toEqual([
+      "espoon-teatteri",
+    ]);
+    expect(overdueSources(ids, [run({ startedAt: hoursAgo(25) })], now)).toEqual(["espoon-teatteri"]);
+  });
+
+  it("does not count a failed run as fresh", () => {
+    expect(overdueSources(["hkt"], [run({ startedAt: hoursAgo(1), status: "FAILED" }), run({ startedAt: hoursAgo(30) })], now)).toEqual(["hkt"]);
   });
 });
 

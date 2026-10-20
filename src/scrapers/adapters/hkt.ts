@@ -3,7 +3,7 @@ import { z } from "zod";
 import { politeFetch } from "../http";
 import { collectPages } from "../paginate";
 import { mapRoleText } from "../roles";
-import { cleanText, helsinkiToUtc, languageCodes, parseFinnishDate, stripGuestMarker } from "../text";
+import { cleanText, helsinkiToUtc, languageCodes, parseFinnishDate, splitPeople, stripGuestMarker } from "../text";
 import {
   rawProductionDetailSchema,
   rawProductionSchema,
@@ -193,10 +193,28 @@ function parseReviews($: Page): RawCriticReview[] {
   return reviews;
 }
 
+/**
+ * The list byline names book first, then music: "David West Read - Max Martin". HKT's own
+ * team list also gives the composer "Teksti" (the song lyrics), which made Max Martin a
+ * second writer of & Julia (Oct 2026). A composer after the first byline name keeps only
+ * the composer credit; a sole author-composer keeps both.
+ */
+export function bylineCredits(credits: RawCredit[], authorHint: string | undefined): RawCredit[] {
+  const byline = (authorHint ?? "").split(/\s+[-–]\s+/).map((name) => cleanText(name)).filter(Boolean);
+  if (byline.length < 2) return credits;
+  const composers = new Set(credits.filter((credit) => credit.roles.includes("COMPOSER")).flatMap((credit) => splitPeople(credit.name)));
+  const musicOnly = new Set(byline.slice(1).filter((name) => composers.has(name)));
+  return credits.flatMap((credit) => {
+    if (!musicOnly.has(credit.name) || !credit.roles.includes("WRITER")) return [credit];
+    const roles = credit.roles.filter((role) => role !== "WRITER");
+    return roles.length > 0 ? [{ ...credit, roles }] : [];
+  });
+}
+
 export function parseDetail(
   html: string,
   ticketJson: string | null,
-  ref: Pick<RawProduction, "externalId" | "url" | "title">,
+  ref: Pick<RawProduction, "externalId" | "url" | "title" | "authorHint">,
 ): RawProductionDetail {
   const $ = cheerio.load(html);
   const description = $("article.show--description").first();
@@ -221,7 +239,7 @@ export function parseDetail(
     runEnd: performances.at(-1)?.startsAt,
     languages,
     subtitleLangs,
-    credits: parseCredits($),
+    credits: bylineCredits(parseCredits($), ref.authorHint),
     performances,
     criticReviews: parseReviews($),
     isVisiting: false,

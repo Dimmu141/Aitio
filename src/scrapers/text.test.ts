@@ -12,7 +12,19 @@ import {
   yearFromWeekday,
   sentenceCaseShouting,
   splitPeople,
+  nameCaseShouting,
 } from "./text";
+
+describe("nameCaseShouting", () => {
+  it.each([
+    ["EDWARD AF SILLÉN", "Edward af Sillén"],
+    ["KARL-JOHAN ANKARBLOM", "Karl-Johan Ankarblom"],
+    ["VICKY VON DER LANCKEN", "Vicky von der Lancken"],
+    ["Lenka Vagnerová", "Lenka Vagnerová"],
+  ])("%s", (raw, name) => {
+    expect(nameCaseShouting(raw)).toBe(name);
+  });
+});
 
 describe("helsinkiToUtc", () => {
   it("uses UTC+3 in summer time", () => {
@@ -127,6 +139,18 @@ describe("splitPeople", () => {
     ["Eva-Maria Dahlin och Lisa Lindén", ["Eva-Maria Dahlin", "Lisa Lindén"]],
     ["Kristian Smeds", ["Kristian Smeds"]],
     ["Pia Ingman m.fl.", ["Pia Ingman"]],
+    ["Irena Kraus efter boken ”OM Niklas Strömstedt”", ["Irena Kraus"]],
+    // The third review (20 Oct 2026).
+    ["Silva Lillrank och Outi Paasivirta", ["Silva Lillrank", "Outi Paasivirta"]],
+    ["Christoffer Österlund & Tom Laurmaa", ["Christoffer Österlund", "Tom Laurmaa"]],
+    ["Juulia Björn, Nina-Maria Häggblom, Noona Leppinen", ["Juulia Björn", "Nina-Maria Häggblom", "Noona Leppinen"]],
+    ["Ylipää med vänner", ["Ylipää"]],
+    ["Okko Kivikataja / Heikki Nikula", ["Okko Kivikataja", "Heikki Nikula"]],
+    ["August Strindberg/Marie-Louise Ekman", ["August Strindberg", "Marie-Louise Ekman"]],
+    ["AC/DC", ["AC/DC"]],
+    ["Anacarsis Ramos / Pornotráfico", ["Anacarsis Ramos"]],
+    ["Jaakko Saariluoma / Teatteri Takomo", ["Jaakko Saariluoma"]],
+    ["Ida Rosenblad, Ella Slunga, Kristina Grönqvist von Bonsdorff", ["Ida Rosenblad", "Ella Slunga", "Kristina Grönqvist von Bonsdorff"]],
   ])("%s", (raw, people) => {
     expect(splitPeople(raw)).toEqual(people);
   });
@@ -138,6 +162,8 @@ describe("splitPeople", () => {
 
   it("never makes a person of a group or a company alone", () => {
     expect(splitPeople("ATR-tuotanto Oy")).toEqual([]);
+    expect(splitPeople("Starman Työryhmä")).toEqual([]);
+    expect(splitPeople("työryhmä")).toEqual([]);
     expect(splitPeople("ystävät")).toEqual([]);
   });
 });
@@ -146,6 +172,10 @@ describe("sentenceCaseShouting", () => {
   it.each([
     ["NÅT ATT GÖRA", "Nåt att göra"],
     ["PÄHKINÄNSÄRKIJÄN JOULU", "Pähkinänsärkijän joulu"],
+    // Third review (20 Oct 2026): only the shouting part before the dash.
+    ["PÄHKINÄNSÄRKIJÄN JOULU – juhla, jota et tiennyt kaipaavasi", "Pähkinänsärkijän joulu – juhla, jota et tiennyt kaipaavasi"],
+    ["KAJ – karar i arbeit", "KAJ – karar i arbeit"],
+    ["Tommy Körberg – Unplugged", "Tommy Körberg – Unplugged"],
     ["AJA, BAJA ALFONS ÅBERG!", "Aja, baja alfons åberg!"],
     ["KAJ", "KAJ"],
     ["1984", "1984"],

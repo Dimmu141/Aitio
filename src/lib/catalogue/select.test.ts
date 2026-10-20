@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  canBeSeen,
   effectiveType,
   isClosingSoon,
   isCurrent,
@@ -133,6 +134,14 @@ describe("lifecycle", () => {
     expect(lifecycle(facts({ sourceUpdatedAt: day(-50) }), asOf).phase).toBe("archive");
   });
 
+  // Third review (20 Oct 2026): both still in Svenska Teatern's listing, which is its whole archive.
+  it("archives both Konstens natt posts although the theatre still lists them", () => {
+    const today = new Date("2026-10-20T04:08:00Z");
+    for (const sourceUpdatedAt of [new Date("2026-08-20T05:34:00Z"), new Date("2025-08-07T12:00:00Z")]) {
+      expect(lifecycle(facts({ sourceUpdatedAt, delistedAt: null }), today).phase).toBe("archive");
+    }
+  });
+
   it("keeps a recently edited undated post upcoming, and a stale one with a date ahead too", () => {
     expect(lifecycle(facts({ sourceUpdatedAt: day(-10) }), asOf).phase).toBe("upcoming");
     expect(lifecycle(facts({ sourceUpdatedAt: day(-90), premiereDate: day(40) }), asOf).phase).toBe("upcoming");
@@ -224,5 +233,25 @@ describe("currentProductionCount", () => {
     // Writer and director of one show, plus a credit the theatre has since removed.
     expect(currentProductionCount([credit("a"), credit("a"), credit("b", older)])).toBe(1);
     expect(currentProductionCount([credit("a"), credit("b")])).toBe(2);
+  });
+});
+
+describe("canBeSeen", () => {
+  const show = (title: string, stage: string | null, type: "OTHER" | "PLAY" = "OTHER", typeOverride: "PLAY" | null = null) => ({
+    title,
+    stage: stage ? { name: stage } : null,
+    type,
+    typeOverride,
+  });
+
+  it("refuses a guided tour or an open house", () => {
+    expect(canBeSeen(show("Topelius och teatern", "Rundvandring"))).toBe(false);
+    expect(canBeSeen(show("Konstens natt 2026", null))).toBe(false);
+  });
+
+  it("allows real performances, unknown types and an admin's override", () => {
+    expect(canBeSeen(show("Änglagård", "Stora scenen", "PLAY"))).toBe(true);
+    expect(canBeSeen(show("Wishamalii (FI/JO)", "AMOS-scenen"))).toBe(true); // OTHER, but a performance
+    expect(canBeSeen(show("Topelius och teatern", "Rundvandring", "OTHER", "PLAY"))).toBe(true);
   });
 });

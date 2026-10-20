@@ -71,7 +71,7 @@ export const sv: Dictionary = {
     allDates: "Alla datum",
     criticsAside: "länkar till originalen",
     sourceLine: "Uppgifter",
-    updated: "uppdaterad",
+    checked: "kontrollerad",
     spokenIn: { it: "på italienska", fi: "på finska", sv: "på svenska", en: "på engelska", ru: "på ryska", uk: "på ukrainska", es: "på spanska", ar: "på arabiska", lv: "på lettiska", et: "på estniska", fr: "på franska", de: "på tyska", sign: "på teckenspråk", zxx: "ordlös föreställning" },
     histogramLabel: "Betygsfördelning",
     stars: (value: number) => `${value.toLocaleString("sv-FI")} stjärnor`,

@@ -32,8 +32,19 @@ Things these captures taught us, which a refresh must keep true:
   announcements; the adapter uses the curated repertoire page and the calendar. The
   production's ticket link is the "OSTA LIPUT" link on its page. The repertoire can link to
   pages that don't exist (Trio Kaipuu, 404 on 18 Oct 2026); runs log those as missing.
+  Checked again 19 Oct 2026: pages print dates two ways ("to 1.10. klo 18.30" in a `<p>`,
+  or "ma 7.9. 18.30" under `<h4>` months in `div.paragraph`), with "PERUTTU" for cancelled
+  shows and talks ("+teosesittely klo 17.45") on the same line. Credit lines can hold several
+  bold names and empty `<strong>`s around `<br>`s. Review bylines are "– Critic / Outlet" or
+  "Outlet / Critic". Film screenings (NAZA) are on the repertoire page and skipped, and a
+  later card can link to another card's page (Lukureivit → NAZA): the first card wins.
 - **ryhmateatteri.fi** has one production on (checked against its own programme page on
   18 Oct 2026; `ohjelmisto-liput.html` is kept for reference, not used by the tests).
+
+- **svenskateatern.fi** guest musicals can lack the `.member` team list and print the team as
+  centred paragraphs, "<strong>Regi</strong> MARIA LUNDSTRÖM" (`production-anglagard.html`,
+  19 Oct 2026). They are read only when there is no team list; names are cased with
+  `nameCaseShouting`, and "Originalregi" (the Stockholm original) is not the director.
 
 ## What the live run changed (18 Oct 2026)
 

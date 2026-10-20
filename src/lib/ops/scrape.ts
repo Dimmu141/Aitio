@@ -6,7 +6,7 @@ import { absoluteUrl } from "@/lib/site";
 import { ADAPTERS, describeError, runSource } from "@/scrapers/run";
 import { adminEmails } from "./admin";
 import { closeStuckRuns, recentRuns } from "./runs";
-import { health, needsAlert, nextSource, ranRecently, type Health } from "./schedule";
+import { health, needsAlert, nextSource, OVERDUE_AFTER_HOURS, overdueSources, ranRecently, type Health } from "./schedule";
 
 export interface ScrapeOutcome {
   sourceId: string;
@@ -42,7 +42,9 @@ export async function scheduledScrape(sourceId: string, now = new Date()): Promi
 
   const latest = (await recentRuns(5)).find((run) => run.sourceId === id);
   outcome.health = health(latest, new Date());
-  if (!outcome.error) revalidateTag(CATALOGUE_TAG, "max");
+  // expire 0, not "max": with "max" the first visitor after a scrape still got the old page,
+  // and an unvisited page kept the old "päivitetty" date (20 Oct 2026).
+  if (!outcome.error) revalidateTag(CATALOGUE_TAG, { expire: 0 });
   if (needsAlert(outcome.health)) await alertAdmins(outcome, log);
   return outcome;
 }
@@ -64,4 +66,25 @@ async function alertAdmins(outcome: ScrapeOutcome, log: string[]): Promise<void>
       (error: unknown) => console.error("Alert email failed", error),
     );
   }
+}
+
+/**
+ * Once a day after the scrape window (the cleanup cron): email the admins about sources
+ * with no successful run in OVERDUE_AFTER_HOURS, e.g. a cron that silently stopped firing.
+ */
+export async function alertOverdueSources(now: Date): Promise<string[]> {
+  const overdue = overdueSources(Object.keys(ADAPTERS), await recentRuns(), now);
+  const recipients = adminEmails();
+  if (overdue.length === 0 || recipients.length === 0) return overdue;
+  const text = [
+    `Ei onnistunutta hakua ${OVERDUE_AFTER_HOURS} tuntiin: ${overdue.join(", ")}.`,
+    "",
+    `Seuranta: ${absoluteUrl("/yllapito")}`,
+  ].join("\n");
+  for (const to of recipients) {
+    await sendEmail({ to, subject: `Aitio: ${overdue.length} lähdettä ilman tuoretta hakua`, text }).catch((error: unknown) =>
+      console.error("Overdue alert email failed", error),
+    );
+  }
+  return overdue;
 }

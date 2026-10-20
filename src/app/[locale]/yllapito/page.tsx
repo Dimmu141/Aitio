@@ -13,7 +13,7 @@ import { formatPerformance } from "@/lib/format";
 import { isAdmin } from "@/lib/ops/admin";
 import { titleReviewQueue, typeReviewQueue } from "@/lib/ops/catalogue-admin";
 import { recentRuns, type RunRow } from "@/lib/ops/runs";
-import { health, type Health } from "@/lib/ops/schedule";
+import { health, OVERDUE_AFTER_HOURS, overdueSources, type Health } from "@/lib/ops/schedule";
 import { requireUser } from "@/lib/session";
 import { ADAPTERS } from "@/scrapers/run";
 
@@ -46,11 +46,17 @@ async function ScrapeHealth({ now }: { now: Date }) {
   ]);
   const names = new Map(theatres.map((theatre) => [theatre.sourceId, theatre.name]));
   const bySource = (id: string): RunRow[] => runs.filter((run) => run.sourceId === id);
+  const overdue = overdueSources(Object.keys(ADAPTERS), runs, now);
   return (
     <section aria-labelledby="haut" className="space-y-4">
       <h2 id="haut" className="text-section">
         Haut
       </h2>
+      {overdue.length > 0 && (
+        <Notice tone="error">
+          Ei onnistunutta hakua {OVERDUE_AFTER_HOURS} tuntiin: {overdue.map((id) => names.get(id) ?? id).join(", ")}.
+        </Notice>
+      )}
       <ul className="space-y-4">
         {Object.keys(ADAPTERS).map((id) => {
           const history = bySource(id);

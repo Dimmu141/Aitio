@@ -1,7 +1,7 @@
 import * as cheerio from "cheerio";
 import { politeFetch } from "../http";
 import { mapRoleText } from "../roles";
-import { cleanText, helsinkiToUtc } from "../text";
+import { cleanText, helsinkiToUtc, splitPeople } from "../text";
 import {
   rawProductionDetailSchema,
   rawProductionSchema,
@@ -41,19 +41,25 @@ function slugFromUrl(url: string): string {
   return url.replace(/^.*\/ohjelmisto\//, "").replace(/[/?#].*$/, "");
 }
 
+/** Film screenings and reading nights share the repertoire page; they are not theatre. */
+const NOT_A_PRODUCTION = /elokuv|lukureiv/i;
+
 export function parseList(html: string): RawProduction[] {
   const $ = cheerio.load(html);
-  const results = new Map<string, RawProduction>();
+  // null keeps a skipped card's link taken.
+  const results = new Map<string, RawProduction | null>();
   $("main article").each((_, element) => {
     const article = $(element);
     const url = article.find('a[href*="/ohjelmisto/"]').last().attr("href");
     const title = cleanText(article.find("h1").first().text().replace(/­/g, ""));
     if (!url || !title) return;
     const externalId = slugFromUrl(url);
-    if (!externalId || externalId === "kalenteri") return;
-    results.set(externalId, rawProductionSchema.parse({ externalId, title, url, isVisiting: false }));
+    // The first card wins: a later card can link to the wrong page (Lukureivit → NAZA, Oct 2026).
+    if (!externalId || externalId === "kalenteri" || results.has(externalId)) return;
+    const skip = NOT_A_PRODUCTION.test(article.text().replace(/­/g, ""));
+    results.set(externalId, skip ? null : rawProductionSchema.parse({ externalId, title, url, isVisiting: false }));
   });
-  return [...results.values()];
+  return [...results.values()].filter((production): production is RawProduction => production !== null);
 }
 
 export interface CalendarRow {
@@ -90,7 +96,11 @@ interface PageDates {
   premiere?: Date;
 }
 
-/** "LOKAKUU 2026" headings followed by "to 1.10. klo 18.30 (ensi-ilta)" and "la 31.10. klo 13.00 ja 18.30". */
+/**
+ * "LOKAKUU 2026" headings followed by "to 1.10. klo 18.30 (ensi-ilta)", "la 31.10. klo 13.00
+ * ja 18.30" or, without "klo", "pe 23.10. 18.30 (+teosesittely klo 17.45 …)". Only lines
+ * that start with a weekday, so a talk's "klo 17.45" is never a show; "PERUTTU" is dropped.
+ */
 export function parsePageDates(text: string): PageDates {
   const result: PageDates = { performances: [] };
   let year: number | null = null;
@@ -100,8 +110,10 @@ export function parsePageDates(text: string): PageDates {
       year = Number(heading[2]);
       continue;
     }
-    const match = line.match(/(\d{1,2})\.(\d{1,2})\.\s*klo\s+([\d.:]+(?:\s*(?:ja|&|,)\s*[\d.:]+)*)/i);
-    if (!match || !year) continue;
+    const match = line.match(
+      /^(?:ma|ti|ke|to|pe|la|su)\s+(\d{1,2})\.(\d{1,2})\.\s*(?:klo\s+)?(\d{1,2}[.:]\d{2}(?:\s*(?:ja|&|,)\s*\d{1,2}[.:]\d{2})*)/i,
+    );
+    if (!match || !year || /\bperu(?:ttu|tettu)\b/i.test(line)) continue;
     const [, day, month, times] = match;
     for (const time of times.split(/\s*(?:ja|&|,)\s*/)) {
       const [hours, minutes] = time.split(/[.:]/);
@@ -129,33 +141,47 @@ export function mergePerformances(pageDates: Date[], calendar: CalendarRow[]): R
 
 type Page = cheerio.CheerioAPI;
 
-/** Lines like "Ohjaus <strong>Erkki Saarela</strong>": a short role, then the name in bold at the end. */
+/**
+ * Lines like "Ohjaus <strong>Erkki Saarela</strong>" or "Näyttämöllä <strong>A</strong>,
+ * <strong>B</strong> ja <strong>C</strong>": a short role, then the names from the first
+ * bold word on. Empty <strong>s around <br>s are common, so only bold text counts.
+ */
 function parseCredits($: Page): RawCredit[] {
   const credits: RawCredit[] = [];
   $("main p").each((_, element) => {
     for (const fragment of ($(element).html() ?? "").split(/<br\s*\/?>/i)) {
       const line = cheerio.load(`<div>${fragment}</div>`);
-      const name = cleanText(line("strong").last().text());
+      const firstName = line("strong")
+        .map((_, strong) => cleanText(line(strong).text()))
+        .get()
+        .find(Boolean);
       const text = cleanText(line("div").text());
-      if (!name || !text.endsWith(name)) continue;
-      const roleText = cleanText(text.slice(0, -name.length));
+      const start = firstName ? text.indexOf(firstName) : -1;
+      if (start < 0) continue;
+      const roleText = cleanText(text.slice(0, start));
       if (roleText.length < 3 || roleText.length > 40) continue;
       const roles = mapRoleText(roleText);
-      if (roles.length > 0 && !(roles.length === 1 && roles[0] === "OTHER")) credits.push({ name, roleText, roles });
+      if (roles.length === 0 || (roles.length === 1 && roles[0] === "OTHER")) continue;
+      for (const name of splitPeople(text.slice(start))) credits.push({ name, roleText, roles });
     }
   });
   return credits;
 }
 
-/** A quote followed by "– Selina Keränen / Apu" linking to the review; we keep only the link facts. */
+/**
+ * A quote followed by a link to the review; we keep only the link facts. Two bylines:
+ * "– Selina Keränen / Apu" (critic first) and "Helsingin Sanomat / Maria Säkö" (outlet first).
+ */
 function parseReviews($: Page): RawCriticReview[] {
   const reviews: RawCriticReview[] = [];
   $("main a").each((_, element) => {
     const text = cleanText($(element).text());
     const url = $(element).attr("href");
-    const match = text.match(/^[–-]\s*(.+?)\s*\/\s*(.+)$/);
-    if (!match || !url?.startsWith("http")) return;
-    reviews.push({ outlet: match[2], critic: match[1], url });
+    if (!url?.startsWith("http") || url.startsWith(BASE) || /lippu\.fi/.test(url)) return;
+    const criticFirst = text.match(/^[–-]\s*(.+?)\s*\/\s*(.+)$/);
+    const outletFirst = text.match(/^(\p{Lu}[^/]{1,40}?)\s*\/\s*(\p{Lu}[^/]{1,40})$/u);
+    if (criticFirst) reviews.push({ outlet: criticFirst[2], critic: criticFirst[1], url });
+    else if (outletFirst) reviews.push({ outlet: outletFirst[1], critic: outletFirst[2], url });
   });
   return reviews;
 }
@@ -176,7 +202,8 @@ export function parseDetail(
 ): RawProductionDetail {
   const $ = cheerio.load(html);
   const mainText = $("main")
-    .find("p, h1, h2, h3, blockquote")
+    // Month headings can be <h4>s with the dates in a sibling div.paragraph (Poiskatsojat).
+    .find("p, h1, h2, h3, h4, blockquote, div.paragraph")
     .map((_, element) => $(element).html() ?? "")
     .get()
     .join("\n")

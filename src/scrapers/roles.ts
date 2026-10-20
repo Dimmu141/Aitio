@@ -22,7 +22,7 @@ export function mapRoleText(roleText: string): CreditRoleName[] {
   const isAssistant = /assist|apulais|apuohjaa/.test(text);
   if (!isAssistant && /ohjaa|ohjaus|\bregi\b|regiss|\bdirect/.test(text)) roles.add("DIRECTOR");
   if (
-    /käsikirjoit|\bteksti\b|kirjoittaja|kirjailija|^näytelmä(?:$|[\s:,])|\bwriter|^av\b|^text\b|\bmanus\b|librett|alkuperäis|författ/.test(text)
+    /käsikirjoit|\bteksti\b|kirjoittaja|kirjailija|^näytelmä(?:$|[\s:,])|\bwriter|^av\b|^text\b|\bmanus\b|\bmanuskript\b|librett|alkuperäis|författ/.test(text)
   ) {
     roles.add("WRITER");
   }
@@ -33,11 +33,11 @@ export function mapRoleText(roleText: string): CreditRoleName[] {
   if (!conducts && /sävel|musiikki|kompo|\bmusik\b/.test(text)) roles.add("COMPOSER");
   if (/suomennos|käännös|översättning/.test(text)) roles.add("TRANSLATOR");
   if (!isAssistant && /koreograf/.test(text)) roles.add("CHOREOGRAPHER");
-  if (/suunnittel|design|lavastu|lavastaj|scenografi|kostym|puku|valo|ljus|ääni|ljud|naamio|mask|video/.test(text)) {
+  if (/suunnittel|design|lavastu|lavastaj|scenografi|skenograf|kostym|puku|valo|ljus|ääni|ljud|naamio|mask|video/.test(text)) {
     roles.add("DESIGNER");
   }
   // Dance credits name dancers and performers instead of roles.
-  if (/rooleissa|näyttämöllä|medverkande|ensemble|skådespel|tanssij|esiinty|näyttelij|^performance$|^cast$|dansare|dansar\b|performer|på scen/.test(text)) {
+  if (/rooleissa|näyttämöllä|\blavalla\b|medverkande|ensemble|skådespel|tanssij|esiinty|näyttelij|^performance$|^cast$|dansare|dansar\b|performer|på scen/.test(text)) {
     roles.add("CAST");
   }
   if (roles.size === 0) return skipped ? [] : ["OTHER"];

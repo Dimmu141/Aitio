@@ -23,6 +23,7 @@ export function pageMetadata({
   description,
   absoluteTitle = false,
   noindex = false,
+  indexedLocales,
 }: {
   locale: Locale;
   section?: Section;
@@ -33,6 +34,8 @@ export function pageMetadata({
   absoluteTitle?: boolean;
   /** Keep a thin page out of search results; its links are still followed. */
   noindex?: boolean;
+  /** Only these locales are offered as hreflang alternates (person pages: Finnish only). */
+  indexedLocales?: readonly Locale[];
 }): Metadata {
   const canonical = href(locale, section, slug);
   const image = { url: shareImagePath(locale, section, slug), ...OG_SIZE, alt: title };
@@ -40,7 +43,7 @@ export function pageMetadata({
     title: absoluteTitle ? { absolute: title } : title,
     description,
     ...(noindex ? { robots: { index: false, follow: true } } : {}),
-    alternates: { canonical, languages: { ...alternates(section, slug), "x-default": href("fi", section, slug) } },
+    alternates: { canonical, languages: { ...languageAlternates(section, slug, indexedLocales), "x-default": href("fi", section, slug) } },
     openGraph: {
       type: "website",
       siteName: "Aitio",
@@ -52,4 +55,9 @@ export function pageMetadata({
     },
     twitter: { card: "summary_large_image", title, description, images: [image] },
   };
+}
+
+function languageAlternates(section: Section | undefined, slug: string | undefined, only?: readonly Locale[]): Record<string, string> {
+  const all = alternates(section, slug);
+  return only ? Object.fromEntries(Object.entries(all).filter(([locale]) => (only as readonly string[]).includes(locale))) : all;
 }

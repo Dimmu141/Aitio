@@ -5,6 +5,7 @@ import { hasFullSchedule } from "@/scrapers/theatres";
 import { cardSelect, toCard } from "./cards";
 import {
   effectiveType,
+  canBeSeen,
   isClosingSoon,
   currentProductionCount,
   isCurrent,
@@ -91,7 +92,8 @@ export interface ProductionPage {
   ratings: RatingSummary;
   tags: Array<{ slug: string; labels: { fi: string; sv: string; en: string }; count: number }>;
   reviews: PublicReview[];
-  updatedAt: Date;
+  /** When the theatre's site was last read successfully ("tarkistettu"), not when this row changed. */
+  checkedAt: Date;
 }
 
 export interface ReviewLink {
@@ -121,7 +123,7 @@ export async function getProduction(slug: string): Promise<ProductionPage | null
   const row = await db.production.findUnique({
     where: { slug },
     include: {
-      theatre: { select: { slug: true, name: true, city: true, website: true } },
+      theatre: { select: { slug: true, name: true, city: true, website: true, sourceId: true } },
       stage: { select: { name: true } },
       performances: { include: { stage: { select: { name: true } } }, orderBy: { startsAt: "asc" } },
       credits: { include: { person: { select: { slug: true, name: true } } }, orderBy: { sortOrder: "asc" } },
@@ -143,6 +145,13 @@ export async function getProduction(slug: string): Promise<ProductionPage | null
     },
   });
   if (!row) return null;
+  const lastCheck = row.theatre.sourceId
+    ? await db.scrapeRun.findFirst({
+        where: { sourceId: row.theatre.sourceId, status: "SUCCESS" },
+        orderBy: { startedAt: "desc" },
+        select: { startedAt: true },
+      })
+    : null;
 
   // A production the theatre no longer lists has no performances to sell, whatever is stored.
   const upcoming = row.delistedAt ? [] : upcomingPerformances(row.performances, row, asOf);
@@ -157,7 +166,7 @@ export async function getProduction(slug: string): Promise<ProductionPage | null
     slug: row.slug,
     title: row.title,
     type: effectiveType(row),
-    theatre: row.theatre,
+    theatre: { slug: row.theatre.slug, name: row.theatre.name, city: row.theatre.city, website: row.theatre.website },
     stage: row.stage?.name ?? null,
     languages: row.languages,
     subtitleLangs: row.subtitleLangs,
@@ -178,7 +187,7 @@ export async function getProduction(slug: string): Promise<ProductionPage | null
     fullSchedule,
     closingSoon: isClosingSoon(timing, row.runEnd, fullSchedule, asOf),
     phase: life.phase,
-    started: life.started,
+    started: life.started && canBeSeen(row),
     year: life.year,
     credits: row.credits
       .filter((credit) => isCurrent(credit, row))
@@ -201,7 +210,7 @@ export async function getProduction(slug: string): Promise<ProductionPage | null
         seenOn: entry.seenOn,
         text: entry.review ?? "",
       })),
-    updatedAt: row.lastSeenAt,
+    checkedAt: lastCheck?.startedAt ?? row.lastSeenAt,
   };
 }
 

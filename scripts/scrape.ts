@@ -26,7 +26,7 @@ async function main(): Promise<void> {
   for (const id of selected) {
     try {
       const result = await runSource(db, ADAPTERS[id], { dryRun, limit });
-      console.log(`${id}: ${result.saved}/${result.found} processed, ${result.failed.length} failed${dryRun ? " (dry run, nothing saved)" : ""}`);
+      console.log(`${id}: ${result.saved}/${result.found} processed, ${result.failed.length} failed, ${result.warnings.length} warnings${dryRun ? " (dry run, nothing saved)" : ""}`);
     } catch (error) {
       exitCode = 1;
       console.error(`${id}: run failed: ${describeError(error)}`);

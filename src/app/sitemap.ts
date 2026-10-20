@@ -1,17 +1,23 @@
 import type { MetadataRoute } from "next";
-import { LOCALES, type Section } from "@/i18n/config";
+import { connection } from "next/server";
+import { LOCALES, type Locale, type Section } from "@/i18n/config";
 import { alternates } from "@/i18n/paths";
 import { getAllSlugs } from "@/lib/catalogue/queries";
-import { MIN_PRODUCTIONS_TO_INDEX } from "@/lib/catalogue/select";
+import { MIN_PRODUCTIONS_TO_INDEX, PERSON_INDEX_LOCALE } from "@/lib/catalogue/select";
 import { absoluteUrl } from "@/lib/site";
 
 type Entry = MetadataRoute.Sitemap[number];
 
 /** One entry per page and locale, each listing its siblings as hreflang alternates. */
-function entries(section: Section | undefined, slug: string | undefined, lastModified?: Date): Entry[] {
+function entries(
+  section: Section | undefined,
+  slug: string | undefined,
+  lastModified?: Date,
+  locales: readonly Locale[] = LOCALES,
+): Entry[] {
   const paths = alternates(section, slug);
-  const languages = Object.fromEntries(LOCALES.map((locale) => [locale, absoluteUrl(paths[locale])]));
-  return LOCALES.map((locale) => ({
+  const languages = Object.fromEntries(locales.map((locale) => [locale, absoluteUrl(paths[locale])]));
+  return locales.map((locale) => ({
     url: absoluteUrl(paths[locale]),
     lastModified,
     alternates: { languages },
@@ -19,6 +25,9 @@ function entries(section: Section | undefined, slug: string | undefined, lastMod
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  // Built per request (its data stays cached under the catalogue tag): prerendered, the file
+  // kept serving 19 Oct's lastmod dates after the next day's scrapes.
+  await connection();
   const { productions, theatres, people } = await getAllSlugs();
   return [
     ...entries(undefined, undefined),
@@ -28,6 +37,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...theatres.flatMap(({ slug, updatedAt }) => entries("teatteri", slug, updatedAt)),
     ...people
       .filter(({ productions }) => productions >= MIN_PRODUCTIONS_TO_INDEX)
-      .flatMap(({ slug }) => entries("henkilo", slug)),
+      .flatMap(({ slug }) => entries("henkilo", slug, undefined, [PERSON_INDEX_LOCALE])),
   ];
 }
