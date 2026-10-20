@@ -50,6 +50,8 @@ export interface RunResult {
   sourceId: string;
   found: number;
   saved: number;
+  /** Saved productions whose stored facts differ from the previous run (new ones included). */
+  changed: number;
   failed: Array<{ url: string; error: string }>;
   /** Listed by the theatre but its page answers 404: their broken link, not our failure. */
   missing: string[];
@@ -94,7 +96,7 @@ export async function runSource(
   options: RunOptions,
 ): Promise<RunResult> {
   const log = options.log ?? console.log;
-  const result: RunResult = { sourceId: adapter.id, found: 0, saved: 0, failed: [], missing: [], warnings: [] };
+  const result: RunResult = { sourceId: adapter.id, found: 0, saved: 0, changed: 0, failed: [], missing: [], warnings: [] };
 
   const theatre = db ? await db.theatre.findUnique({ where: { sourceId: adapter.id } }) : null;
   if (db && !theatre) throw new Error(`No theatre with sourceId "${adapter.id}". Run the seed first.`);
@@ -159,7 +161,8 @@ export async function runSource(
 
       const summary = await upsertProduction(db, theatre, detail, seenAt);
       result.saved += 1;
-      log(`  ${summary.created ? "+" : "~"} ${summary.slug} (${summary.performances} perf, ${summary.credits} credits)`);
+      if (summary.changed) result.changed += 1;
+      log(`  ${summary.created ? "+" : summary.changed ? "~" : "="} ${summary.slug} (${summary.performances} perf, ${summary.credits} credits)`);
       for (const warning of warnings) log(`    ! ${warning.rule}: ${warning.detail}`);
     }
 
@@ -176,7 +179,7 @@ export async function runSource(
           status: "SUCCESS",
           finishedAt: new Date(),
           itemsFound: result.found,
-          itemsChanged: result.saved,
+          itemsChanged: result.changed,
           errors:
             result.failed.length || result.missing.length ? { failed: result.failed, missing: result.missing } : undefined,
         },

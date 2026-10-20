@@ -45,7 +45,7 @@ describe.skipIf(!url)("upsertProduction (integration)", () => {
 
   it("creates the production with performances, people and credits", async () => {
     const summary = await upsertProduction(db, theatre, detail, new Date());
-    expect(summary).toMatchObject({ created: true, slug: "nattland-svenska-teatern", performances: 7 });
+    expect(summary).toMatchObject({ created: true, changed: true, slug: "nattland-svenska-teatern", performances: 7 });
 
     const saved = await db.production.findUniqueOrThrow({
       where: { slug: "nattland-svenska-teatern" },
@@ -83,6 +83,8 @@ describe.skipIf(!url)("upsertProduction (integration)", () => {
   it("is idempotent: a second run updates instead of duplicating", async () => {
     const summary = await upsertProduction(db, theatre, detail, new Date());
     expect(summary.created).toBe(false);
+    // Same page, same facts: only lastSeenAt moved, which is not a change.
+    expect(summary.changed).toBe(false);
     expect(await db.production.count()).toBe(1);
     expect(await db.performance.count()).toBe(7);
   });
@@ -98,7 +100,7 @@ describe.skipIf(!url)("upsertProduction (integration)", () => {
   it("keeps dropped performances and credits but leaves their lastSeenAt behind", async () => {
     const later = new Date(Date.now() + 60_000);
     const trimmed = { ...detail, performances: detail.performances.slice(1), credits: detail.credits.slice(1) };
-    await upsertProduction(db, theatre, trimmed, later);
+    expect((await upsertProduction(db, theatre, trimmed, later)).changed).toBe(true);
 
     const saved = await db.production.findUniqueOrThrow({
       where: { slug: "nattland-svenska-teatern" },

@@ -7,6 +7,8 @@ export interface UpsertSummary {
   productionId: string;
   slug: string;
   created: boolean;
+  /** Created, or any stored fact differs from before this run (see factsFingerprint). */
+  changed: boolean;
   performances: number;
   credits: number;
   reviews: number;
@@ -98,6 +100,44 @@ async function upsertCredit(
 }
 
 /**
+ * The production's facts as a stable string: its own fields and its current performances,
+ * credits and critic links, without the lastSeenAt bookkeeping every run rewrites. Equal
+ * before and after a save means the theatre's page said nothing new.
+ */
+async function factsFingerprint(db: PrismaClient, productionId: string): Promise<string> {
+  const production = await db.production.findUniqueOrThrow({
+    where: { id: productionId },
+    include: {
+      performances: { orderBy: { startsAt: "asc" } },
+      credits: { orderBy: [{ personId: "asc" }, { role: "asc" }] },
+      criticReviews: { orderBy: { url: "asc" } },
+    },
+  });
+  const current = (row: { lastSeenAt: Date }) => row.lastSeenAt.getTime() >= production.lastSeenAt.getTime();
+  return JSON.stringify([
+    production.title,
+    production.sourceUrl,
+    production.stageId,
+    production.type,
+    production.languages,
+    production.subtitleLangs,
+    production.premiereDate,
+    production.sourceUpdatedAt,
+    production.runStart,
+    production.runEnd,
+    production.durationText,
+    production.ticketUrl,
+    production.performances
+      .filter(current)
+      .map((row) => [row.startsAt, row.stageId, row.ticketUrl, row.subtitleLangs]),
+    production.credits
+      .filter(current)
+      .map((row) => [row.personId, row.role, row.roleText, row.characterName, row.sortOrder]),
+    production.criticReviews.map((row) => [row.url, row.outlet, row.critic, row.publishedAt, row.paywalled, row.feature]),
+  ]);
+}
+
+/**
  * Upsert one scraped production with its performances, credits and critic links.
  * Never deletes: performances and credits that disappeared simply keep their old
  * lastSeenAt, so readers can tell current rows from stale ones (see src/lib/current.ts).
@@ -112,6 +152,7 @@ export async function upsertProduction(
   const stage = await upsertStage(db, theatre.id, detail.stage);
   const key = { theatreId_externalId: { theatreId: theatre.id, externalId: detail.externalId } };
   const existing = await db.production.findUnique({ where: key });
+  const before = existing ? await factsFingerprint(db, existing.id) : null;
   const slug =
     existing?.slug ??
     (await uniqueProductionSlug(db, `${slugify(detail.title)}-${theatre.slug}`, theatre.id, detail.externalId));
@@ -200,6 +241,7 @@ export async function upsertProduction(
     productionId: production.id,
     slug: production.slug,
     created: !existing,
+    changed: before !== (await factsFingerprint(db, production.id)),
     performances: detail.performances.length,
     credits: creditCount,
     reviews: detail.criticReviews.length,
