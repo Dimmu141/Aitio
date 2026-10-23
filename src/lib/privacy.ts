@@ -7,7 +7,7 @@ import { RATE_LIMIT_RETENTION_DAYS } from "@/lib/ops/cleanup";
  * constants, so changing one changes the policy. Bump POLICY_DATE when the meaning
  * changes, and have a person who knows data protection read it before launch.
  */
-export const POLICY_DATE = new Date("2026-10-19T00:00:00Z");
+export const POLICY_DATE = new Date("2026-10-23T00:00:00Z");
 
 /** The database provider's restore window: deleted data lives on in backups this long. */
 export const BACKUP_DAYS = 7;
@@ -63,6 +63,19 @@ const PROCESSORS: Processor[] = [
       fi: "Yhdysvaltalainen yritys; tiedot säilytetään Frankfurtissa. Siirrot DPF:n ja vakiolausekkeiden perusteella.",
       sv: "Amerikanskt företag; uppgifterna lagras i Frankfurt. Överföringar enligt DPF och standardavtalsklausulerna.",
       en: "US company; data is stored in Frankfurt. Transfers under the DPF and the Standard Contractual Clauses.",
+    },
+  },
+  {
+    name: "GitHub Inc. (Microsoft)",
+    role: {
+      fi: "esitystietojen ja tekijöiden nimien haku teatterien sivuilta",
+      sv: "hämtning av föreställningsuppgifter och upphovspersonernas namn från teatrarnas webbplatser",
+      en: "collecting production details and credited names from the theatres' websites",
+    },
+    where: {
+      fi: "Yhdysvaltalainen yritys; haku ajetaan Yhdysvalloissa. Siirrot DPF:n ja vakiolausekkeiden perusteella.",
+      sv: "Amerikanskt företag; hämtningen körs i USA. Överföringar enligt DPF och standardavtalsklausulerna.",
+      en: "US company; the collection runs in the United States. Transfers under the DPF and the Standard Contractual Clauses.",
     },
   },
   {

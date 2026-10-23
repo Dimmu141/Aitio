@@ -134,6 +134,21 @@ pnpm launch:check .env.production.local   # must print "Ready"
 rm .env.production.local
 ```
 
+## 3b. GitHub Actions for the nightly scrape (since 23 Oct 2026)
+
+**you do this:** the scrape left Vercel Cron because it used up the Hobby plan's CPU and
+Vercel paused every project on the account (README "Status: CPU budget"). In GitHub,
+`dimmu141/aitio`, Settings, Secrets and variables, Actions:
+
+| Secrets | Variables |
+|---|---|
+| `DATABASE_URL` (the same pooled Neon URL as in Vercel) | `SITE_URL` = `https://omaaitio.fi` |
+| `REVALIDATE_SECRET` (the same as in Vercel) | `PRIVACY_EMAIL`, `ADMIN_EMAILS`, `EMAIL_FROM` (as in Vercel) |
+| `BREVO_API_KEY` | |
+
+**Check:** Actions, "Scrape", "Run workflow". The log lists every source, ends with
+"Page cache cleared." and the job is green; `/yllapito` shows the runs.
+
 ## 4. Legal
 
 - **you decide:** have someone who knows data protection read `/tietosuoja`
@@ -146,11 +161,11 @@ rm .env.production.local
 ## 5. First production run
 
 1. Deploy. Visit `/`, `/tietosuoja`, `/sitemap.xml`.
-2. Trigger each scrape once by hand, a minute apart:
-   `curl -H "Authorization: Bearer $CRON_SECRET" https://aitio.fi/api/cron/scrape/hkt`
+2. Run the scrape once by hand: GitHub, Actions, "Scrape", "Run workflow". For one source
+   only: `curl -H "Authorization: Bearer $CRON_SECRET" https://aitio.fi/api/cron/scrape/hkt`
 3. Open `/yllapito`: every source should show "Kunnossa" (OK).
 4. Trigger `/api/cron/cleanup` and, with yourself opted in, `/api/cron/digest`.
-5. **Check:** the next morning `/yllapito` shows six fresh runs from the cron.
+5. **Check:** the next morning `/yllapito` shows fresh runs for every source, and the "Scrape" workflow is green.
 
 ## After launch
 
