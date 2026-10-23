@@ -2,6 +2,7 @@ import "dotenv/config";
 import { db } from "../src/lib/db";
 import { moderate, moderationQueue } from "../src/lib/diary/service";
 import { productionTag } from "../src/lib/catalogue/tags";
+import { revalidateRemote } from "./revalidate";
 
 /**
  * Usage:
@@ -11,18 +12,9 @@ import { productionTag } from "../src/lib/catalogue/tags";
  * With SITE_URL and REVALIDATE_SECRET set, the production page updates immediately.
  */
 async function revalidate(slug: string): Promise<void> {
-  const site = process.env.SITE_URL;
-  const secret = process.env.REVALIDATE_SECRET;
-  if (!site || !secret) {
-    console.log("SITE_URL or REVALIDATE_SECRET not set: the page updates within the hour.");
-    return;
-  }
-  const response = await fetch(new URL("/api/revalidate", site), {
-    method: "POST",
-    headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ tags: [productionTag(slug)], immediate: true }),
-  });
-  console.log(response.ok ? "Page cache cleared." : `Cache clear failed: HTTP ${response.status}`);
+  const cleared = await revalidateRemote([productionTag(slug)]);
+  if (cleared === null) console.log("SITE_URL or REVALIDATE_SECRET not set: the page updates within the hour.");
+  else if (cleared) console.log("Page cache cleared.");
 }
 
 async function list(): Promise<void> {

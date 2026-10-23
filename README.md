@@ -4,7 +4,7 @@ A mobile-first website for logging, rating and discovering theatre in Finland: L
 
 ## Where things stand (20 Oct 2026)
 
-Live at https://omaaitio.fi (Vercel, functions in `fra1`; Neon in Frankfurt; Brevo for email). All milestones in `BRIEF.md` are built, 13 sources are scraped daily by Vercel Cron, and what's left before a public launch is in `LAUNCH.md`. The sections below are a log per milestone: each "Known gaps" list was written at the time, and items fixed since are marked **Resolved** with the date.
+Live at https://omaaitio.fi (Vercel, functions in `fra1`; Neon in Frankfurt; Brevo for email). All milestones in `BRIEF.md` are built, 13 sources are scraped nightly by GitHub Actions (Vercel Cron until 23 Oct 2026, see "Status: CPU budget"), and what's left before a public launch is in `LAUNCH.md`. The sections below are a log per milestone: each "Known gaps" list was written at the time, and items fixed since are marked **Resolved** with the date.
 
 Still open, across all milestones:
 
@@ -132,7 +132,7 @@ pnpm build && pnpm test:e2e             # smoke tests against the production bui
 | `BETTER_AUTH_SECRET` | production | signs session cookies; `openssl rand -base64 32` |
 | `SITE_URL` | production | public origin for links in emails, canonical URLs, sitemap |
 | `RESEND_API_KEY`, `EMAIL_FROM` | production | sends sign-in emails; without a key dev prints links to the console |
-| `REVALIDATE_SECRET` | optional | lets `pnpm moderation` (and later the scraper) clear cached pages at once |
+| `REVALIDATE_SECRET` | optional | lets `pnpm moderation` and the nightly scrape clear cached pages at once |
 | `DEV_EMAIL_LOG_FILE` | tests only | e2e tests read sign-in links from this file; refused on Vercel production |
 
 Sign in locally: `pnpm dev`, enter any address on `/kirjaudu`, copy the link from the terminal.
@@ -171,7 +171,7 @@ Every adapter has fixtures and tests (`src/scrapers/adapters/*.test.ts`); `fixtu
 
 ### Scheduling and monitoring
 
-- **Vercel Cron**: one job per theatre (`vercel.json`), daily 03:00–03:50 UTC, calling `/api/cron/scrape/<source>` with `Authorization: Bearer $CRON_SECRET`, up to 300 s each. `/api/cron/scrape/next` runs whichever source is most overdue, for a plan with fewer cron jobs.
+- **Vercel Cron** (until 23 Oct 2026, now GitHub Actions; see "Status: CPU budget"): one job per theatre (`vercel.json`), daily 03:00–03:50 UTC, calling `/api/cron/scrape/<source>` with `Authorization: Bearer $CRON_SECRET`, up to 300 s each. `/api/cron/scrape/next` runs whichever source is most overdue, for a plan with fewer cron jobs.
 - **Once a day** per source even if a cron retries; runs killed by the time limit are closed as failed; a successful run refreshes the cached catalogue.
 - **Alerts**: a failed or timed-out run, or one that lost over a quarter of its detail pages, emails `ADMIN_EMAILS`.
 - **`/yllapito`** (admins only, Finnish): health and history per source, a type-override list for productions the classifier was unsure about, and the moderation queue.
@@ -193,7 +193,7 @@ Every adapter has fixtures and tests (`src/scrapers/adapters/*.test.ts`); `fixtu
 ### Known gaps
 
 - **Live scrape**: **Resolved 18 Oct 2026**, the Firecrawl fixtures were replaced with live server HTML and the parsers fixed.
-- **Vercel plan limits**: **Resolved 18 Oct 2026**, Hobby allows 100 daily cron jobs of up to 300 s (`LAUNCH.md` step 3).
+- **Vercel plan limits**: **Resolved 18 Oct 2026**, Hobby allows 100 daily cron jobs of up to 300 s (`LAUNCH.md` step 3). The cron count was never the problem; CPU was (see "Status: CPU budget").
 - **Espoo shows only its next few performances**, so its productions list only those, with the theatre's own ticket link for the rest.
 - **Kansallisteatteri subtitles**: **Resolved 18 Oct 2026**.
 - **No production type for circus, puppetry or game performances**; they come out as OTHER and wait in the admin's type list. Since 20 Oct 2026 a source's own "other" (the Opera's "Muuta") stops the guess from credits, so a circus piece with a director is no longer called a play.
@@ -276,3 +276,24 @@ After comparing Aitio with foreign listing sites (Official London Theatre, Berli
 
 - **No reminder for shows on the list that aren't closing.** The email covers "closing soon" only; "your saved show opens next week" would need its own rule.
 - **The button doesn't know you've already saved the show**, because the page is static. Saving twice is harmless and lands on the list.
+
+## Status: CPU budget (23 Oct 2026)
+
+Vercel paused every project on the account: Hobby includes a few hours of Fluid Active CPU a month, shared by all projects, and from 18 Oct Aitio alone used about 9 minutes a day (roughly 4.5 hours a month), on top of the other sites. Almost none of it was visitors: it was the 13 nightly scrapes and the cache clears after them.
+
+| What | Where |
+|---|---|
+| The nightly scrape runs on GitHub Actions at 02:40 UTC, every source in one job, with the same once-a-day rule, run log and admin alerts as before | `.github/workflows/scrape.yml`, `scripts/scheduled-scrape.ts` (`pnpm scrape:scheduled [sourceId ...]`) |
+| The page cache is cleared once after all sources (via `/api/revalidate`), not 13 times | `scripts/revalidate.ts` |
+| Vercel keeps only the weekly digest and the daily cleanup, whose overdue alert now also catches a scrape workflow that didn't run | `vercel.json` |
+| `/api/cron/scrape/<source>` stays for a one-off run by hand and clears the cache itself | `src/app/api/cron/scrape/[source]/route.ts` |
+| GitHub is listed as a processor in the privacy policy (it handles credited names) | `src/lib/privacy.ts` |
+
+The workflow needs repository secrets `DATABASE_URL`, `REVALIDATE_SECRET` and `BREVO_API_KEY`, and variables `SITE_URL`, `PRIVACY_EMAIL`, `ADMIN_EMAILS` and `EMAIL_FROM` (`LAUNCH.md` step 3b). Run it by hand from the Actions tab ("Run workflow", optionally with source ids).
+
+### Known gaps
+
+- **GitHub disables scheduled workflows after 60 days without commits.** The overdue alert at 06:15 UTC would email the admins; re-enable the workflow in the Actions tab.
+- **The runner is in the US and Neon in Frankfurt**, so each database round trip takes about 100 ms. The run is still dominated by the one-request-per-second fetch rule.
+- **Pages still expire every hour** (`cacheLife("hours")`). Before launch that costs little; with real traffic, a longer life for detail pages is the next saving.
+

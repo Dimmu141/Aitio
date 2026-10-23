@@ -1,5 +1,3 @@
-import { revalidateTag } from "next/cache";
-import { CATALOGUE_TAG } from "@/lib/catalogue/queries";
 import { db } from "@/lib/db";
 import { sendEmail } from "@/lib/email";
 import { absoluteUrl } from "@/lib/site";
@@ -20,7 +18,9 @@ export interface ScrapeOutcome {
 
 /**
  * One scheduled run of one source: close runs that died, respect the once-a-day rule,
- * scrape, refresh the cached catalogue, and email the admins if the result looks wrong.
+ * scrape, and email the admins if the result looks wrong. Clearing the page cache is the
+ * caller's job: the nightly script (scripts/scheduled-scrape.ts) does it once after all
+ * sources, since every clear makes the whole site re-render (Vercel CPU, 23 Oct 2026).
  * `sourceId` "next" picks the source whose last run is oldest (single-cron setups).
  */
 export async function scheduledScrape(sourceId: string, now = new Date()): Promise<ScrapeOutcome> {
@@ -42,9 +42,6 @@ export async function scheduledScrape(sourceId: string, now = new Date()): Promi
 
   const latest = (await recentRuns(5)).find((run) => run.sourceId === id);
   outcome.health = health(latest, new Date());
-  // expire 0, not "max": with "max" the first visitor after a scrape still got the old page,
-  // and an unvisited page kept the old "päivitetty" date (20 Oct 2026).
-  if (!outcome.error) revalidateTag(CATALOGUE_TAG, { expire: 0 });
   if (needsAlert(outcome.health)) await alertAdmins(outcome, log);
   return outcome;
 }

@@ -15,6 +15,7 @@
     "db:seed": "prisma db seed",
     "db:seed:fixtures": "tsx scripts/seed-fixtures.ts",
     "scrape": "tsx scripts/scrape.ts",
+    "scrape:scheduled": "tsx scripts/scheduled-scrape.ts",
     "fixtures:refresh": "tsx scripts/refresh-fixtures.ts",
     "postinstall": "prisma generate",
     "test:e2e": "playwright test",

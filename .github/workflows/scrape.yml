@@ -1,0 +1,52 @@
+# The nightly scrape. It ran as 13 Vercel Cron jobs until 23 Oct 2026, when it used more
+# Fluid CPU than the Hobby plan allows and Vercel paused every project on the account.
+# Here the CPU is GitHub's; Vercel only serves pages and clears its cache once at the end.
+#
+# Repository secrets: DATABASE_URL (Neon, pooled), REVALIDATE_SECRET, BREVO_API_KEY.
+# Repository variables: SITE_URL, PRIVACY_EMAIL, ADMIN_EMAILS, EMAIL_FROM.
+name: Scrape
+
+on:
+  schedule:
+    # 02:40 UTC is 04:40/05:40 in Helsinki. GitHub may start it late; the cleanup cron
+    # on Vercel (06:15 UTC) emails the admins when a source goes without a fresh run.
+    - cron: "40 2 * * *"
+  workflow_dispatch:
+    inputs:
+      sources:
+        description: "Source ids separated by spaces (empty: all)"
+        required: false
+        default: ""
+
+concurrency:
+  group: scrape
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      REVALIDATE_SECRET: ${{ secrets.REVALIDATE_SECRET }}
+      BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+      SITE_URL: ${{ vars.SITE_URL }}
+      PRIVACY_EMAIL: ${{ vars.PRIVACY_EMAIL }}
+      ADMIN_EMAILS: ${{ vars.ADMIN_EMAILS }}
+      EMAIL_FROM: ${{ vars.EMAIL_FROM }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Scrape
+        env:
+          SOURCES: ${{ inputs.sources }}
+        # Unquoted on purpose: one argument per source id.
+        run: pnpm scrape:scheduled $SOURCES
