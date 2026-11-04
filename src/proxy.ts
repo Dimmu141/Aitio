@@ -1,6 +1,6 @@
 import { getSessionCookie } from "better-auth/cookies";
 import { type NextRequest, NextResponse } from "next/server";
-import { resolvePublicPath } from "@/i18n/paths";
+import { homeRoute, resolvePublicPath } from "@/i18n/paths";
 import { AUTH_COOKIE_PREFIX } from "@/lib/auth-config";
 import { signInRedirect } from "@/lib/auth-gate";
 
@@ -22,6 +22,13 @@ export function proxy(request: NextRequest): NextResponse {
   const hasSession = getSessionCookie(request, { cookiePrefix: AUTH_COOKIE_PREFIX }) !== null;
   const signIn = signInRedirect(internal, `${pathname}${search}`, hasSession);
   if (signIn) return NextResponse.redirect(new URL(signIn, request.url), 307);
+
+  const home = homeRoute(internal, request.nextUrl.searchParams);
+  if (home === "missing") return new NextResponse("Not found", { status: 404 });
+  if (home) {
+    url.pathname = home;
+    return NextResponse.rewrite(url);
+  }
 
   if (resolution.kind === "pass") return NextResponse.next();
   url.pathname = internal;

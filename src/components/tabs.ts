@@ -1,5 +1,5 @@
 import type { Locale } from "@/i18n/config";
-import { href } from "@/i18n/paths";
+import { href, STATIC_HOME } from "@/i18n/paths";
 
 export const TABS = ["programme", "search", "diary", "settings"] as const;
 export type Tab = (typeof TABS)[number];
@@ -20,7 +20,7 @@ export function activeTab(pathname: string, locale: Locale): Tab | null {
     href(locale, section),
     `/${locale}/${section}`,
   ]);
-  const home = [href(locale), `/${locale}`];
+  const home = [href(locale), `/${locale}`, `/${locale}/${STATIC_HOME}`];
   if (home.includes(pathname) || programme.some((base) => within(pathname, base))) return "programme";
   return null;
 }
