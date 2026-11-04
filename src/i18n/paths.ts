@@ -82,3 +82,20 @@ export function switchLocalePath(pathname: string, target: Locale): string {
   const section = SECTIONS.find((candidate) => candidate === segment);
   return section ? href(target, section, slug === undefined ? undefined : decodeURIComponent(slug)) : href(target);
 }
+
+/** Internal segment of the prerendered front page (src/app/[locale]/ohjelma). */
+export const STATIC_HOME = "ohjelma";
+
+/**
+ * Where the proxy sends an internal path: the bare front page goes to its prerendered
+ * twin, and the twin's own URL is not a page ("missing"). Any query string other than
+ * the router's `_rsc` keeps the per-request page, which reads the filters.
+ */
+export function homeRoute(internal: string, searchParams: URLSearchParams): string | "missing" | null {
+  const [locale, segment, ...rest] = internal.split("/").filter(Boolean);
+  if (!locale || !isLocale(locale)) return null;
+  if (segment === STATIC_HOME) return "missing";
+  if (segment !== undefined || rest.length > 0) return null;
+  const keys = [...searchParams.keys()].filter((key) => key !== "_rsc");
+  return keys.length === 0 ? `/${locale}/${STATIC_HOME}` : null;
+}

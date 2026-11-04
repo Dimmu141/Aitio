@@ -28,7 +28,7 @@ function Row({ row, slug, asOf, locale, t }: RowProps) {
           {when}
         </time>
         {meta.length > 0 && <span className="ai-perf__stage">{meta.join(" · ")}</span>}
-        <a href={calendarHref(slug, row.startsAt, locale)} className="ai-perf__cal" aria-label={`${t.production.addToCalendar}: ${when}`}>
+        <a href={calendarHref(slug, row.startsAt, locale)} rel="nofollow" className="ai-perf__cal" aria-label={`${t.production.addToCalendar}: ${when}`}>
           <span aria-hidden="true">＋&nbsp;</span>
           {t.production.addToCalendar}
         </a>

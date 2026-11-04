@@ -56,7 +56,7 @@ export async function GET(request: NextRequest): Promise<Response> {
     headers: {
       "Content-Type": "text/calendar; charset=utf-8",
       "Content-Disposition": `attachment; filename="${slug}-${performance.startsAt.toISOString().slice(0, 10)}.ics"`,
-      "Cache-Control": "public, max-age=3600",
+      "Cache-Control": "public, max-age=3600, s-maxage=3600",
     },
   });
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { alternates, href, resolvePublicPath, switchLocalePath } from "./paths";
+import { alternates, homeRoute, href, resolvePublicPath, switchLocalePath } from "./paths";
 
 describe("href", () => {
   it("leaves Finnish unprefixed and translates segments", () => {
@@ -57,5 +57,23 @@ describe("switchLocalePath", () => {
     ["/en/teatteri/y", "sv", "/sv/teater/y"],
   ] as const)("%s → %s", (pathname, target, expected) => {
     expect(switchLocalePath(pathname, target)).toBe(expected);
+  });
+});
+
+describe("homeRoute", () => {
+  const none = new URLSearchParams();
+  it("sends the bare front page to its prerendered twin", () => {
+    expect(homeRoute("/fi", none)).toBe("/fi/ohjelma");
+    expect(homeRoute("/sv", new URLSearchParams("_rsc=abc"))).toBe("/sv/ohjelma");
+  });
+  it("keeps the per-request page for filters", () => {
+    expect(homeRoute("/fi", new URLSearchParams("when=week"))).toBeNull();
+  });
+  it("leaves other pages alone and hides the twin's own URL", () => {
+    expect(homeRoute("/fi/esitys/x", none)).toBeNull();
+    expect(homeRoute("/en/ohjelma", none)).toBe("missing");
+  });
+  it("switches language from the twin to the other front page", () => {
+    expect(switchLocalePath("/fi/ohjelma", "sv")).toBe("/sv");
   });
 });
